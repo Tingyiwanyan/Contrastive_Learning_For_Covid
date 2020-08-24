@@ -72,7 +72,7 @@ class dynamic_hgm():
         self.bias_output_gate = tf.Variable(self.init_output_gate(shape=(self.latent_dim,)))
 
         """
-        Define LSTM variables plus attenstion
+        Define LSTM variables plus attention
         """
         self.init_hiddenstate_att = tf.keras.backend.placeholder([None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.latent_dim])
         self.input_x_vital_att = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.item_size])
@@ -176,7 +176,7 @@ class dynamic_hgm():
                 
 
     def demo_layer(self):
-        self.Dense_demo = tf.layers.dense(inputs=self.input_x_demo,
+        self.Dense_demo = tf.keras.layers.Dense(inputs=self.input_x_demo,
                                             units=self.latent_dim_demo,
                                             kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                             activation=tf.nn.relu)
@@ -188,7 +188,7 @@ class dynamic_hgm():
         idx_origin = tf.constant([0])
         self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
         self.patient_lstm = tf.gather(self.hidden_last_comb,idx_origin,axis=1)
-        self.output_layer = tf.layers.dense(inputs=self.patient_lstm,
+        self.output_layer = tf.keras.layers.Dense(inputs=self.patient_lstm,
                                            units=2,
                                            kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                            activation=tf.nn.relu)

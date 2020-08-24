@@ -107,7 +107,7 @@ class LSTM_model():
         self.check = concat_cur
     
     def demo_layer(self):
-        self.Dense_demo = tf.layers.dense(inputs=self.input_demo,
+        self.Dense_demo = tf.keras.layers.Dense(inputs=self.input_demo,
                                             units=self.latent_dim_demo,
                                             kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                             activation=tf.nn.relu)
@@ -120,7 +120,7 @@ class LSTM_model():
         Implement softmax loss layer
         """
         self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
-        self.output_layer = tf.layers.dense(inputs=self.hidden_last_comb,
+        self.output_layer = tf.keras.layers.Dense(inputs=self.hidden_last_comb,
                                            units=2,
                                            kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                            activation=tf.nn.relu)

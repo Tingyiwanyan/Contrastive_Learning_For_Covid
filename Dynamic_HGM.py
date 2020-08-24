@@ -74,9 +74,9 @@ class dynamic_hgm():
         """
         Define LSTM variables plus attenstion
         """
-        self.init_hiddenstate_att = tf.keras.backend.placeholder([None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
-        self.input_x_vital_att = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
-        self.input_x_lab_att = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
+        self.init_hiddenstate_att = tf.keras.backend.placeholder([None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.latent_dim])
+        self.input_x_vital_att = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.item_size])
+        self.input_x_lab_att = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.lab_size])
         self.input_x_att = tf.concat([self.input_x_vital_att,self.input_x_lab_att],3)
         self.input_x_demo_att = tf.keras.backend.placeholder([None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.demo_size])
 

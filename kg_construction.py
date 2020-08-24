@@ -370,17 +370,17 @@ if __name__ == "__main__":
     #kg.create_kg_dic()
     
      
-    with open('dic_patient.json', 'r') as fp:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_patient.json', 'r') as fp:
         kg.dic_patient = json.load(fp)
-    with open('dic_vital.json','r') as tp:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_vital.json','r') as tp:
         kg.dic_vital = json.load(tp)
-    with open('total_data.txt','r') as filehand:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/total_data.txt','r') as filehand:
         kg.total_data = json.load(filehand)
-    with open('dic_demographic.json','r') as fp_:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_demographic.json','r') as fp_:
         kg.dic_demographic = json.load(fp_)
-    with open('dic_race.json','r') as tp_:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_race.json','r') as tp_:
         kg.dic_race = json.load(tp_)
-    with open('dic_lab.json','r') as lab:
+    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_lab.json','r') as lab:
         kg.dic_lab = json.load(lab)
     
     for i in kg.dic_lab.keys():

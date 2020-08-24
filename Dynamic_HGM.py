@@ -219,6 +219,14 @@ class dynamic_hgm():
         self.Dense_lab = tf.math.add(self.Dense_lab_,self.relation_lab)
         """
 
+    def build_att_mortality(self):
+        """
+        build attention model for mortality node
+        """
+        self.att_skip_latent = tf.matmul(self.x_att_skip,self.weight_att_W)
+
+
+
 
     def get_latent_rep_hetero(self):
         """

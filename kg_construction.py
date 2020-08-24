@@ -366,7 +366,7 @@ class Kg_construct_ehr():
 
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
-    kg.read_csv()
+    #kg.read_csv()
     #kg.create_kg_dic()
     
      

@@ -30,12 +30,12 @@ class MLP_model():
         """
         define variables
         """
-        self.input_y_logit = tf.keras.backend.placeholder(tf.float32,[None,2])
-        self.input_x_vital = tf.keras.backend.placeholder(tf.float32,[None,self.item_size])
-        self.input_x_lab = tf.keras.backend.placeholder(tf.float32,[None,self.lab_size])
+        self.input_y_logit = tf.keras.backend.placeholder([None,2])
+        self.input_x_vital = tf.keras.backend.placeholder([None,self.item_size])
+        self.input_x_lab = tf.keras.backend.placeholder([None,self.lab_size])
         self.input_x_ = tf.concat([self.input_x_vital,self.input_x_lab],1)
-        self.input_demo_ = tf.keras.backend.placeholder(tf.float32,[None,self.demo_size])
-        self.input_x_com = tf.keras.backend.placeholder(tf.float32,[None,self.com_size])
+        self.input_demo_ = tf.keras.backend.placeholder([None,self.demo_size])
+        self.input_x_com = tf.keras.backend.placeholder([None,self.com_size])
         self.input_demo = tf.concat([self.input_demo_,self.input_x_com],1)
         self.input_x = tf.concat([self.input_x_,self.input_demo],1)
 

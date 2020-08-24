@@ -43,13 +43,13 @@ class dynamic_hgm():
         """
         define LSTM variables
         """
-        self.init_hiddenstate = tf.placeholder(tf.float32, [None, 1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
-        self.input_y_logit = tf.placeholder(tf.float32, [None, 2])
-        self.input_x_vital = tf.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.item_size])
-        self.input_x_lab = tf.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.lab_size])
+        self.init_hiddenstate = tf.compat.v1.placeholder(tf.float32, [None, 1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
+        self.input_y_logit = tf.compat.v1.placeholder(tf.float32, [None, 2])
+        self.input_x_vital = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.item_size])
+        self.input_x_lab = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.lab_size])
         self.input_x = tf.concat([self.input_x_vital,self.input_x_lab],3)
-        self.input_x_demo = tf.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size,self.demo_size])
-        self.input_x_com = tf.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size,self.com_size])
+        self.input_x_demo = tf.compat.v1.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size,self.demo_size])
+        self.input_x_com = tf.compat.v1.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size,self.com_size])
         #self.input_x_demo = tf.concat([self.input_x_demo_,self.input_x_com],2)
         self.init_forget_gate = tf.keras.initializers.he_normal(seed=None)
         self.init_info_gate = tf.keras.initializers.he_normal(seed=None)
@@ -74,11 +74,11 @@ class dynamic_hgm():
         """
         Define LSTM variables plus attenstion
         """
-        self.init_hiddenstate_att = tf.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
-        self.input_x_vital_att = tf.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
-        self.input_x_lab_att = tf.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
+        self.init_hiddenstate_att = tf.compat.v1.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
+        self.input_x_vital_att = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
+        self.input_x_lab_att = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,latent_dim])
         self.input_x_att = tf.concat([self.input_x_vital_att,self.input_x_lab_att],3)
-        self.input_x_demo_att = tf.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.demo_size])
+        self.input_x_demo_att = tf.compat.v1.placeholder(tf.float32,[None,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.demo_size])
 
         """
         Define relation model
@@ -89,14 +89,14 @@ class dynamic_hgm():
         """
         Define parameters
         """
-        self.mortality = tf.placeholder(tf.float32,[None,2,2])
+        self.mortality = tf.compat.v1.placeholder(tf.float32,[None,2,2])
         self.init_weight_mortality = tf.keras.initializers.he_normal(seed=None)
         self.weight_mortality = \
             tf.Variable(self.init_weight_mortality(shape=(2,self.latent_dim+self.latent_dim_demo)))
         self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.latent_dim+self.latent_dim_demo,)))
 
         self.lab_test = \
-            tf.placeholder(tf.float32,[None,self.positive_lab_size+self.negative_lab_size,self.item_size])
+            tf.compat.v1.placeholder(tf.float32,[None,self.positive_lab_size+self.negative_lab_size,self.item_size])
         self.weight_lab = \
             tf.Variable(self.init_weight_mortality(shape=(self.item_size,self.latent_dim)))
         self.bias_lab = tf.Variable(self.init_weight_mortality(shape=(self.latent_dim,)))

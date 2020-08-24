@@ -181,6 +181,12 @@ class dynamic_hgm():
                                             kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                             activation=tf.nn.relu)
 
+    def demo_layer_att(self):
+        self.Dense_demo = tf.compat.v1.layers.dense(inputs=self.input_x_demo_att,
+                                            units=self.latent_dim_demo,
+                                            kernel_initializer=tf.keras.initializers.he_normal(seed=None),
+                                            activation=tf.nn.relu)
+
     def softmax_loss(self):
         """
         Implement softmax loss layer

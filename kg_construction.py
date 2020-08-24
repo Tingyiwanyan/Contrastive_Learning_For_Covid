@@ -15,7 +15,7 @@ class Kg_construct_ehr():
     construct knowledge graph out of EHR data
     """
     def __init__(self):
-        file_path = '/datadrive/user_tingyi.wanyan/tensorflow_venv/registry_2020-06-29'
+        file_path = '/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/registry_2020-06-29'
         self.reg = file_path + '/registry.csv'
         self.covid_lab = file_path + '/covid19LabTest.csv'
         self.lab = file_path + '/Lab.csv'
@@ -29,13 +29,13 @@ class Kg_construct_ehr():
         self.covid_labtest = pd.read_csv(self.covid_lab)
         self.labtest = pd.read_csv(self.lab)
         self.vital_sign = pd.read_csv(self.vital)
-        self.comorbidity = pd.read_csv(self.file_path_comorbidity)
-        self.lab_comb = pd.read_csv(self.lab_comb)
+        #self.comorbidity = pd.read_csv(self.file_path_comorbidity)
+        #self.lab_comb = pd.read_csv(self.lab_comb)
         self.reg_ar = np.array(self.registry)
         self.covid_ar = np.array(self.covid_labtest)
         self.labtest_ar = np.array(self.labtest)
         self.vital_sign_ar = np.array(self.vital_sign)
-        self.lab_comb_ar = np.array(self.lab_comb)
+        #self.lab_comb_ar = np.array(self.lab_comb)
     
     def create_kg_dic(self):
         self.dic_patient = {}
@@ -366,7 +366,7 @@ class Kg_construct_ehr():
 
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
-    #kg.read_csv()
+    kg.read_csv()
     #kg.create_kg_dic()
     
      
@@ -459,6 +459,7 @@ if __name__ == "__main__":
             age_total.append(age)
     kg.age_mean = np.mean(age_total)
     kg.age_std = np.std(age_total)
+    """
     com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)
     com_ar_rough = np.concatenate(np.array(com))
@@ -475,6 +476,7 @@ if __name__ == "__main__":
     com_mapping_ar = np.array(com_mapping)
 
     kg.com_mapping_ar = com_mapping_ar
+    """
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
     LSTM_ = LSTM_model(kg,process_data)

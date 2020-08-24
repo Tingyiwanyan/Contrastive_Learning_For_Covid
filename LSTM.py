@@ -37,10 +37,10 @@ class LSTM_model():
         """
         define LSTM variables
         """
-        self.init_hiddenstate = tf.compat.v1.placeholder(tf.float32, [None, self.latent_dim])
-        self.input_y_logit = tf.compat.v1.placeholder(tf.float32, [None, 2])
-        self.input_x_vital = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,self.item_size])
-        self.input_x_lab = tf.compat.v1.placeholder(tf.float32,[None,self.time_sequence,self.lab_size])
+        self.init_hiddenstate = tf.keras.backend.placeholder([None, self.latent_dim])
+        self.input_y_logit = tf.keras.backend.placeholder([None, 2])
+        self.input_x_vital = tf.keras.backend.placeholder([None,self.time_sequence,self.item_size])
+        self.input_x_lab = tf.keras.backend.placeholder([None,self.time_sequence,self.lab_size])
         self.input_x = tf.concat([self.input_x_vital,self.input_x_lab],2)
         #self.input_y_diag_single = tf.placeholder(tf.float32,[None,self.diagnosis_size])
         #self.input_y_diag = tf.placeholder(tf.float32,[None,self.time_sequence,self.diagnosis_size])
@@ -70,8 +70,8 @@ class LSTM_model():
         """
         define input demographic and comorbidity features
         """
-        self.input_demo_ = tf.compat.v1.placeholder(tf.float32,[None,self.demo_size])
-        self.input_x_com = tf.compat.v1.placeholder(tf.float32,[None,self.com_size])
+        self.input_demo_ = tf.keras.backend.placeholder([None,self.demo_size])
+        self.input_x_com = tf.keras.backend.placeholder([None,self.com_size])
         self.input_demo = tf.concat([self.input_demo_,self.input_x_com],1)
 
 

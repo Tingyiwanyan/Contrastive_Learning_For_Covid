@@ -286,7 +286,7 @@ class dynamic_hgm():
 
         att_idx_skip = tf.constant([i+self.positive_lab_size+self.negative_lab_size+1 for i in range(self.neighbor_pick_skip)])
         self.x_att_skip = tf.gather(self.Dense_patient,att_idx_skip)
-        att_idx_neg = tf.constant([i+self.positive_lab_size+self.negative_lab_size+self.negibor_pick_skip+1 for i in range(self.neighbor_pick_neg)])
+        att_idx_neg = tf.constant([i+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+1 for i in range(self.neighbor_pick_neg)])
         self.x_att_neg = tf.gather(self.Dense_patient,att_idx_neg)
 
 

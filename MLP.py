@@ -40,12 +40,12 @@ class MLP_model():
         self.input_x = tf.concat([self.input_x_,self.input_demo],1)
 
     def embed_layer(self):
-        self.Dense_embed = tf.keras.layers.Dense(inputs=self.input_x,
+        self.Dense_embed = tf.compat.v1.layers.dense(inputs=self.input_x,
                                             units=self.latent_dim,
                                             kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                             activation=tf.nn.relu)
     def softmax_loss(self):
-        self.output_layer = tf.keras.layers.Dense(inputs=self.Dense_embed,
+        self.output_layer = tf.compat.v1.layers.dense(inputs=self.Dense_embed,
                                             units=2,
                                             kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                             activation=tf.nn.relu)

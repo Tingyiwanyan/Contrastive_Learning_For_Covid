@@ -633,7 +633,7 @@ class dynamic_hgm():
 
         return train_one_batch,one_batch_logit, train_one_batch_mortality
 
-    def get_pos_neg_neighbor(self):
+    #def get_pos_neg_neighbor(self):
         
 
     def train(self):

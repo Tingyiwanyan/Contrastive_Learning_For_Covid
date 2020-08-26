@@ -230,7 +230,12 @@ class dynamic_hgm():
         build attention model for mortality node
         """
         self.att_skip_latent = tf.matmul(self.x_att_skip,self.weight_att_W)
-        self.concat_att = tf.concat([self.x_att_skip,self.att_skip_latent],axis=2)
+        self.concat_att_skip = tf.concat([self.x_att_skip,self.att_skip_latent],axis=2)
+        self.concat_att_skip_center = tf.concat([self.x_skip_mor,self.concat_att_skip],axis=1)
+
+        self.att_neg_latent = tf.matmul(self.x_att_neg,self.weight_att_W)
+        self.concat_att_neg = tf.concat([self.x_att_neg,self.att_neg_latent],axis=2)
+        self.concat_att_neg_center = tf.concat([self.x_negative_mor,self.concat_att_neg],axis=1)
 
 
 
@@ -243,9 +248,9 @@ class dynamic_hgm():
         #self.x_origin = self.hidden_last
 
         idx_skip_mortality = tf.constant([0])
-        self.x_skip = tf.gather(self.Dense_mortality,idx_skip_mortality,axis=1)
+        self.x_skip_mor = tf.gather(self.Dense_mortality,idx_skip_mortality,axis=1)
         idx_neg_mortality = tf.constant([1])
-        self.x_negative = tf.gather(self.Dense_mortality,idx_neg_mortality,axis=1)
+        self.x_negative_mor = tf.gather(self.Dense_mortality,idx_neg_mortality,axis=1)
 
         """
         item_idx_skip = tf.constant([i+1 for i in range(self.positive_lab_size)])
@@ -261,8 +266,8 @@ class dynamic_hgm():
         patient_idx_negative = tf.constant([i+self.positive_lab_size+1 for i in range(self.negative_lab_size)])
         self.x_negative_patient = tf.gather(self.Dense_patient,patient_idx_negative,axis=1)
 
-        self.x_skip = tf.concat([self.x_skip,self.x_skip_patient],axis=1)
-        self.x_negative = tf.concat([self.x_negative,self.x_negative_patient],axis=1)
+        self.x_skip = tf.concat([self.x_skip_mor,self.x_skip_patient],axis=1)
+        self.x_negative = tf.concat([self.x_negative_mor,self.x_negative_patient],axis=1)
 
     def get_latent_rep_hetero_att(self):
         """
@@ -272,17 +277,17 @@ class dynamic_hgm():
         self.x_origin = tf.gather(self.Dense_patient,idx_origin,axis=1)
 
         idx_skip_mortality = tf.constant([0])
-        self.x_skip = tf.gather(self.Dense_mortality,idx_skip_mortality,axis=1)
+        self.x_skip_mor = tf.gather(self.Dense_mortality,idx_skip_mortality,axis=1)
         idx_neg_mortality = tf.constant([1])
-        self.x_negative = tf.gather(self.Dense_mortality,idx_neg_mortality,axis=1)
+        self.x_negative_mor = tf.gather(self.Dense_mortality,idx_neg_mortality,axis=1)
 
         patient_idx_skip = tf.constant([i+1 for i in range(self.positive_lab_size)])
         self.x_skip_patient = tf.gather(self.Dense_patient,patient_idx_skip,axis=1)
         patient_idx_negative = tf.constant([i+self.positive_lab_size+1 for i in range(self.negative_lab_size)])
         self.x_negative_patient = tf.gather(self.Dense_patient,patient_idx_negative,axis=1)
 
-        self.x_skip = tf.concat([self.x_skip,self.x_skip_patient],axis=1)
-        self.x_negative = tf.concat([self.x_negative,self.x_negative_patient],axis=1)
+        self.x_skip = tf.concat([self.x_skip_mor,self.x_skip_patient],axis=1)
+        self.x_negative = tf.concat([self.x_negative_mor,self.x_negative_patient],axis=1)
 
         att_idx_skip = tf.constant([i+self.positive_lab_size+self.negative_lab_size+1 for i in range(self.neighbor_pick_skip)])
         self.x_att_skip = tf.gather(self.Dense_patient,att_idx_skip,axis=1)

@@ -230,7 +230,7 @@ class dynamic_hgm():
         build attention model for mortality node
         """
         self.att_skip_latent = tf.matmul(self.x_att_skip,self.weight_att_W)
-
+        self.concat_att = tf.concat([self.x_att_skip,self.att_skip_latent],axis=2)
 
 
 
@@ -285,9 +285,9 @@ class dynamic_hgm():
         self.x_negative = tf.concat([self.x_negative,self.x_negative_patient],axis=1)
 
         att_idx_skip = tf.constant([i+self.positive_lab_size+self.negative_lab_size+1 for i in range(self.neighbor_pick_skip)])
-        self.x_att_skip = tf.gather(self.Dense_patient,att_idx_skip)
+        self.x_att_skip = tf.gather(self.Dense_patient,att_idx_skip,axis=1)
         att_idx_neg = tf.constant([i+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+1 for i in range(self.neighbor_pick_neg)])
-        self.x_att_neg = tf.gather(self.Dense_patient,att_idx_neg)
+        self.x_att_neg = tf.gather(self.Dense_patient,att_idx_neg,axis=1)
 
 
     def get_positive_patient(self,center_node_index):

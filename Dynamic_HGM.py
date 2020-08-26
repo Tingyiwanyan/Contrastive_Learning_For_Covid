@@ -458,6 +458,7 @@ class dynamic_hgm():
         self.lstm_cell_att()
         self.demo_layer_att()
         self.build_dhgm_model()
+        self.get_latent_rep_hetero_att()
         self.build_att_mortality()
 
     def assign_value_patient(self,patientid,start_time,end_time):

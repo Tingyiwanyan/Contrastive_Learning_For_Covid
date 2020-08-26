@@ -230,12 +230,15 @@ class dynamic_hgm():
         build attention model for mortality node
         """
         self.att_skip_latent = tf.matmul(self.x_att_skip,self.weight_att_W)
-        self.concat_att_skip = tf.concat([self.x_att_skip,self.att_skip_latent],axis=2)
-        self.concat_att_skip_center = tf.concat([self.x_skip_mor,self.concat_att_skip],axis=1)
+        self.x_skip_center_brod = tf.broadcast_to(self.x_skip_mor,[self.batch_size,self.neighbor_pick_skip,self.latent_dim+self.latent_dim_demo])
+        self.att_skip_center = tf.matmul(self.x_skip_center_brod,sekf,weight_att_W)
+        self.concat_att_skip = tf.concat([self.att_skip_center,self.att_skip_latent],axis=2)
 
+        """
         self.att_neg_latent = tf.matmul(self.x_att_neg,self.weight_att_W)
         self.concat_att_neg = tf.concat([self.x_att_neg,self.att_neg_latent],axis=2)
         self.concat_att_neg_center = tf.concat([self.x_negative_mor,self.concat_att_neg],axis=1)
+        """
 
 
 

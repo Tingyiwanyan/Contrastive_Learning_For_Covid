@@ -231,7 +231,7 @@ class dynamic_hgm():
         """
         self.att_skip_latent = tf.matmul(self.x_att_skip,self.weight_att_W)
         self.x_skip_center_brod = tf.broadcast_to(self.x_skip_mor,[self.batch_size,self.neighbor_pick_skip,self.latent_dim+self.latent_dim_demo])
-        self.att_skip_center = tf.matmul(self.x_skip_center_brod,self,weight_att_W)
+        self.att_skip_center = tf.matmul(self.x_skip_center_brod,self.weight_att_W)
         self.concat_att_skip = tf.concat([self.att_skip_center,self.att_skip_latent],axis=2)
 
         """

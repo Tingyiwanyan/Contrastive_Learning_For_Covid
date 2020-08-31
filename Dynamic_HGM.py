@@ -240,8 +240,15 @@ class dynamic_hgm():
         self.att_neg_center = tf.matmul(self.x_neg_center_brod,self.weight_att_W)
         self.concat_att_neg = tf.concat([self.att_neg_center,self.att_neg_latent],axis=2)
 
-        self.soft_max_att_skip = tf.nn.softmax(self.concat_att_skip)
-        self.soft_max_att_neg = tf.nn.softmax(self.concat_att_neg)
+        """
+        times the weight vector a
+        """
+        self.weight_att_skip_a = tf.matmul(self.concat_att_skip,self.weight_vec_a)
+        self.weight_att_neg_a = tf.matmul(self.concat_att_neg,self.weight_vec_a)
+
+        self.soft_max_att_skip = tf.nn.softmax(self.weight_att_skip_a,axis=1)
+        self.soft_max_att_neg = tf.nn.softmax(self.weight_att_neg_a,axis=1)
+
 
 
 

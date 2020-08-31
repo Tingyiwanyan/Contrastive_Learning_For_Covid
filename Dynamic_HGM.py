@@ -319,8 +319,8 @@ class dynamic_hgm():
 
         self.build_att_mortality()
 
-        self.x_skip = tf.concat([tf.expand_dims(tf.att_rep_skip_mor_final,axis=1),self.x_skip_patient],axis=1)
-        self.x_negative = tf.concat([tf.expand_dims(tf.att_rep_neg_mor_final,axis=1),self.x_negative_patient],axis=1)
+        self.x_skip = tf.concat([tf.expand_dims(self.att_rep_skip_mor_final,axis=1),self.x_skip_patient],axis=1)
+        self.x_negative = tf.concat([tf.expand_dims(self.att_rep_neg_mor_final,axis=1),self.x_negative_patient],axis=1)
 
 
 

@@ -112,7 +112,7 @@ class dynamic_hgm():
         self.init_weight_att_W = tf.keras.initializers.he_normal(seed=None)
         self.init_weight_vec_a = tf.keras.initializers.he_normal(seed=None)
         self.weight_att_W = tf.Variable(self.init_weight_att_W(shape=(self.latent_dim+self.latent_dim_demo,self.latent_dim_att+self.latent_dim_demo)))
-        self.weight_vec_a = tf.Variable(self.init_weight_vec_a(shape=(2*(self.latent_dim_att+self.latent_dim_demo),)))
+        self.weight_vec_a = tf.Variable(self.init_weight_vec_a(shape=(2*(self.latent_dim_att+self.latent_dim_demo),1)))
 
     def lstm_cell(self):
         cell_state = []

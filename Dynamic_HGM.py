@@ -243,8 +243,8 @@ class dynamic_hgm():
         """
         times the weight vector a
         """
-        self.weight_att_skip_a = tf.squeeze(tf.matmul(self.concat_att_skip,self.weight_vec_a))
-        self.weight_att_neg_a = tf.squeeze(tf.matmul(self.concat_att_neg,self.weight_vec_a))
+        self.weight_att_skip_a = tf.matmul(self.concat_att_skip,self.weight_vec_a)
+        self.weight_att_neg_a = tf.matmul(self.concat_att_neg,self.weight_vec_a)
 
         self.soft_max_att_skip = tf.broadcast_to(tf.nn.softmax(self.weight_att_skip_a,axis=1),[self.batch_size,self.neighbor_pick_skip,self.latent_dim_att+self.latent_dim_demo])
         self.soft_max_att_neg = tf.broadcast_to(tf.nn.softmax(self.weight_att_neg_a,axis=1),[self.batch_size,self.neighbor_pick_neg,self.latent_dim_att+self.latent_dim_demo])

@@ -252,6 +252,12 @@ class dynamic_hgm():
         self.att_rep_skip_mor = tf.multiply(self.soft_max_att_skip,self.att_skip_latent)
         self.att_rep_neg_mor = tf.multiply(self.soft_max_att_neg,self.att_neg_latent)
 
+        self.att_rep_skip_mor_sum = tf.reduce_sum(self.att_rep_skip_mor,1)
+        self.att_rep_neg_mor_sum = tf.reduce_sum(self.att_rep_neg_mor,1)
+
+        self.att_rep_skip_mor_final = tf.nn.relu(self.att_rep_skip_mor_sum)
+        self.att_rep_neg_mor_final = tf.nn.relu(self.att_rep_neg_mor_sum)
+
 
 
 
@@ -303,13 +309,20 @@ class dynamic_hgm():
         patient_idx_negative = tf.constant([i+self.positive_lab_size+1 for i in range(self.negative_lab_size)])
         self.x_negative_patient = tf.gather(self.Dense_patient,patient_idx_negative,axis=1)
 
-        self.x_skip = tf.concat([self.x_skip_mor,self.x_skip_patient],axis=1)
-        self.x_negative = tf.concat([self.x_negative_mor,self.x_negative_patient],axis=1)
-
         att_idx_skip = tf.constant([i+self.positive_lab_size+self.negative_lab_size+1 for i in range(self.neighbor_pick_skip)])
         self.x_att_skip = tf.gather(self.Dense_patient,att_idx_skip,axis=1)
         att_idx_neg = tf.constant([i+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+1 for i in range(self.neighbor_pick_neg)])
         self.x_att_neg = tf.gather(self.Dense_patient,att_idx_neg,axis=1)
+
+        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+
+        self.build_att_mortality()
+
+        self.x_skip = tf.concat([tf.expand_dims(tf.att_rep_skip_mor_final,axis=1),self.x_skip_patient],axis=1)
+        self.x_negative = tf.concat([tf.expand_dims(tf.att_rep_neg_mor_final,axis=1),self.x_negative_patient],axis=1)
+
+
 
 
     def get_positive_patient(self,center_node_index):

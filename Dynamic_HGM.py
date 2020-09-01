@@ -359,7 +359,7 @@ class dynamic_hgm():
             self.patient_pos_sample_lab[j,0,:] = one_data_lab
             #time_index += 1
         one_data_demo = self.assign_value_demo(center_node_index)
-        one_data_com = self.assign_value_com(center_node_index)
+        #one_data_com = self.assign_value_com(center_node_index)
         self.patient_pos_sample_demo[0,:] = one_data_demo
         self.patient_pos_sample_com[0,:] = one_data_com
         for i in range(self.positive_lab_size):
@@ -369,9 +369,9 @@ class dynamic_hgm():
             time_seq_int = [np.int(k) for k in time_seq]
             time_seq_int.sort()
             one_data_demo = self.assign_value_demo(patient_id)
-            one_data_com = self.assign_value_com(patient_id)
+            #one_data_com = self.assign_value_com(patient_id)
             self.patient_pos_sample_demo[i+1,:] = one_data_demo
-            self.patient_pos_sample_com[i+1,:] = one_data_com
+            #self.patient_pos_sample_com[i+1,:] = one_data_com
             #time_index = 0
             #for j in time_seq_int:
             for j in range(self.time_sequence):
@@ -411,9 +411,9 @@ class dynamic_hgm():
             time_seq_int.sort()
             time_index = 0
             one_data_demo = self.assign_value_demo(patient_id)
-            one_data_com = self.assign_value_com(patient_id)
+            #one_data_com = self.assign_value_com(patient_id)
             self.patient_neg_sample_demo[i,:] = one_data_demo
-            self.patient_neg_sample_com[i,:] = one_data_com
+            #self.patient_neg_sample_com[i,:] = one_data_com
             #for j in time_seq_int:
             for j in range(self.time_sequence):
                 #if time_index == self.time_sequence:

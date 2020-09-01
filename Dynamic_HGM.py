@@ -10,7 +10,8 @@ class dynamic_hgm():
     Create dynamic HGM model
     """
     def __init__(self,kg,data_process):
-        tf.compat.v1.diable_v2_behavior()
+        #tf.compat.v1.disable_v2_behavior()
+        #tf.compat.v1.disable_eager_execution()
         self.kg = kg
         self.data_process = data_process
         #self.hetro_model = hetro_model

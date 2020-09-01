@@ -361,7 +361,7 @@ class dynamic_hgm():
         one_data_demo = self.assign_value_demo(center_node_index)
         #one_data_com = self.assign_value_com(center_node_index)
         self.patient_pos_sample_demo[0,:] = one_data_demo
-        self.patient_pos_sample_com[0,:] = one_data_com
+        #self.patient_pos_sample_com[0,:] = one_data_com
         for i in range(self.positive_lab_size):
             index_neighbor = np.int(np.floor(np.random.uniform(0, len(neighbor_patient), 1)))
             patient_id = neighbor_patient[index_neighbor]

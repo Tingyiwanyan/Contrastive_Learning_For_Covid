@@ -27,7 +27,7 @@ class dynamic_hgm():
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
         self.latent_dim_demo = 50
-        self.epoch = 12
+        self.epoch = 6
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))
         self.lab_size = len(list(kg.dic_lab.keys()))
@@ -883,6 +883,81 @@ class dynamic_hgm():
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
             threshold += self.resolution
+
+    def test_att(self, data):
+        test_length = len(data)
+        init_hidden_state = np.zeros(
+            (test_length, 1 + self.positive_lab_size + self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg, self.latent_dim))
+        self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com = self.get_batch_train_att(
+            test_length, 0, data)
+        self.test_patient = self.sess.run(self.Dense_patient, feed_dict={self.input_x_vital_att: self.test_data_batch_vital,
+                                                                         self.input_x_lab_att: self.test_one_batch_lab,
+                                                                         self.input_x_demo_att: self.test_one_batch_demo,
+                                                                         # self.input_x_com: self.test_com,
+                                                                         self.init_hiddenstate_att: init_hidden_state})[:,0, :]
+        single_mortality = np.zeros((1, 2, 2))
+        single_mortality[0][0][0] = 1
+        single_mortality[0][1][1] = 1
+        self.mortality_test = self.sess.run(self.Dense_mortality, feed_dict={self.mortality: single_mortality})[0]
+        self.score = np.zeros(test_length)
+        for i in range(test_length):
+            embed_single_patient = self.test_patient[i] / np.linalg.norm(self.test_patient[i])
+            embed_mortality = self.mortality_test[1] / np.linalg.norm(self.mortality_test[1])
+            self.score[i] = np.matmul(embed_single_patient, embed_mortality.T)
+
+        self.correct = 0
+        self.tp_correct = 0
+        self.tp_neg = 0
+        for i in range(test_length):
+            if self.test_logit[i, 1] == 1:
+                self.tp_correct += 1
+            if self.test_logit[i, 0] == 1:
+                self.tp_neg += 1
+            if self.score[i] < 0 and self.test_logit[i, 0] == 1:
+                self.correct += 1
+            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
+                self.correct += 1
+
+        self.acc = np.float(self.correct) / test_length
+
+        self.tp_test = 0
+        self.fp_test = 0
+        self.fn_test = 0
+        for i in range(test_length):
+            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
+                self.tp_test += 1
+            if self.score[i] < 0 and self.test_logit[i, 1] == 1:
+                self.fn_test += 1
+            if self.score[i] > 0 and self.test_logit[i, 0] == 1:
+                self.fp_test += 1
+
+        self.precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
+        self.recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
+        self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
+
+        threshold = -1.01
+        self.resolution = 0.05
+        tp_test = 0
+        fp_test = 0
+        self.tp_total = []
+        self.fp_total = []
+
+        while (threshold < 1.01):
+            tp_test = 0
+            fp_test = 0
+            for i in range(test_length):
+                if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
+                    tp_test += 1
+                if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
+                    fp_test += 1
+
+            tp_rate = tp_test / self.tp_correct
+            fp_rate = fp_test / self.tp_neg
+            self.tp_total.append(tp_rate)
+            self.fp_total.append(fp_rate)
+            threshold += self.resolution
+
+
 
     def cal_auc(self):
         self.area = 0

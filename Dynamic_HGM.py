@@ -793,7 +793,7 @@ class dynamic_hgm():
         """
         train the system
         """
-        init_hidden_state = np.zeros((self.batch_size,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim))
+        init_hidden_state = np.zeros((self.batch_size,1+self.positive_lab_size+self.negative_lab_size+self.neighbor_pick_skip+self.neighbor_pick_neg,self.latent_dim))
         iteration = np.int(np.floor(np.float(self.length_train)/self.batch_size))
 
         for j in range(self.epoch):
@@ -803,13 +803,13 @@ class dynamic_hgm():
                 self.train_one_batch_vital,self.train_one_batch_lab,self.train_one_batch_demo, self.one_batch_logit,self.one_batch_mortality,self.one_batch_com = self.get_batch_train_att(self.batch_size,i*self.batch_size,self.train_data)
 
                 self.err_ = self.sess.run([self.negative_sum, self.train_step_neg],
-                                     feed_dict={self.input_x_vital: self.train_one_batch_vital,
-                                                self.input_x_lab: self.train_one_batch_lab,
-                                                self.input_x_demo: self.train_one_batch_demo,
+                                     feed_dict={self.input_x_vital_att: self.train_one_batch_vital,
+                                                self.input_x_lab_att: self.train_one_batch_lab,
+                                                self.input_x_demo_att: self.train_one_batch_demo,
                                                 #self.input_x_com: self.one_batch_com,
                                                 #self.lab_test: self.one_batch_item,
                                                 self.mortality: self.one_batch_mortality,
-                                                self.init_hiddenstate:init_hidden_state})
+                                                self.init_hiddenstate_att:init_hidden_state})
                 print(self.err_[0])
 
 

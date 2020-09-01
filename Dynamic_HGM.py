@@ -710,7 +710,7 @@ class dynamic_hgm():
             train_one_batch_vital[i,:,:,:] = train_one_data_vital
             train_one_batch_lab[i,:,:,:] = train_one_data_lab
             train_one_batch_demo[i,:,:] = train_one_data_demo
-            train_one_batch_com[i,:,:] = train_one_data_com
+            #train_one_batch_com[i,:,:] = train_one_data_com
 
         return train_one_batch_vital,train_one_batch_lab,train_one_batch_demo,one_batch_logit, train_one_batch_mortality,train_one_batch_com
 

@@ -116,6 +116,13 @@ class dynamic_hgm():
         self.weight_att_W = tf.Variable(self.init_weight_att_W(shape=(self.latent_dim+self.latent_dim_demo,self.latent_dim_att+self.latent_dim_demo)))
         self.weight_vec_a = tf.Variable(self.init_weight_vec_a(shape=(2*(self.latent_dim_att+self.latent_dim_demo),1)))
 
+
+        """
+        Define attention on sample neighbors
+        """
+        self.init_weight_vec_a_neighbor = tf.keras.initializers.he_normal(seed=None)
+        self.weight_vec_a_neighbor = tf.Variable(self.init_weight_vec_a_neighbor(shape=(self.latent_dim+self.latent_dim_demo,1)))
+
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
@@ -293,6 +300,24 @@ class dynamic_hgm():
 
         self.x_skip = tf.concat([self.x_skip_mor,self.x_skip_patient],axis=1)
         self.x_negative = tf.concat([self.x_negative_mor,self.x_negative_patient],axis=1)
+
+    def process_patient_att(self):
+        """
+        Process att on patient importance, for feeding the relational learning layer
+        """
+        self.weight_att_x_skip = tf.matmul(self.x_skip_patient,self.weight_vec_a_neighbor)
+        self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip,axis=1)
+        self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,[self.batch_size,self.positive_lab_size,self.latent_dim+self.latent_dim_demo])
+
+        self.x_skip_patient = tf.multiply(self.x_skip_patient,self.weight_att_x_skip_softmax_broad)
+
+        self.weight_att_x_neg = tf.matmul(self.x_negative_patient,self.weight_vec_a_neighbor)
+        self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg,axis=1)
+        self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,[self.batch_size,self.negative_lab_size,self.latent_dim+self.latent_dim_demo])
+
+        self.x_negative_patient = tf.multiply(self.x_negative_patient,self.weight_att_x_skip_softmax_broad)
+
+
 
     def get_latent_rep_hetero_att(self):
         """

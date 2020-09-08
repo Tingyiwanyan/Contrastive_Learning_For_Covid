@@ -127,11 +127,20 @@ class dynamic_hgm():
 
 
         """
-        Define attention on Retain model
+        Define attention on Retain model for time
         """
         self.init_retain_b = tf.keras.initializers.he_normal(seed=None)
         self.init_retain_weight = tf.keras.initializers.he_normal(seed=None)
         self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.latent_dim,1)))
+
+
+        """
+        Define attention on Retain model for feature variable
+        """
+        self.init_retain_variable_b = tf.keras.initializers.he_normal(seed=None)
+        self.bias_retain_variable_b = tf.Variable(self.init_retain_variable_b(shape=(self.latent_dim,)))
+        self.init_retain_variable_w = tf.keras.initializers.he_normal(seed=None)
+        self.weight_retain_variable_w = tf.Variable(self.init_retain_variable_w(shape=(self.latent_dim,self.latent_dim)))
 
     def lstm_cell(self):
         cell_state = []
@@ -230,12 +239,19 @@ class dynamic_hgm():
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
         #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
+        """
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
-        self.hidden_last_comb = tf.concat([self.hidden_final,self.Dense_demo],2)
+        """
+        tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
+        self.hidden_att_e = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w),self.bias_retain_variable_b))
+        #self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
+        self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
+        #self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
+        self.hidden_last_comb = tf.concat([self.hidden_mul_variable,self.Dense_demo],2)
         self.Dense_patient = self.hidden_last_comb
         #self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 

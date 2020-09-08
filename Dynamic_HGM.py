@@ -36,10 +36,10 @@ class dynamic_hgm():
         self.threshold = 0.5
         self.positive_lab_size = 5
         self.negative_lab_size = 10
-        #self.positive_sample_size = self.positive_lab_size + 1
-        self.positive_sample_size = 2
-        #self.negative_sample_size = self.negative_lab_size + 1
-        self.negative_sample_size = 2
+        self.positive_sample_size = self.positive_lab_size + 1
+        #self.positive_sample_size = 2
+        self.negative_sample_size = self.negative_lab_size + 1
+        #self.negative_sample_size = 2
         self.neighbor_pick_skip = 5
         self.neighbor_pick_neg = 10
         self.neighbor_death = len(kg.dic_death[1])

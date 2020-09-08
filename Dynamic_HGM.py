@@ -319,7 +319,7 @@ class dynamic_hgm():
         self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg,axis=1)
         self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,[self.batch_size,self.negative_lab_size,self.latent_dim+self.latent_dim_demo])
 
-        self.x_negative_patient = tf.expand_dimes(tf.reduce_sum(tf.multiply(self.x_negative_patient,self.weight_att_x_neg_softmax_broad),1),1)
+        self.x_negative_patient = tf.expand_dims(tf.reduce_sum(tf.multiply(self.x_negative_patient,self.weight_att_x_neg_softmax_broad),1),1)
 
 
 

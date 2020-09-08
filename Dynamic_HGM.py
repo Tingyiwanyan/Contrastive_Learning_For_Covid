@@ -36,8 +36,10 @@ class dynamic_hgm():
         self.threshold = 0.5
         self.positive_lab_size = 5
         self.negative_lab_size = 10
-        self.positive_sample_size = self.positive_lab_size + 1
-        self.negative_sample_size = self.negative_lab_size + 1
+        #self.positive_sample_size = self.positive_lab_size + 1
+        self.positive_sample_size = 2
+        #self.negative_sample_size = self.negative_lab_size + 1
+        self.negative_sample_size = 2
         self.neighbor_pick_skip = 5
         self.neighbor_pick_neg = 10
         self.neighbor_death = len(kg.dic_death[1])
@@ -311,13 +313,13 @@ class dynamic_hgm():
         self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip,axis=1)
         self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,[self.batch_size,self.positive_lab_size,self.latent_dim+self.latent_dim_demo])
 
-        self.x_skip_patient = tf.multiply(self.x_skip_patient,self.weight_att_x_skip_softmax_broad)
+        self.x_skip_patient = tf.expand_dims(tf.reduce_sum(tf.multiply(self.x_skip_patient,self.weight_att_x_skip_softmax_broad),1),1)
 
         self.weight_att_x_neg = tf.matmul(self.x_negative_patient,self.weight_vec_a_neighbor)
         self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg,axis=1)
         self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,[self.batch_size,self.negative_lab_size,self.latent_dim+self.latent_dim_demo])
 
-        self.x_negative_patient = tf.multiply(self.x_negative_patient,self.weight_att_x_neg_softmax_broad)
+        self.x_negative_patient = tf.expand_dimes(tf.reduce_sum(tf.multiply(self.x_negative_patient,self.weight_att_x_neg_softmax_broad),1),1)
 
 
 

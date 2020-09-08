@@ -246,7 +246,6 @@ class dynamic_hgm():
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
         """
-        tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
         self.hidden_att_e = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w),self.bias_retain_variable_b))
         #self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
         self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)

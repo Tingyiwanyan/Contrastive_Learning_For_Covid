@@ -125,6 +125,14 @@ class dynamic_hgm():
         self.init_weight_vec_a_neighbor = tf.keras.initializers.he_normal(seed=None)
         self.weight_vec_a_neighbor = tf.Variable(self.init_weight_vec_a_neighbor(shape=(self.latent_dim+self.latent_dim_demo,1)))
 
+
+        """
+        Define attention on Retain model
+        """
+        self.init_retain_b = tf.keras.initializers.he_normal(seed=None)
+        self.init_retain_weight = tf.keras.initializers.he_normal(seed=None)
+        self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.latent_dim,1)))
+
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
@@ -221,7 +229,13 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
+        self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
+        self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
+        self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[self.batch_size,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.item_size])
+        self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)
+        self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
+        self.hidden_last_combtf.concat([self.hidden_final,self.Dense_demo],2)
         self.Dense_patient = self.hidden_last_comb
         #self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 

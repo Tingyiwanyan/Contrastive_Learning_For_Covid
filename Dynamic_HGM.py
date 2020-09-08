@@ -235,7 +235,7 @@ class dynamic_hgm():
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[self.batch_size,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
-        self.hidden_last_combtf.concat([self.hidden_final,self.Dense_demo],2)
+        self.hidden_last_comb = tf.concat([self.hidden_final,self.Dense_demo],2)
         self.Dense_patient = self.hidden_last_comb
         #self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 

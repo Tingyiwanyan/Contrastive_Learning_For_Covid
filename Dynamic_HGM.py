@@ -267,6 +267,9 @@ class dynamic_hgm():
         self.hidden_mul_combine = tf.multiply(self.hidden_mul,self.hidden_mul_variable)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_combine,1)
 
+        self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 2)
+        self.Dense_patient = self.hidden_last_comb
+
         self.Dense_mortality_ = \
             tf.nn.relu(tf.math.add(tf.matmul(self.mortality,self.weight_mortality),self.bias_mortality))
 

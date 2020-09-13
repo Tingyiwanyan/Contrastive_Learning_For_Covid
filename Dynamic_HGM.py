@@ -264,7 +264,7 @@ class dynamic_hgm():
         self.hidden_att_variable_e = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w),self.bias_retain_variable_b))
         self.hidden_mul_variable = tf.multiply(self.hidden_att_variable_e, self.hidden_rep)
 
-        self.hidden_mul_comine = tf.multiply(self.hidden_mul,self.hidden_mul_variable)
+        self.hidden_mul_combine = tf.multiply(self.hidden_mul,self.hidden_mul_variable)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_combine,1)
 
         self.Dense_mortality_ = \

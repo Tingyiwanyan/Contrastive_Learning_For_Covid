@@ -131,14 +131,17 @@ class dynamic_hgm():
         """
         self.init_retain_b = tf.keras.initializers.he_normal(seed=None)
         self.init_retain_weight = tf.keras.initializers.he_normal(seed=None)
-        self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.latent_dim,1)))
+        #self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.latent_dim,1)))
+        self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.item_size+self.lab_size, 1)))
+        self.bias_retain_b = tf.Variable(self.init_retain_b(shape=(self.item_size+self.lab_size,)))
 
 
         """
         Define attention on Retain model for feature variable
         """
         self.init_retain_variable_b = tf.keras.initializers.he_normal(seed=None)
-        self.bias_retain_variable_b = tf.Variable(self.init_retain_variable_b(shape=(self.latent_dim,)))
+        #self.bias_retain_variable_b = tf.Variable(self.init_retain_variable_b(shape=(self.latent_dim,)))
+        self.bias_retain_variable_b = tf.Variable(self.init_retain_variable_b(shape=(self.item_size+self.lab_size,)))
         self.init_retain_variable_w = tf.keras.initializers.he_normal(seed=None)
         self.weight_retain_variable_w = tf.Variable(self.init_retain_variable_w(shape=(self.latent_dim,self.latent_dim)))
 
@@ -240,7 +243,7 @@ class dynamic_hgm():
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
         #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-        self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
+        self.hidden_att_e = tf.math.add(tf.matmul(self.input_x,self.weight_retain_w),self.bias_retain_b)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)

@@ -259,12 +259,12 @@ class dynamic_hgm():
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
-        self.hidden_mul = tf.multiply(self.hidden_att_e_broad, self.hidden_rep)
+        #self.hidden_mul = tf.multiply(self.hidden_att_e_broad, self.hidden_rep)
 
         self.hidden_att_variable_e = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w),self.bias_retain_variable_b))
         self.hidden_mul_variable = tf.multiply(self.hidden_att_variable_e, self.hidden_rep)
 
-        self.hidden_mul_combine = tf.multiply(self.hidden_mul,self.hidden_mul_variable)
+        self.hidden_mul_combine = tf.multiply(self.hidden_att_e_broad,self.hidden_mul_variable)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_combine,1)
 
         self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 2)

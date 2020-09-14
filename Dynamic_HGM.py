@@ -273,7 +273,7 @@ class dynamic_hgm():
                                                                              self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.lab_size+self.item_size])
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.project_input)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
-        self.Dense_patient = tf.concat([self.hidden_mul, self.Dense_demo], 2)
+        self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
 
         """
         self.hidden_att_e = tf.math.sigmoid(

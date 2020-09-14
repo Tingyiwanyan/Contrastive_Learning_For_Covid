@@ -288,7 +288,7 @@ class dynamic_hgm():
             tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))
         # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
         self.parameter_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_att_e_variable)
-        self.hidden_mul_variable = tf.multiply(self.hidden_att_e_variable, self.project_input)
+        self.hidden_mul_variable = tf.multiply(self.parameter_mul, self.project_input)
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)

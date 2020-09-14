@@ -22,7 +22,7 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 12
+        self.time_sequence = 6
         self.time_step_length = 2
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim = 100
@@ -255,7 +255,7 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
         """
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
@@ -263,14 +263,14 @@ class dynamic_hgm():
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.hidden_rep)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
         """
-        """
+
         self.hidden_att_e = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w), self.bias_retain_variable_b))
         # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
         self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
+
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 

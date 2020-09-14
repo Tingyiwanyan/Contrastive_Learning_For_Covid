@@ -248,8 +248,8 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
-        self.Dense_patient = self.hidden_last_comb
+        #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = self.hidden_last_comb
 
         self.hidden_project = tf.math.add(tf.matmul(self.input_x,self.weight_project_w),self.bias_project_b)
         """
@@ -262,7 +262,7 @@ class dynamic_hgm():
         self.Dense_patient = self.hidden_last_comb
         """
 
-        """
+
         self.hidden_att_e = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w),self.bias_retain_variable_b))
         #self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
         self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
@@ -270,7 +270,7 @@ class dynamic_hgm():
         self.hidden_last_comb = tf.concat([self.hidden_mul_variable,self.Dense_demo],2)
         self.Dense_patient = self.hidden_last_comb
         #self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
-        """
+
 
         """
         self.hidden_att_e = tf.math.add(tf.matmul(self.hidden_project,self.weight_retain_w),self.bias_project_b)

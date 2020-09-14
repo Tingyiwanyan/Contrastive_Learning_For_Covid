@@ -22,14 +22,14 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 12
+        self.time_sequence = 6
         self.time_step_length = 2
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim = 100
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
         self.latent_dim_demo = 50
-        self.epoch = 12
+        self.epoch = 8
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))
         self.lab_size = len(list(kg.dic_lab.keys()))
@@ -254,8 +254,8 @@ class dynamic_hgm():
         """
         Build dynamic HGM model
         """
-        self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
+        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
         """
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
@@ -271,7 +271,7 @@ class dynamic_hgm():
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_last_comb = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
         """
-        self.Dense_patient = self.hidden_last_comb
+        #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 
         self.Dense_mortality_ = \
@@ -1082,8 +1082,7 @@ class dynamic_hgm():
         test the system, return the accuracy of the model
         """
         init_hidden_state = np.zeros((self.length_test, self.latent_dim))
-        self.test_data, self.test_logit, self.train_one_batch_item = self.get_batch_train(self.length_test, 0,
-                                                                                          self.test_data)
+        self.test_data, self.test_logit, self.train_one_batch_item = self.get_batch_train(self.length_test, 0,self.test_data)
         self.logit_out = self.sess.run(self.logit_sig, feed_dict={self.input_x: self.test_data,
                                                                   self.init_hiddenstate: init_hidden_state})
         self.correct = 0

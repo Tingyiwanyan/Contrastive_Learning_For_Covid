@@ -25,7 +25,7 @@ class dynamic_hgm():
         self.time_sequence = 6
         self.time_step_length = 2
         self.predict_window_prior = self.time_sequence * self.time_step_length
-        self.latent_dim = 100
+        self.latent_dim = self.item_size+self.lab_size
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
         self.latent_dim_demo = 50
@@ -104,7 +104,7 @@ class dynamic_hgm():
         """
         Define relation model
         """
-        self.shape_relation = (self.item_size+self.lab_size + self.latent_dim_demo,)
+        self.shape_relation = (self.latent_dim + self.latent_dim_demo,)
         self.init_mortality = tf.keras.initializers.he_normal(seed=None)
         self.init_lab = tf.keras.initializers.he_normal(seed=None)
         """
@@ -113,7 +113,7 @@ class dynamic_hgm():
         self.mortality = tf.keras.backend.placeholder([None, 2, 2])
         self.init_weight_mortality = tf.keras.initializers.he_normal(seed=None)
         self.weight_mortality = \
-            tf.Variable(self.init_weight_mortality(shape=(2, self.item_size+self.lab_size + self.latent_dim_demo)))
+            tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim + self.latent_dim_demo)))
         self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.item_size+self.lab_size + self.latent_dim_demo,)))
 
         self.lab_test = \
@@ -270,7 +270,7 @@ class dynamic_hgm():
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
-                                                                             self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.lab_size+self.item_size])
+                                                                             self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
         self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.project_input)
         self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)

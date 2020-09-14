@@ -113,8 +113,8 @@ class dynamic_hgm():
         self.mortality = tf.keras.backend.placeholder([None, 2, 2])
         self.init_weight_mortality = tf.keras.initializers.he_normal(seed=None)
         self.weight_mortality = \
-            tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim + self.latent_dim_demo)))
-        self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.latent_dim + self.latent_dim_demo,)))
+            tf.Variable(self.init_weight_mortality(shape=(2, self.item_size+self.lab_size + self.latent_dim_demo)))
+        self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.item_size+self.lab_size + self.latent_dim_demo,)))
 
         self.lab_test = \
             tf.keras.backend.placeholder([None, self.positive_lab_size + self.negative_lab_size, self.item_size])

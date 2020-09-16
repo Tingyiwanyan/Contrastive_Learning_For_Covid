@@ -164,15 +164,16 @@ class dynamic_hgm():
         Define input projection
         """
         self.init_projection_b = tf.keras.initializers.he_normal(seed=None)
-        self.bias_projection_b = tf.Variable(self.init_projection_b(shape=(self.lab_size+self.item_size,)))
+        self.bias_projection_b = tf.Variable(self.init_projection_b(shape=(self.latent_dim,)))
         self.init_projection_w = tf.keras.initializers.he_normal(seed=None)
         self.weight_projection_w = tf.Variable(
-            self.init_projection_w(shape=(self.lab_size+self.item_size, self.lab_size+self.item_size)))
+            self.init_projection_w(shape=(self.lab_size+self.item_size, self.latent_dim)))
 
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
-        self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
+        #self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
+        self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
             x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
@@ -297,10 +298,40 @@ class dynamic_hgm():
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 
+
         self.Dense_mortality_ = \
             tf.nn.relu(tf.math.add(tf.matmul(self.mortality, self.weight_mortality), self.bias_mortality))
 
         self.Dense_mortality = tf.math.subtract(self.Dense_mortality_, self.relation_mortality)
+
+        """
+        Get interpretation matrix
+        """
+        self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
+                                                                               self.time_sequence,
+                                                                               1+self.positive_lab_size+self.negative_lab_size,
+                                                                               self.latent_dim,self.latent_dim])
+
+        self.broad_hidden_att_e_variable = tf.broadcast_to(self.hidden_att_e_variable,[tf.shape(self.input_x_vital)[0],
+                                                                               self.time_sequence,
+                                                                               1+self.positive_lab_size+self.negative_lab_size,
+                                                                               self.latent_dim,self.latent_dim])
+
+        self.broad_hidden_att_e = tf.broadcast_to(self.hidden_att_e_broad,[tf.shape(self.input_x_vital)[0],
+                                                                               self.time_sequence,
+                                                                               1+self.positive_lab_size+self.negative_lab_size,
+                                                                               self.latent_dim,self.latent_dim])
+        self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
+        self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
+
+        """
+        Get score important
+        """
+        self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
+        self.mortality_hidden_rep = tf.gather(self.Dense_mortality, self.time_feature_index, axis=2)
+        self.score_attention = tf.matmul(self.project_weight_variable_final,self.Dense_hidden_rep)
+
+
         """
         self.Dense_lab_ = \
             tf.nn.relu(tf.math.add(tf.matmul(self.lab_test,self.weight_lab),self.bias_lab))

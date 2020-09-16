@@ -111,6 +111,7 @@ class dynamic_hgm():
         Define parameters
         """
         self.mortality = tf.keras.backend.placeholder([None, 2, 2])
+        self.Death_input = tf.keras.backend.placeholder([1, 2])
         self.init_weight_mortality = tf.keras.initializers.he_normal(seed=None)
         self.weight_mortality = \
             tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim + self.latent_dim_demo)))
@@ -304,6 +305,11 @@ class dynamic_hgm():
 
         self.Dense_mortality = tf.math.subtract(self.Dense_mortality_, self.relation_mortality)
 
+        self.Dense_death_rep_ = \
+            tf.nn.relu(tf.math.add(tf.matmul(self.Death_input, self.weight_mortality), self.bias_mortality))
+
+        self.Dense_death_rep = tf.math.subtract(self.Dense_death_rep_, self.relation_mortality)
+
         """
         Get interpretation matrix
         """
@@ -330,8 +336,10 @@ class dynamic_hgm():
         Get score important
         """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
-        self.mortality_hidden_rep = tf.gather(self.Dense_mortality, self.time_feature_index, axis=2)
-        self.score_attention = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
+        self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
+        self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
+        self.score_attention = tf.squeeze(self.score_attention_,[4])
+        self.input_importance = tf.multiply(self.score_attention,self.input_x)
 
 
         """
@@ -975,6 +983,8 @@ class dynamic_hgm():
                 print(self.err_[0])
 
     def test(self, data):
+        Death = np.zeros([1,2])
+        Death[0][1] = 1
         test_length = len(data)
         init_hidden_state = np.zeros(
             (test_length, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim))
@@ -986,6 +996,13 @@ class dynamic_hgm():
                                                                          # self.input_x_com: self.test_com,
                                                                          self.init_hiddenstate: init_hidden_state})[:,
                             0, :]
+        self.test_att_score = self.sess.run([self.score_attention,self.input_importance],feed_dict={self.input_x_vital: self.test_data_batch_vital,
+                                                                         self.input_x_lab: self.test_one_batch_lab,
+                                                                         self.input_x_demo: self.test_one_batch_demo,
+                                                                         # self.input_x_com: self.test_com,
+                                                                         self.init_hiddenstate: init_hidden_state,
+                                                                         self.Death_input: Death})
+
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
         single_mortality[0][1][1] = 1

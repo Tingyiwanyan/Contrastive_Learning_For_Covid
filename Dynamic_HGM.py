@@ -331,7 +331,7 @@ class dynamic_hgm():
         """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_mortality, self.time_feature_index, axis=2)
-        self.score_attention = tf.matmul(self.project_weight_variable_final,self.Dense_hidden_rep)
+        self.score_attention = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
 
 
         """

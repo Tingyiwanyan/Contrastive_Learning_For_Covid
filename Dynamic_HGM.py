@@ -173,8 +173,8 @@ class dynamic_hgm():
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
-        #self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
-        self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
+        self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
+        #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
             x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
@@ -285,6 +285,7 @@ class dynamic_hgm():
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
         """
+
 
         self.hidden_att_e_variable = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))

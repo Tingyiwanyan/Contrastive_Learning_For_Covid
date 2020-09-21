@@ -483,6 +483,20 @@ if __name__ == "__main__":
     #LSTM_.config_model()
     #LSTM_.train()
     dhgm = dynamic_hgm(kg,process_data)
+    feature = list(kg.dic_vital.keys())+list(kg.dic_lab.keys())
     mlp = MLP_model(kg,process_data)
+
+    dhgm.config_model()
+    dhgm.train()
+
+    dhgm.test(dhgm.test_data)
+
+    total_list = list(np.where(dhgm.test_att_score[1][9][0][0]>0)[0])+list(np.where(dhgm.test_att_score[1][9][1][0]>0)[0])+ \
+                 list(np.where(dhgm.test_att_score[1][9][2][0]>0)[0])+list(np.where(dhgm.test_att_score[1][9][3][0]>0)[0])+\
+                 list(np.where(dhgm.test_att_score[1][9][4][0]>0)[0])+list(np.where(dhgm.test_att_score[1][9][5][0]>0)[0])
+
+
+
+
 
 

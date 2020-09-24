@@ -75,6 +75,7 @@ class LSTM_model():
         self.input_demo = tf.concat([self.input_demo_,self.input_x_com],1)
 
 
+
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
@@ -119,7 +120,7 @@ class LSTM_model():
         """
         Implement softmax loss layer
         """
-        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
+        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo_],1)
         self.output_layer = tf.compat.v1.layers.dense(inputs=self.hidden_last_comb,
                                            units=2,
                                            kernel_initializer=tf.keras.initializers.he_normal(seed=None),
@@ -314,9 +315,9 @@ class LSTM_model():
                 #else:
                     #one_batch_logit[i,0] = 1
             self.one_data_demo = self.assign_value_demo(self.patient_id)
-            self.one_data_com = self.assign_value_com(self.patient_id)
+            #self.one_data_com = self.assign_value_com(self.patient_id)
             train_one_batch_demo[i,:] = self.one_data_demo
-            train_one_batch_com[i,:] = self.one_data_com
+            #train_one_batch_com[i,:] = self.one_data_com
         
         return train_one_batch_vital,train_one_batch_lab,one_batch_logit,train_one_batch_demo,train_one_batch_com
 
@@ -336,8 +337,8 @@ class LSTM_model():
                                                 self.input_x_lab: self.train_one_batch_lab,
                                                 self.input_y_logit: self.logit_one_batch,
                                                 self.init_hiddenstate:init_hidden_state,
-                                                self.input_demo_:self.train_one_batch_demo,
-                                                self.input_x_com:self.train_one_batch_com})
+                                                self.input_demo_:self.train_one_batch_demo})
+                                                #self.input_x_com:self.train_one_batch_com})
                 print(self.err_[0])
 
     def test(self,data):

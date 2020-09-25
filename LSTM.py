@@ -180,7 +180,7 @@ class LSTM_model():
         self.hidden_mul_variable = tf.multiply(self.parameter_mul, self.project_input)
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
-        self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 2)
+        self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 1)
 
         """
         self.output_layer = tf.compat.v1.layers.dense(inputs=self.hidden_last_comb,

@@ -189,7 +189,7 @@ class LSTM_model():
                                            activation=tf.nn.relu)
         """
 
-        self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last_comb,self.weight_cell_state),self.bias_cell_state))
+        self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last_comb,self.weight_classification_w),self.bias_classification_b))
         #self.logit_sig = tf.math.sigmoid(self.output_layer)
         #self.logit_sig = tf.nn.softmax(self.output_layer)
         #self.cross_entropy = tf.reduce_mean(tf.math.negative(

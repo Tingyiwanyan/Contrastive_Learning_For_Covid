@@ -404,7 +404,7 @@ class LSTM_model():
             print(j)
             for i in range(iteration):
                 self.train_one_batch, self.train_one_batch_lab,self.logit_one_batch,self.train_one_batch_demo,self.train_one_batch_com = self.get_batch_train_period(self.batch_size,i*self.batch_size,self.train_data)
-                self.err_ = self.sess.run([self.cross_entropy, self.train_step_cross_entropy,self.init_hiddenstate,self.output_layer,self.logit_sig],
+                self.err_ = self.sess.run([self.cross_entropy, self.train_step_cross_entropy,self.init_hiddenstate,self.output_layer],
                                      feed_dict={self.input_x_vital: self.train_one_batch,
                                                 self.input_x_lab: self.train_one_batch_lab,
                                                 self.input_y_logit: self.logit_one_batch,
@@ -420,7 +420,7 @@ class LSTM_model():
         test_length = len(data)
         init_hidden_state = np.zeros((test_length, self.latent_dim))
         test_data, self.test_data_lab,self.test_logit,self.test_demo,self.test_com = self.get_batch_train_period(test_length,0,data)
-        self.logit_out = self.sess.run(self.logit_sig,feed_dict={self.input_x_vital: test_data,
+        self.logit_out = self.sess.run(self.output_layer,feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,
                                             self.input_x_com:self.test_com,
@@ -452,12 +452,12 @@ class LSTM_model():
         for i in range(test_length):
             if self.test_logit[i,0] == 1:
                 self.tp_correct += 1
-            if self.test_logit[i,0] == 1 and self.output_layer[i,0] > self.threshold:
+            if self.test_logit[i,0] == 1 and self.logit_out[i,0] > self.threshold:
                 self.correct += 1
                 self.tp_test += 1
             if self.test_logit[i,0] == 0:
                 self.tp_neg += 1
-            if self.test_logit[i,0] == 1 and self.output_layer[i,0] < self.threshold:
+            if self.test_logit[i,0] == 1 and self.logit_out[i,0] < self.threshold:
                 self.fn_test += 1
             if self.test_logit[i,0] == 0 and self.logit_out[i,0] > self.threshold:
                 self.fp_test += 1

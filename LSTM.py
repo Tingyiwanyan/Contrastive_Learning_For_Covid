@@ -23,7 +23,6 @@ class LSTM_model():
         self.time_sequence = 6
         self.time_step_length = 5
         self.predict_window_prior = self.time_sequence*self.time_step_length
-        self.latent_dim = self.item_size+self.lab_size
         self.latent_dim_cell_state = 100
         self.latent_dim_demo = 50
         self.epoch = 1
@@ -31,6 +30,7 @@ class LSTM_model():
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))
         self.lab_size = len(list(kg.dic_lab.keys()))
+        self.latent_dim = self.item_size + self.lab_size
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5

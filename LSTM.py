@@ -355,7 +355,7 @@ class LSTM_model():
         train_one_batch_lab = np.zeros((data_length,self.time_sequence,self.lab_size))
         train_one_batch_demo = np.zeros((data_length,self.demo_size))
         train_one_batch_com = np.zeros((data_length,self.com_size))
-        one_batch_logit = np.zeros((data_length,2))
+        one_batch_logit = np.zeros((data_length,1))
         for i in range(data_length):
             self.patient_id = data[start_index + i]
             flag = self.kg.dic_patient[self.patient_id]['death_flag']
@@ -376,12 +376,14 @@ class LSTM_model():
             train_one_batch_vital[i,j,:] = self.one_data_vital
             train_one_batch_lab[i,j,:] = self.one_data_lab
             #flag = self.kg.dic_patient[self.patient_id]['death_flag']
-            if flag == 0:
+            if flag == 1:
                 one_batch_logit[i,0] = 1
+            """
             else:
                 #death_time_length = self.kg.dic_patient[self.patient_id]['death_hour']-self.train_time_window
                 #if death_time_length < self.death_predict_window:
                 one_batch_logit[i,1] = 1
+            """
                 #else:
                     #one_batch_logit[i,0] = 1
             self.one_data_demo = self.assign_value_demo(self.patient_id)
@@ -429,6 +431,7 @@ class LSTM_model():
         self.fn_test = 0
         self.tp_correct = 0
         self.tp_neg = 0
+        """
         for i in range(test_length):
             if self.test_logit[i,1] == 1:
                 self.tp_correct += 1
@@ -445,6 +448,22 @@ class LSTM_model():
                 self.fp_test += 1
             if self.test_logit[i,1] == 0 and self.logit_out[i,1] < self.threshold:
                 self.correct += 1
+        """
+        for i in range(test_length):
+            if self.test_logit[i,0] == 1:
+                self.tp_correct += 1
+            if self.test_logit[i,0] == 1 and self.output_layer[i,0] > self.threshold:
+                self.correct += 1
+                self.tp_test += 1
+            if self.test_logit[i,0] == 0:
+                self.tp_neg += 1
+            if self.test_logit[i,0] == 1 and self.output_layer[i,0] < self.threshold:
+                self.fn_test += 1
+            if self.test_logit[i,0] == 0 and self.logit_out[i,0] > self.threshold:
+                self.fp_test += 1
+            if self.test_logit[i,0] == 0 and self.logit_out[i,0] < self.threshold:
+                self.correct += 1
+
         """
         self.tp_test = 0
         self.fp_test = 0

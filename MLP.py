@@ -37,7 +37,7 @@ class MLP_model():
         self.input_demo_ = tf.keras.backend.placeholder([None,self.demo_size])
         self.input_x_com = tf.keras.backend.placeholder([None,self.com_size])
         self.input_demo = tf.concat([self.input_demo_,self.input_x_com],1)
-        self.input_x = tf.concat([self.input_x_,self.input_demo],1)
+        self.input_x = tf.concat([self.input_x_,self.input_demo_],1)
 
     def embed_layer(self):
         self.Dense_embed = tf.compat.v1.layers.dense(inputs=self.input_x,
@@ -170,9 +170,9 @@ class MLP_model():
             train_one_batch_vital[i,:] = self.one_data_vital
             train_one_batch_lab[i,:] = self.one_data_lab
             self.one_data_demo = self.assign_value_demo(self.patient_id)
-            self.one_data_com = self.assign_value_com(self.patient_id)
+            #self.one_data_com = self.assign_value_com(self.patient_id)
             train_one_batch_demo[i,:] = self.one_data_demo
-            train_one_batch_com[i,:] = self.one_data_com
+            #train_one_batch_com[i,:] = self.one_data_com
             if flag == 0:
                 one_batch_logit[i,0] = 1
             else:
@@ -193,8 +193,8 @@ class MLP_model():
                                         feed_dict={self.input_x_vital:self.train_one_batch,
                                                     self.input_x_lab:self.train_one_batch_lab,
                                                     self.input_y_logit:self.logit_one_batch,
-                                                    self.input_demo_:self.train_one_batch_demo,
-                                                    self.input_x_com:self.train_one_batch_com})
+                                                    self.input_demo_:self.train_one_batch_demo})
+                                                    #self.input_x_com:self.train_one_batch_com})
                 print(self.err_[0])
 
     def test(self,data):

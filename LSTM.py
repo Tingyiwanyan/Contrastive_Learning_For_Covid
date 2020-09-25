@@ -20,10 +20,10 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 5
+        self.time_sequence = 6
         self.time_step_length = 5
         self.predict_window_prior = self.time_sequence*self.time_step_length
-        self.latent_dim = 100
+        self.latent_dim = self.item_size+self.lab_size
         self.latent_dim_cell_state = 100
         self.latent_dim_demo = 50
         self.epoch = 1
@@ -38,7 +38,7 @@ class LSTM_model():
         define LSTM variables
         """
         self.init_hiddenstate = tf.keras.backend.placeholder([None, self.latent_dim])
-        self.input_y_logit = tf.keras.backend.placeholder([None, 2])
+        self.input_y_logit = tf.keras.backend.placeholder([None, 1])
         self.input_x_vital = tf.keras.backend.placeholder([None,self.time_sequence,self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder([None,self.time_sequence,self.lab_size])
         self.input_x = tf.concat([self.input_x_vital,self.input_x_lab],2)
@@ -74,6 +74,29 @@ class LSTM_model():
         self.input_x_com = tf.keras.backend.placeholder([None,self.com_size])
         self.input_demo = tf.concat([self.input_demo_,self.input_x_com],1)
 
+        """
+        Define attention on Retain model for time
+        """
+        self.init_retain_b = tf.keras.initializers.he_normal(seed=None)
+        self.init_retain_weight = tf.keras.initializers.he_normal(seed=None)
+        self.weight_retain_w = tf.Variable(self.init_retain_weight(shape=(self.latent_dim, 1)))
+
+        """
+        Define attention on Retain model for feature variable
+        """
+        self.init_retain_variable_b = tf.keras.initializers.he_normal(seed=None)
+        self.bias_retain_variable_b = tf.Variable(self.init_retain_variable_b(shape=(self.latent_dim,)))
+        self.init_retain_variable_w = tf.keras.initializers.he_normal(seed=None)
+        self.weight_retain_variable_w = tf.Variable(
+            self.init_retain_variable_w(shape=(self.latent_dim, self.latent_dim)))
+
+        """
+        Define classification matrix for lstm
+        """
+        self.init_bias_classification_b = tf.keras.initializers.he_normal(seed=None)
+        self.init_weight_classification_w = tf.keras.initializers.he_normal(seed=None)
+        self.bias_classification_b = tf.Variable(self.init_bias_classification_b(shape=(self.latent_dim+self.latent_dim_demo,1)))
+        self.weight_classification_w = tf.Variable(self.init_weight_classification_w(shape=(self.latent_dim+self.latent_dim_demo,1)))
 
 
     def lstm_cell(self):
@@ -120,13 +143,46 @@ class LSTM_model():
         """
         Implement softmax loss layer
         """
-        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
+        #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
+
+        self.hidden_att_e = tf.matmul(self.hidden_rep, self.weight_retain_w)
+        self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, 1)
+        self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax, [tf.shape(self.input_x_vital)[0],
+                                                                              self.time_sequence,
+                                                                              1 + self.positive_lab_size + self.negative_lab_size,
+                                                                              self.latent_dim])
+        # self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.project_input)
+        # self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
+        # self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
+
+        """
+        self.hidden_att_e = tf.math.sigmoid(
+            tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w), self.bias_retain_variable_b))
+        # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
+        self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
+        # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
+        self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
+        """
+
+        self.hidden_att_e_variable = tf.math.sigmoid(
+            tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))
+        # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
+        self.parameter_mul = tf.multiply(self.hidden_att_e_broad, self.hidden_att_e_variable)
+        self.hidden_mul_variable = tf.multiply(self.parameter_mul, self.project_input)
+        # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
+        self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
+        self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 2)
+
+        """
         self.output_layer = tf.compat.v1.layers.dense(inputs=self.hidden_last_comb,
                                            units=2,
                                            kernel_initializer=tf.keras.initializers.he_normal(seed=None),
                                            activation=tf.nn.relu)
+        """
+
+        self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last_comb,self.weight_cell_state),self.bias_cell_state))
         #self.logit_sig = tf.math.sigmoid(self.output_layer)
-        self.logit_sig = tf.nn.softmax(self.output_layer)
+        #self.logit_sig = tf.nn.softmax(self.output_layer)
         #self.cross_entropy = tf.reduce_mean(tf.math.negative(
         #    tf.reduce_sum(tf.math.multiply(self.input_y_diag_single, tf.log(self.logit_softmax)), reduction_indices=[1])))
         """
@@ -144,8 +200,11 @@ class LSTM_model():
             tf.reduce_sum(tf.math.multiply(self.input_y_logit, tf.log(self.logit_sig)), axis=1)),
             axis=0)
         """
+
         self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
         self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
+
+
 
 
     def config_model(self):

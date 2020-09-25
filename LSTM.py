@@ -210,8 +210,10 @@ class LSTM_model():
             axis=0)
         """
 
-        self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
-        self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
+        #self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
+        #self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
+
+        self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))
 
 
 

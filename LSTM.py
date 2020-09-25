@@ -96,7 +96,7 @@ class LSTM_model():
         self.init_bias_classification_b = tf.keras.initializers.he_normal(seed=None)
         self.init_weight_classification_w = tf.keras.initializers.he_normal(seed=None)
         self.bias_classification_b = tf.Variable(self.init_bias_classification_b(shape=(self.latent_dim+self.latent_dim_demo,1)))
-        self.weight_classification_w = tf.Variable(self.init_weight_classification_w(shape=(self.latent_dim+self.latent_dim_demo,1)))
+        self.weight_classification_w = tf.Variable(self.init_weight_classification_w(shape=(1,)))
 
         """
         Define input projection

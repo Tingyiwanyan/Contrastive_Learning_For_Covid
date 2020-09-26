@@ -212,8 +212,10 @@ class LSTM_model():
 
         #self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
         #self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
+        a = tf.constant(1,shape=(tf.shape(self.input_x_vital)[0],1))
 
-        self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))
+        self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))+\
+                             tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
 
 
 
@@ -494,9 +496,9 @@ class LSTM_model():
             tp_test = 0
             fp_test = 0
             for i in range(test_length):
-                if self.test_logit[i,1] == 1 and self.logit_out[i,1] > threshold:
+                if self.test_logit[1,0] == 1 and self.logit_out[i,0] > threshold:
                     tp_test += 1
-                if self.test_logit[i,1] == 0 and self.logit_out[i,1] > threshold:
+                if self.test_logit[1,0] == 0 and self.logit_out[i,0] > threshold:
                     fp_test += 1
             tp_rate = tp_test/self.tp_correct
             fp_rate = fp_test/self.tp_neg

@@ -372,6 +372,7 @@ if __name__ == "__main__":
     kg.read_csv()
     # kg.create_kg_dic()
 
+    """
     for i in kg.dic_lab.keys():
         mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
         std_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
@@ -384,14 +385,7 @@ if __name__ == "__main__":
         std = np.std(values)
         kg.dic_vital[i]['mean_value'] = mean
         kg.dic_vital[i]['std'] = std
-    """
-    kg.dic_death = {}
-    for i in kg.total_data:
-        if kg.dic_patient[i]['death_flag'] == 0:
-            kg.dic_death.setdefault(0,[]).append(i)
-        if kg.dic_patient[i]['death_flag'] == 1:
-            kg.dic_death.setdefault(1,[]).append(i)
-    """
+        
     total_data_check = []
     for i in kg.total_data:
         check_icu = np.where(kg.reg_ar[:, 45] == i)[0]
@@ -450,6 +444,7 @@ if __name__ == "__main__":
             age_total.append(age)
     kg.age_mean = np.mean(age_total)
     kg.age_std = np.std(age_total)
+    """
     """
     com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)

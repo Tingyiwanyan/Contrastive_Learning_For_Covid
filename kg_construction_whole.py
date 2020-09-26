@@ -31,12 +31,12 @@ class Kg_construct_ehr():
         self.labtest = pd.read_csv(self.lab)
         self.vital_sign = pd.read_csv(self.vital)
         # self.comorbidity = pd.read_csv(self.file_path_comorbidity)
-        # self.lab_comb = pd.read_csv(self.lab_comb)
+        #self.lab_comb = pd.read_csv(self.lab_comb)
         self.reg_ar = np.array(self.registry)
         self.covid_ar = np.array(self.covid_labtest)
         self.labtest_ar = np.array(self.labtest)
         self.vital_sign_ar = np.array(self.vital_sign)
-        # self.lab_comb_ar = np.array(self.lab_comb)
+        #self.lab_comb_ar = np.array(self.lab_comb)
 
     def create_kg_dic(self):
         self.dic_patient = {}

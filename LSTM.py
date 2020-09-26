@@ -25,7 +25,7 @@ class LSTM_model():
         self.predict_window_prior = self.time_sequence*self.time_step_length
         self.latent_dim_cell_state = 100
         self.latent_dim_demo = 50
-        self.epoch = 1
+        self.epoch = 6
         self.train_time_window = self.time_sequence * self.time_step_length
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))
@@ -461,6 +461,13 @@ class LSTM_model():
                                             self.input_x_lab:self.test_data_lab,
                                             self.input_x_com:self.test_com,
                                             self.init_hiddenstate:init_hidden_state})
+
+        self.test_att_score = self.sess.run([self.score_attention, self.input_importance],
+                                            feed_dict={self.input_x_vital: self.test_data,
+                                                       self.input_x_lab: self.test_data_lab,
+                                                       self.input_x_demo: self.test_demo,
+                                                       # self.input_x_com: self.test_com,
+                                                       self.init_hiddenstate: init_hidden_state})
         self.correct = 0
         self.tp_test = 0
         self.fp_test = 0

@@ -240,14 +240,16 @@ class LSTM_model():
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
-        self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
-        self.score_attention_ = tf.matmul(self.project_weight_variable_final,
-                                          tf.expand_dims(tf.squeeze(self.mortality_hidden_rep), 1))
+        self.mortality_hidden_rep = tf.gather(self.weight_classification_w, self.time_feature_index, axis=0)
+        #self.score_attention_ = tf.matmul(self.project_weight_variable_final,
+        #                                  tf.expand_dims(tf.squeeze(self.mortality_hidden_rep), 1))
+
+        self.score_attention_ = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
         self.score_attention = tf.squeeze(self.score_attention_, [4])
         self.input_importance = tf.multiply(self.score_attention, self.input_x)
-        """
+
 
 
 

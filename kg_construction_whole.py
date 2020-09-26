@@ -22,7 +22,7 @@ class Kg_construct_ehr():
         self.lab = file_path + '/Lab.csv'
         self.vital = file_path + '/vitals.csv'
         file_path_ = '/home/tingyi.wanyan'
-        self.lab_comb = '/lab_mapping_comb.csv'
+        self.lab_comb = 'lab_mapping_comb.csv'
         self.file_path_comorbidity = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
 
     def read_csv(self):

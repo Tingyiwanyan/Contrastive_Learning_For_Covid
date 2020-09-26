@@ -247,7 +247,7 @@ class LSTM_model():
         #                                  tf.expand_dims(tf.squeeze(self.mortality_hidden_rep), 1))
 
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
-        self.score_attention = tf.squeeze(self.score_attention_, [4])
+        self.score_attention = tf.squeeze(self.score_attention_, [3])
         self.input_importance = tf.multiply(self.score_attention, self.input_x)
 
 

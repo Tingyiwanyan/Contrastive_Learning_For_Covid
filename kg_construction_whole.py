@@ -22,7 +22,7 @@ class Kg_construct_ehr():
         self.lab = file_path + '/Lab.csv'
         self.vital = file_path + '/vitals.csv'
         file_path_ = '/home/tingyi.wanyan'
-        self.lab_comb = file_path_ + '/lab_mapping_comb.csv'
+        self.lab_comb = '/lab_mapping_comb.csv'
         self.file_path_comorbidity = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
 
     def read_csv(self):
@@ -31,12 +31,12 @@ class Kg_construct_ehr():
         self.labtest = pd.read_csv(self.lab)
         self.vital_sign = pd.read_csv(self.vital)
         # self.comorbidity = pd.read_csv(self.file_path_comorbidity)
-        #self.lab_comb = pd.read_csv(self.lab_comb)
+        self.lab_comb = pd.read_csv(self.lab_comb)
         self.reg_ar = np.array(self.registry)
         self.covid_ar = np.array(self.covid_labtest)
         self.labtest_ar = np.array(self.labtest)
         self.vital_sign_ar = np.array(self.vital_sign)
-        #self.lab_comb_ar = np.array(self.lab_comb)
+        self.lab_comb_ar = np.array(self.lab_comb)
 
     def create_kg_dic(self):
         self.dic_patient = {}
@@ -372,20 +372,6 @@ if __name__ == "__main__":
     kg.read_csv()
     # kg.create_kg_dic()
 
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_patient.json', 'r') as fp:
-        kg.dic_patient = json.load(fp)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_vital.json', 'r') as tp:
-        kg.dic_vital = json.load(tp)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/total_data.txt', 'r') as filehand:
-        kg.total_data = json.load(filehand)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_demographic.json',
-              'r') as fp_:
-        kg.dic_demographic = json.load(fp_)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_race.json', 'r') as tp_:
-        kg.dic_race = json.load(tp_)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_lab.json', 'r') as lab:
-        kg.dic_lab = json.load(lab)
-
     for i in kg.dic_lab.keys():
         mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
         std_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
@@ -482,6 +468,7 @@ if __name__ == "__main__":
 
     kg.com_mapping_ar = com_mapping_ar
     """
+    """
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
     LSTM_ = LSTM_model(kg, process_data)
@@ -490,3 +477,4 @@ if __name__ == "__main__":
     dhgm = dynamic_hgm(kg, process_data)
     feature = list(kg.dic_vital.keys()) + list(kg.dic_lab.keys())
     mlp = MLP_model(kg, process_data)
+    """

@@ -217,6 +217,36 @@ class LSTM_model():
         self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))+\
                              tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
 
+        """
+        Get interpretation matrix
+        """
+        self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w, [tf.shape(self.input_x_vital)[0],
+                                                                                self.time_sequence,
+                                                                                self.latent_dim, self.latent_dim])
+
+        self.exp_hidden_att_e_variable = tf.expand_dims(self.hidden_att_e_variable, axis=3)
+        self.broad_hidden_att_e_variable = tf.broadcast_to(self.exp_hidden_att_e_variable,
+                                                           [tf.shape(self.input_x_vital)[0],
+                                                            self.time_sequence,
+                                                            self.latent_dim, self.latent_dim])
+
+        self.exp_hidden_att_e_broad = tf.expand_dims(self.hidden_att_e_broad, axis=3)
+        self.broad_hidden_att_e = tf.broadcast_to(self.exp_hidden_att_e_broad, [tf.shape(self.input_x_vital)[0],
+                                                                                self.time_sequence,
+                                                                                self.latent_dim, self.latent_dim])
+        self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
+        self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e, self.project_weight_variable)
+
+        """
+        Get score important
+        """
+        self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
+        self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
+        self.score_attention_ = tf.matmul(self.project_weight_variable_final,
+                                          tf.expand_dims(tf.squeeze(self.mortality_hidden_rep), 1))
+        self.score_attention = tf.squeeze(self.score_attention_, [4])
+        self.input_importance = tf.multiply(self.score_attention, self.input_x)
+
 
 
 

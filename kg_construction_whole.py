@@ -108,7 +108,7 @@ class Kg_construct_ehr():
                 death_flag = 0
 
             self.in_admit_time = in_admit_time_single.split(' ')
-            in_admit_date = [np.int(i) for i in self.in_time[0].split('-')]
+            in_admit_date = [np.int(i) for i in self.in_admit_time[0].split('-')]
             in_admit_date_value = (in_admit_date[0] * 365.0 + in_admit_date[1] * 30 + in_admit_date[2]) * 24 * 60
             self.in_admit_time_ = [np.int(i) for i in self.in_admit_time[1].split(':')[0:-1]]
             in_admit_time_value = self.in_admit_time_[0] * 60.0 + self.in_admit_time_[1]

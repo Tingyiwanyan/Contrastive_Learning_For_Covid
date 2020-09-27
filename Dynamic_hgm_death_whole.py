@@ -786,7 +786,7 @@ class dynamic_hgm():
             (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size))
         train_one_batch_lab = np.zeros(
             (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size))
-        train_one_batch_icu_intubation = np.zeros(self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2)
+        train_one_batch_icu_intubation = np.zeros((self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2))
         train_one_batch_demo = np.zeros(
             (data_length, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size))
         train_one_batch_com = np.zeros(

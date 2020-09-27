@@ -716,10 +716,6 @@ class dynamic_hgm():
                     one_sample_icu_intubation[1] = 1
 
 
-        if self.kg.dic_patient[patientid]['intubation_label'] == 0:
-            one_sample_icu[0] = 0
-
-
 
     def assign_value_lab(self, patientid, start_time, end_time):
         self.one_sample_lab = np.zeros(self.lab_size)

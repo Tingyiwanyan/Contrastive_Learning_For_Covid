@@ -441,7 +441,7 @@ if __name__ == "__main__":
               'r') as fp:
         kg.total_death_data = json.load(fp)
 
-    """
+
     for i in kg.dic_lab.keys():
         mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
         std_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
@@ -513,7 +513,7 @@ if __name__ == "__main__":
             age_total.append(age)
     kg.age_mean = np.mean(age_total)
     kg.age_std = np.std(age_total)
-    """
+
     """
     com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)

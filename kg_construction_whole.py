@@ -89,39 +89,89 @@ class Kg_construct_ehr():
                 self.dic_vital[i]['index'] = index_vital
                 index_vital += 1
 
-        icu = np.where(self.reg_ar[:, 29] == self.reg_ar[:, 29])[0]
-        for i in icu:
-            mrn_single = self.reg_ar[i, 45]
-            in_time_single = self.reg_ar[i, 29]
-            if self.reg_ar[i, 11] == self.reg_ar[i, 11]:
+        """
+        get all patient with admit time
+        """
+        admit_time = np.where(self.reg_ar[:,1]==self.reg_ar[:,1])[0]
+        self.admit = self.reg_ar[admit_time,:]
+        covid_obv = np.where(self.admit[:,8]==self.admit[:,8])[0]
+        self.covid_ar = self.admit[covid_obv,:]
+
+        for i in range(self.covid_ar.shape[0]):
+            print("im here in create in time")
+            print(i)
+            mrn_single = self.covid_ar[i,45]
+            in_admit_time_single = self.covid_ar[i,1]
+            if self.covid_ar[i,11] == self.covid_ar[i,11]:
                 death_flag = 1
             else:
                 death_flag = 0
-            # self.dic_patient[mrn_single]={}
-            # self.dic_patient[mrn_single]['in_icu_time']=in_time_single
-            # self.dic_patient[mrn_single]['death_flag']=death_flag
-            self.in_time = in_time_single.split(' ')
-            in_date = [np.int(i) for i in self.in_time[0].split('-')]
-            in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
-            self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
-            in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
-            total_in_time_value = in_date_value + in_time_value
+
+            self.in_admit_time = in_admit_time_single.split(' ')
+            in_admit_date = [np.int(i) for i in self.in_time[0].split('-')]
+            in_admit_date_value = (in_admit_date[0] * 365.0 + in_admit_date[1] * 30 + in_admit_date[2]) * 24 * 60
+            self.in_admit_time_ = [np.int(i) for i in self.in_admit_time[1].split(':')[0:-1]]
+            in_admit_time_value = self.in_admit_time_[0] * 60.0 + self.in_admit_time_[1]
+            total_in_admit_time_value = in_admit_date_value + in_admit_time_value
             if mrn_single not in self.dic_patient.keys():
                 self.dic_patient[mrn_single] = {}
-                self.dic_patient[mrn_single]['in_icu_time'] = self.in_time
-                self.dic_patient[mrn_single]['in_date'] = in_date
-                self.dic_patient[mrn_single]['in_time'] = self.in_time_
+                self.dic_patient[mrn_single]['in_admit_time'] = self.in_admit_time
+                self.dic_patient[mrn_single]['in_admit_date'] = in_admit_date
+                self.dic_patient[mrn_single]['in_admit_time_'] = self.in_admit_time_
                 self.dic_patient[mrn_single]['death_flag'] = death_flag
-                self.dic_patient[mrn_single]['total_in_time_value'] = total_in_time_value
+                self.dic_patient[mrn_single]['total_in_admit_time_value'] = total_in_admit_time_value
                 self.dic_patient[mrn_single]['prior_time_vital'] = {}
                 self.dic_patient[mrn_single]['prior_time_lab'] = {}
-                # self.dic_patient[mrn_single]['lab_time_check']={}
-                # self.dic_patient[mrn_single]['time_capture']={}
-        mrn_icu = self.reg_ar[:, 45][icu]
-        covid_detect = np.where(self.covid_ar[:, 7] != 'NOT DETECTED')[0]
-        covid_mrn = self.covid_ar[:, 0][covid_detect]
-        self.total_data = np.intersect1d(list(covid_mrn), list(mrn_icu))
-        index = 0
+                if self.covid_ar[i,29] == self.covid_ar[i,29]:
+                    self.dic_patient[mrn_single]['icu_label'] = 1
+                    in_time_single = self.covid_ar[i, 29]
+                    self.in_time = in_time_single.split(' ')
+                    in_date = [np.int(i) for i in self.in_time[0].split('-')]
+                    in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
+                    self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
+                    in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
+                    total_in_time_value = in_date_value + in_time_value
+                    self.dic_patient[mrn_single]['in_icu_time'] = self.in_time
+                    self.dic_patient[mrn_single]['in_date'] = in_date
+                    self.dic_patient[mrn_single]['in_time'] = self.in_time_
+                    self.dic_patient[mrn_single]['total_in_time_value'] = total_in_time_value
+                else:
+                    self.dic_patient[mrn_single]['icu_label'] = 0
+
+                if self.covid_ar[i,35] == self.covid_ar[i,35]:
+                    self.dic_patient[mrn_single]['intubation_label'] = 1
+                    in_time_single = self.covid_ar[i, 35]
+                    self.in_time = in_time_single.split(' ')
+                    in_date = [np.int(i) for i in self.in_time[0].split('-')]
+                    in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
+                    self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
+                    in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
+                    total_in_time_value = in_date_value + in_time_value
+                    self.dic_patient[mrn_single]['intubation_time'] = self.in_time
+                    self.dic_patient[mrn_single]['intubation_date'] = in_date
+                    self.dic_patient[mrn_single]['intubation_time'] = self.in_time_
+                    self.dic_patient[mrn_single]['total_intubation_time_value'] = total_in_time_value
+                else:
+                    self.dic_patient[mrn_single]['intubation_label'] = 0
+
+                if self.covid_ar[i,19] == self.covid_ar[i,19]:
+                    self.dic_patient[mrn_single]['extubation_label'] = 1
+                    in_time_single = self.covid_ar[i, 19]
+                    self.in_time = in_time_single.split(' ')
+                    in_date = [np.int(i) for i in self.in_time[0].split('-')]
+                    in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
+                    self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
+                    in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
+                    total_in_time_value = in_date_value + in_time_value
+                    self.dic_patient[mrn_single]['extubation_time'] = self.in_time
+                    self.dic_patient[mrn_single]['extubation_date'] = in_date
+                    self.dic_patient[mrn_single]['extubation_time'] = self.in_time_
+                    self.dic_patient[mrn_single]['total_extubation_time_value'] = total_in_time_value
+                else:
+                    self.dic_patient[mrn_single]['extubation_label'] = 0
+
+
+        self.total_data = list(self.covid_ar[:,45])
         for i in self.dic_lab.keys():
             test_specific = self.lab_comb_keep_[np.where(self.lab_comb_keep_[:, -2] == i)[0]][:, 0]
             num = 0
@@ -136,12 +186,12 @@ class Kg_construct_ehr():
         """
         total_data_check = []
         for i in self.total_data:
-            check_icu = np.where(self.reg_ar[:, 45] == i)[0]
+            check_icu = np.where(self.covid_ar[:, 45] == i)[0]
             for j in check_icu:
-                if self.reg_ar[j][11] == self.reg_ar[j][11]:
+                if self.covid_ar[j][11] == self.covid_ar[j][11]:
                     if i not in total_data_check:
                         total_data_check.append(i)
-                elif self.reg_ar[j][30] == self.reg_ar[j][30]:
+                elif self.covid_ar[j][30] == self.covid_ar[j][30]:
                     if i not in total_data_check:
                         total_data_check.append(i)
                 else:
@@ -149,21 +199,21 @@ class Kg_construct_ehr():
         self.total_data = total_data_check
         index_race = 0
         for i in self.total_data:
-            index_race_ = np.where(self.reg_ar[:, 45] == i)[0]
+            index_race_ = np.where(self.covid_ar[:, 45] == i)[0]
             self.check_index = index_race_
             race = 0
             for j in index_race_:
-                race_check = self.reg_ar[:, 61][j]
+                race_check = self.covid_ar[:, 61][j]
                 if race_check == race_check:
                     race = race_check
                     break
             for j in index_race_:
-                age_check = self.reg_ar[:, 7][j]
+                age_check = self.covid_ar[:, 7][j]
                 if age_check == age_check:
                     age = age_check
                     break
             for j in index_race_:
-                gender_check = self.reg_ar[:, 24][j]
+                gender_check = self.covid_ar[:, 24][j]
                 if gender_check == gender_check:
                     gender = gender_check
                     break
@@ -246,7 +296,7 @@ class Kg_construct_ehr():
         for i in self.total_data:
             in_icu_date = self.reg_ar
             self.single_patient_vital = np.where(self.vital_sign_ar[:, 0] == i)[0]
-            in_time_value = self.dic_patient[i]['total_in_time_value']
+            in_time_value = self.dic_patient[i]['total_in_admit_time_value']
             self.single_patient_lab = np.where(self.labtest_ar[:, 0] == i)[0]
             total_value_lab = 0
 

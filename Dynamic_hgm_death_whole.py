@@ -782,7 +782,7 @@ class dynamic_hgm():
             (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size))
         train_one_batch_lab = np.zeros(
             (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size))
-        train_one_batch_icu_intubation = np.zeros((self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2))
+        train_one_batch_icu_intubation = np.zeros((data_length,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2))
         train_one_batch_demo = np.zeros(
             (data_length, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size))
         train_one_batch_com = np.zeros(
@@ -837,7 +837,7 @@ class dynamic_hgm():
             train_one_batch_lab[i, :, :, :] = train_one_data_lab
             train_one_batch_demo[i, :, :] = train_one_data_demo
             train_one_batch_com[i, :, :] = train_one_data_com
-            train_one_batch_icu_intubation = train_one_data_icu_intubation
+            train_one_batch_icu_intubation[i,:,:,:] = train_one_data_icu_intubation
 
         return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com,train_one_batch_icu_intubation
 

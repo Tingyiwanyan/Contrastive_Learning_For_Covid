@@ -592,7 +592,7 @@ class dynamic_hgm():
                     end_time = start_time + self.time_step_length
                 one_data_vital = self.assign_value_patient(patient_id, start_time, end_time)
                 one_data_lab = self.assign_value_lab(patient_id, start_time, end_time)
-                one_data_icu_label = self.assign_value_icu(patient_id,start_time,end_time)
+                one_data_icu_label = self.assign_value_icu_intubation(patient_id,start_time,end_time)
                 self.patient_neg_sample_vital[j, i, :] = one_data_vital
                 self.patient_neg_sample_lab[j, i, :] = one_data_lab
                 self.patient_neg_sample_icu_intubation_label[j,i,:] = one_data_icu_label

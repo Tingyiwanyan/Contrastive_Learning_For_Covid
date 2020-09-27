@@ -469,7 +469,7 @@ if __name__ == "__main__":
                 continue
     kg.total_data = total_data_check
     kg.dic_death = {}
-    for i in kg.total_data:
+    for i in kg.total_death_data:
         if kg.dic_patient[i]['death_flag'] == 0:
             kg.dic_death.setdefault(0, []).append(i)
             discharge_index = np.where(kg.reg_ar[:, 45] == i)[0]

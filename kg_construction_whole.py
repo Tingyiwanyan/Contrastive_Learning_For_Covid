@@ -196,7 +196,7 @@ class Kg_construct_ehr():
                         total_data_check.append(i)
                 else:
                     continue
-        self.total_data = total_data_check
+        self.total_data_death = total_data_check
         index_race = 0
         for i in self.total_data:
             index_race_ = np.where(self.covid_ar[:, 45] == i)[0]
@@ -293,7 +293,10 @@ class Kg_construct_ehr():
                 index_race += 1
             self.dic_demographic[i]['gender'] = gender
 
+        index = 0
         for i in self.total_data:
+            print(index)
+            index++
             in_icu_date = self.reg_ar
             self.single_patient_vital = np.where(self.vital_sign_ar[:, 0] == i)[0]
             in_time_value = self.dic_patient[i]['total_in_admit_time_value']

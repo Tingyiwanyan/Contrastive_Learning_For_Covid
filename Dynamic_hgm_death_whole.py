@@ -170,7 +170,7 @@ class dynamic_hgm():
         self.bias_projection_b = tf.Variable(self.init_projection_b(shape=(self.latent_dim,)))
         self.init_projection_w = tf.keras.initializers.he_normal(seed=None)
         self.weight_projection_w = tf.Variable(
-            self.init_projection_w(shape=(self.lab_size+self.item_size, self.latent_dim)))
+            self.init_projection_w(shape=(self.lab_size+self.item_size+2, self.latent_dim)))
 
     def lstm_cell(self):
         cell_state = []

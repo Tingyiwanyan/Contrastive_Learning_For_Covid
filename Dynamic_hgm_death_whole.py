@@ -715,6 +715,8 @@ class dynamic_hgm():
                 if self.kg.dic_patient[patientid]['extubation_label'] == 0:
                     one_sample_icu_intubation[1] = 1
 
+        return one_sample_icu_intubation
+
 
 
     def assign_value_lab(self, patientid, start_time, end_time):
@@ -841,80 +843,6 @@ class dynamic_hgm():
 
         return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com,train_one_batch_icu_intubation
 
-    def get_batch_train_att(self, data_length, start_index, data):
-        """
-        get training batch data
-        """
-        train_one_batch_vital = np.zeros((data_length, self.time_sequence,
-                                          1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                          self.item_size))
-        train_one_batch_lab = np.zeros((data_length, self.time_sequence,
-                                        1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                        self.lab_size))
-        train_one_batch_demo = np.zeros((data_length,
-                                         1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                         self.demo_size))
-        train_one_batch_com = np.zeros((data_length,
-                                        1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                        self.com_size))
-        # train_one_batch_item = np.zeros((data_length,self.positive_lab_size+self.negative_lab_size,self.item_size))
-        train_one_batch_mortality = np.zeros((data_length, 2, 2))
-        one_batch_logit = np.zeros((data_length, 2))
-        self.real_logit = np.zeros(data_length)
-        # self.item_neg_sample = np.zeros((self.negative_lab_size, self.item_size))
-        # self.item_pos_sample = np.zeros((self.positive_lab_size, self.item_size))
-        index_batch = 0
-        index_increase = 0
-        # while index_batch < data_length:
-        for i in range(data_length):
-            self.patient_id = data[start_index + i]
-            # if self.kg.dic_patient[self.patient_id]['item_id'].keys() == {}:
-            #   index_increase += 1
-            #  continue
-            # index_batch += 1
-            self.time_seq = self.kg.dic_patient[self.patient_id]['prior_time_vital'].keys()
-            self.time_seq_int = [np.int(k) for k in self.time_seq]
-            self.time_seq_int.sort()
-            time_index = 0
-            flag = self.kg.dic_patient[self.patient_id]['death_flag']
-            """
-            if flag == 0:
-                one_batch_logit[i,0,0] = 1
-                one_batch_logit[i,1,1] = 1
-            else:
-                one_batch_logit[i,0,1] = 1
-                one_batch_logit[i,1,0] = 1
-                self.real_logit[i] = 1
-            """
-            if flag == 0:
-                train_one_batch_mortality[i, 0, :] = [1, 0]
-                train_one_batch_mortality[i, 1, :] = [0, 1]
-                one_batch_logit[i, 0] = 1
-            else:
-                train_one_batch_mortality[i, 0, :] = [0, 1]
-                train_one_batch_mortality[i, 1, :] = [1, 0]
-                one_batch_logit[i, 1] = 1
-
-            self.get_positive_patient(self.patient_id)
-            self.get_negative_patient(self.patient_id)
-            train_one_data_vital = np.concatenate((self.patient_pos_sample_vital, self.patient_neg_sample_vital),
-                                                  axis=1)
-            train_one_data_vital = np.concatenate((train_one_data_vital, self.patient_pos_sample_vital[:, 1:, :]),
-                                                  axis=1)
-            train_one_data_vital = np.concatenate((train_one_data_vital, self.patient_neg_sample_vital), axis=1)
-            train_one_data_lab = np.concatenate((self.patient_pos_sample_lab, self.patient_neg_sample_lab), axis=1)
-            train_one_data_lab = np.concatenate((train_one_data_lab, self.patient_pos_sample_lab[:, 1:, :]), axis=1)
-            train_one_data_lab = np.concatenate((train_one_data_lab, self.patient_neg_sample_lab), axis=1)
-            train_one_data_demo = np.concatenate((self.patient_pos_sample_demo, self.patient_neg_sample_demo), axis=0)
-            train_one_data_demo = np.concatenate((train_one_data_demo, self.patient_pos_sample_demo[1:, :]), axis=0)
-            train_one_data_demo = np.concatenate((train_one_data_demo, self.patient_neg_sample_demo), axis=0)
-            train_one_data_com = np.concatenate((self.patient_pos_sample_com, self.patient_neg_sample_com), axis=0)
-            train_one_batch_vital[i, :, :, :] = train_one_data_vital
-            train_one_batch_lab[i, :, :, :] = train_one_data_lab
-            train_one_batch_demo[i, :, :] = train_one_data_demo
-            # train_one_batch_com[i,:,:] = train_one_data_com
-
-        return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com
 
     def get_batch_test(self, data_length, start_index, data):
         """

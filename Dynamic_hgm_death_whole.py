@@ -799,6 +799,7 @@ class dynamic_hgm():
         index_increase = 0
         # while index_batch < data_length:
         for i in range(data_length):
+            self.check_patient = i
             self.patient_id = data[start_index + i]
             # if self.kg.dic_patient[self.patient_id]['item_id'].keys() == {}:
             #   index_increase += 1

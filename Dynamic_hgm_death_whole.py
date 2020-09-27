@@ -319,19 +319,19 @@ class dynamic_hgm():
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim,self.latent_dim])
+                                                                               self.latent_dim+2,self.latent_dim])
 
-        self.exp_hidden_att_e_variable = tf.expand_dims(self.hidden_att_e_variable,axis=4)
+        self.exp_hidden_att_e_variable = tf.expand_dims(self.hidden_att_e_variable,axis=3)
         self.broad_hidden_att_e_variable = tf.broadcast_to(self.exp_hidden_att_e_variable,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim,self.latent_dim])
+                                                                               self.latent_dim+2,self.latent_dim])
 
-        self.exp_hidden_att_e_broad = tf.expand_dims(self.hidden_att_e_broad,axis=4)
+        self.exp_hidden_att_e_broad = tf.expand_dims(self.hidden_att_e_broad,axis=3)
         self.broad_hidden_att_e = tf.broadcast_to(self.exp_hidden_att_e_broad,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim,self.latent_dim])
+                                                                               self.latent_dim+2,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
 

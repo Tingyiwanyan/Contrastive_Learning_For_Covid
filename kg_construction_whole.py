@@ -485,7 +485,7 @@ if __name__ == "__main__":
             total_discharge_time_value = discharge_date_value + discharge_time_value
             kg.dic_patient[i]['discharge_value'] = total_discharge_time_value
             kg.dic_patient[i]['discharge_hour'] = np.int(
-                np.floor((total_discharge_time_value - kg.dic_patient[i]['total_in_time_value']) / 60))
+                np.floor((total_discharge_time_value - kg.dic_patient[i]['total_in_admit_time_value']) / 60))
 
         if kg.dic_patient[i]['death_flag'] == 1:
             kg.dic_death.setdefault(1, []).append(i)
@@ -502,7 +502,7 @@ if __name__ == "__main__":
             total_dead_time_value = death_date_value + dead_time_value
             kg.dic_patient[i]['death_value'] = total_dead_time_value
             kg.dic_patient[i]['death_hour'] = np.int(
-                np.floor((total_dead_time_value - kg.dic_patient[i]['total_in_time_value']) / 60))
+                np.floor((total_dead_time_value - kg.dic_patient[i]['total_in_admit_time_value']) / 60))
 
     age_total = []
     for i in kg.dic_demographic.keys():

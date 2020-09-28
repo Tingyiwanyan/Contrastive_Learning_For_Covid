@@ -470,21 +470,32 @@ if __name__ == "__main__":
     kg.total_data = total_data_check
     kg.dic_death = {}
 
+    kg.total_data_intubate = []
+    kg.total_data_icu = []
+    kg.total_data_extubate = []
+    kg.total_intubation_time = []
+    kg.total_in_icu_time = []
     for i in kg.total_data:
         if kg.dic_patient[i]['icu_label'] == 1:
+            kg.total_data_icu.append(i)
             total_in_icu_time_value = kg.dic_patient[i]['total_in_time_value']
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['in_icu_hour'] = np.int(np.floor((total_in_icu_time_value-total_in_admit_time_value)/60))
+            kg.total_in_icu_time.append(kg.dic_patient[i]['in_icu_hour'])
         if kg.dic_patient[i]['intubation_label'] == 1:
+            kg.total_data_intubate.append(i)
             total_intubation_time_value = kg.dic_patient[i]['total_intubation_time_value']
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['intubation_hour'] = np.int(
                 np.floor((total_intubation_time_value - total_in_admit_time_value) / 60))
+            kg.total_intubation_time.append(kg.dic_patient[i]['intubation_hour'])
         if kg.dic_patient[i]['extubation_label'] == 1:
+            kg.total_data_extubate.append(i)
             total_extubation_time_value = kg.dic_patient[i]['total_extubation_time_value']
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['extubation_hour'] = np.int(
                 np.floor((total_extubation_time_value - total_in_admit_time_value) / 60))
+
 
 
     for i in kg.total_death_data:

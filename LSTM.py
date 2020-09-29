@@ -212,10 +212,15 @@ class LSTM_model():
 
         #self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
         #self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
+        """
         a = tf.constant((float(1)),shape=[self.batch_size,1])
 
         self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))+\
                              tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
+        """
+
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer).numpy()
 
         """
         Get interpretation matrix

@@ -454,7 +454,8 @@ if __name__ == "__main__":
         std = np.std(values)
         kg.dic_vital[i]['mean_value'] = mean
         kg.dic_vital[i]['std'] = std
-        
+
+    """
     total_data_check = []
     for i in kg.total_data:
         check_icu = np.where(kg.reg_ar[:, 45] == i)[0]
@@ -468,6 +469,7 @@ if __name__ == "__main__":
             else:
                 continue
     kg.total_data = total_data_check
+    """
     kg.dic_death = {}
 
     kg.total_data_intubate = []

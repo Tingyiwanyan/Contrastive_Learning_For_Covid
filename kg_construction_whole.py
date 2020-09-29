@@ -586,7 +586,7 @@ if __name__ == "__main__":
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
-    #LSTM_ = LSTM_model(kg, process_data)
+    LSTM_ = LSTM_model(kg, process_data)
     # LSTM_.config_model()
     # LSTM_.train()
     dhgm = dynamic_hgm(kg, process_data)

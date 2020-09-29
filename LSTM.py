@@ -21,7 +21,7 @@ class LSTM_model():
         self.length_test = len(self.test_data)
         self.batch_size = 16
         self.time_sequence = 6
-        self.time_step_length = 5
+        self.time_step_length = 4
         self.predict_window_prior = self.time_sequence*self.time_step_length
         self.latent_dim_cell_state = 100
         self.latent_dim_demo = 50

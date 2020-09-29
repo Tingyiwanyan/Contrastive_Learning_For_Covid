@@ -20,7 +20,7 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 8
+        self.time_sequence = 4
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence*self.time_step_length
         self.latent_dim_cell_state = 100
@@ -113,7 +113,7 @@ class LSTM_model():
         hidden_rep = []
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.project_input, i, axis=1)
+            x_input_cur = tf.gather(self.input_x, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate,x_input_cur],1)
             else:
@@ -153,26 +153,13 @@ class LSTM_model():
         """
         Implement softmax loss layer
         """
-        #self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
-
+        self.hidden_last_comb = tf.concat([self.hidden_last,self.Dense_demo],1)
+        """
         self.hidden_att_e = tf.matmul(self.hidden_rep, self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, 1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax, [tf.shape(self.input_x_vital)[0],
                                                                               self.time_sequence,
                                                                               self.latent_dim])
-        # self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.project_input)
-        # self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
-        # self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
-
-        """
-        self.hidden_att_e = tf.math.sigmoid(
-            tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w), self.bias_retain_variable_b))
-        # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
-        self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
-        # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
-        self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
-
         self.hidden_att_e_variable = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))
         # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
@@ -181,12 +168,6 @@ class LSTM_model():
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 1)
-
-        """
-        self.output_layer = tf.compat.v1.layers.dense(inputs=self.hidden_last_comb,
-                                           units=2,
-                                           kernel_initializer=tf.keras.initializers.he_normal(seed=None),
-                                           activation=tf.nn.relu)
         """
 
         self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last_comb,self.weight_classification_w),self.bias_classification_b))

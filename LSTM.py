@@ -20,12 +20,12 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 4
+        self.time_sequence = 8
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence*self.time_step_length
         self.latent_dim_cell_state = 100
         self.latent_dim_demo = 50
-        self.epoch = 1
+        self.epoch = 2
         self.train_time_window = self.time_sequence * self.time_step_length
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))

@@ -541,6 +541,10 @@ class LSTM_model():
                     tp_test += 1
                 if self.test_logit[1,0] == 0 and self.logit_out[i,0] > threshold:
                     fp_test += 1
+            self.check_fp_test = fp_test
+            print(self.check_fp_test)
+            self.check_tp_test = tp_test
+            print(self.check_tp_test)
             tp_rate = tp_test/self.tp_correct
             fp_rate = fp_test/self.tp_neg
             self.tp_total.append(tp_rate)

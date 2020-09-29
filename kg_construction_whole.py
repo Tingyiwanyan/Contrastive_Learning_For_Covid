@@ -474,7 +474,7 @@ if __name__ == "__main__":
     kg.dic_intubation = {}
     kg.dic_in_icu = {}
 
-    kg.total_data = list(kg.dic_patient.keys())
+    kg.total_data = list(kg.dic_demographic.keys())
     kg.total_data_intubate = []
     kg.total_data_icu = []
     kg.total_data_extubate = []

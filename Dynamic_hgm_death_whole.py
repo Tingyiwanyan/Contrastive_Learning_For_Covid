@@ -22,8 +22,8 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 6
-        self.time_step_length = 5
+        self.time_sequence = 4
+        self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
@@ -58,7 +58,7 @@ class dynamic_hgm():
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size])
         self.input_icu_intubation = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2])
         self.input_x = tf.concat([self.input_x_vital, self.input_x_lab], 3)
-        self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
+        #self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
         self.input_x_demo = tf.keras.backend.placeholder(
             [None, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size])
         self.input_x_com = tf.keras.backend.placeholder(
@@ -170,7 +170,7 @@ class dynamic_hgm():
         self.bias_projection_b = tf.Variable(self.init_projection_b(shape=(self.latent_dim,)))
         self.init_projection_w = tf.keras.initializers.he_normal(seed=None)
         self.weight_projection_w = tf.Variable(
-            self.init_projection_w(shape=(self.lab_size+self.item_size+2, self.latent_dim)))
+            self.init_projection_w(shape=(self.lab_size+self.item_size, self.latent_dim)))
 
     def lstm_cell(self):
         cell_state = []
@@ -319,19 +319,19 @@ class dynamic_hgm():
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
 
         self.exp_hidden_att_e_variable = tf.expand_dims(self.hidden_att_e_variable,axis=3)
         self.broad_hidden_att_e_variable = tf.broadcast_to(self.exp_hidden_att_e_variable,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
 
         self.exp_hidden_att_e_broad = tf.expand_dims(self.hidden_att_e_broad,axis=3)
         self.broad_hidden_att_e = tf.broadcast_to(self.exp_hidden_att_e_broad,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
 

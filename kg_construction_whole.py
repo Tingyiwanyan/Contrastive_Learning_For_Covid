@@ -472,6 +472,7 @@ if __name__ == "__main__":
     """
     kg.dic_death = {}
 
+    kg.total_data = kg.dic_patient.keys()
     kg.total_data_intubate = []
     kg.total_data_icu = []
     kg.total_data_extubate = []
@@ -497,6 +498,17 @@ if __name__ == "__main__":
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['extubation_hour'] = np.int(
                 np.floor((total_extubation_time_value - total_in_admit_time_value) / 60))
+
+    kg.filtered_intubate_hour = [kg.total_intubation_time[i] for i in range(len(kg.total_intubation_time)) if
+                                 ((kg.total_intubation_time[i]>0 or kg.total_intubation_time[i]==0) and kg.total_intubation_time[i]<1000)]
+    kg.filtered_in_icu_time = [kg.total_in_icu_time[i] for i in range(len(kg.total_in_icu_time)) if
+                               ((kg.total_in_icu_time[i]>0 or kg.total_in_icu_time[i]==0) and kg.total_in_icu_time[i]<1000)]
+
+    kg.mean_intubate_time = np.mean(kg.filtered_intubate_hour)
+    kg.std_intubate_time = np.std(kg.filtered_intubate_hour)
+    kg.mean_icu_time = np.mean(kg.filtered_in_icu_time)
+    kg.std_icu_time = np.std(kg.filtered_in_icu_time)
+
 
 
 

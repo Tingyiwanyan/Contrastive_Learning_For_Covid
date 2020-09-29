@@ -502,9 +502,8 @@ class LSTM_model():
                 self.tp_neg += 1
             if self.test_logit[i,0] == 1 and self.logit_out[i,0] < self.threshold:
                 self.fn_test += 1
-            if self.test_logit[i,0] == 0 and self.logit_out[i,0] > self.threshold:
-                self.fp_test += 1
             if self.test_logit[i,0] == 0 and self.logit_out[i,0] < self.threshold:
+                self.fp_test += 1
                 self.correct += 1
 
         """
@@ -537,9 +536,9 @@ class LSTM_model():
             tp_test = 0
             fp_test = 0
             for i in range(test_length):
-                if self.test_logit[1,0] == 1 and self.logit_out[i,0] > threshold:
+                if self.test_logit[i,0] == 1 and self.logit_out[i,0] > threshold:
                     tp_test += 1
-                if self.test_logit[1,0] == 0 and self.logit_out[i,0] > threshold:
+                if self.test_logit[i,0] == 0 and self.logit_out[i,0] > threshold:
                     fp_test += 1
             self.check_fp_test = fp_test
             print(self.check_fp_test)

@@ -220,7 +220,7 @@ class LSTM_model():
         """
 
         self.bce = tf.keras.losses.BinaryCrossentropy()
-        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer).numpy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
         """
         Get interpretation matrix

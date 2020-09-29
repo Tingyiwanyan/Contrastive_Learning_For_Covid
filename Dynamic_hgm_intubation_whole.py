@@ -560,10 +560,10 @@ class dynamic_hgm():
         self.patient_neg_sample_demo = np.zeros((self.negative_lab_size, self.demo_size))
         self.patient_neg_sample_com = np.zeros((self.negative_lab_size, self.com_size))
         if self.kg.dic_patient[center_node_index]['intubation_label'] == 0:
-            neighbor_patient = self.kg.dic_death[1]
+            neighbor_patient = self.kg.dic_intubation[1]
             flag = 1
         else:
-            neighbor_patient = self.kg.dic_death[0]
+            neighbor_patient = self.kg.dic_intubation[0]
             flag = 0
         for i in range(self.negative_lab_size):
             index_neighbor = np.int(np.floor(np.random.uniform(0, len(neighbor_patient), 1)))

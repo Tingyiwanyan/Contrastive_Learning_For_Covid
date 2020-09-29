@@ -6,7 +6,7 @@ import pandas as pd
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_intubation_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -471,6 +471,8 @@ if __name__ == "__main__":
     kg.total_data = total_data_check
     """
     kg.dic_death = {}
+    kg.dic_intubation = {}
+    kg.dic_in_icu = {}
 
     kg.total_data = kg.dic_patient.keys()
     kg.total_data_intubate = []
@@ -480,18 +482,24 @@ if __name__ == "__main__":
     kg.total_in_icu_time = []
     for i in kg.total_data:
         if kg.dic_patient[i]['icu_label'] == 1:
+            kg.dic_in_icu.setdefault(1, []).append(i)
             kg.total_data_icu.append(i)
             total_in_icu_time_value = kg.dic_patient[i]['total_in_time_value']
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['in_icu_hour'] = np.int(np.floor((total_in_icu_time_value-total_in_admit_time_value)/60))
             kg.total_in_icu_time.append(kg.dic_patient[i]['in_icu_hour'])
+        if kg.dic_patient[i]['icu_label'] == 0:
+            kg.dic_in_icu.setdefault(0, []).append(i)
         if kg.dic_patient[i]['intubation_label'] == 1:
+            kg.dic_intubation.setdefault(1,[]).append(i)
             kg.total_data_intubate.append(i)
             total_intubation_time_value = kg.dic_patient[i]['total_intubation_time_value']
             total_in_admit_time_value = kg.dic_patient[i]['total_in_admit_time_value']
             kg.dic_patient[i]['intubation_hour'] = np.int(
                 np.floor((total_intubation_time_value - total_in_admit_time_value) / 60))
             kg.total_intubation_time.append(kg.dic_patient[i]['intubation_hour'])
+        if kg.dic_patient[i]['intubation_label'] == 0:
+            kg.dic_intubation.setdefault(0,[]).append(i)
         if kg.dic_patient[i]['extubation_label'] == 1:
             kg.total_data_extubate.append(i)
             total_extubation_time_value = kg.dic_patient[i]['total_extubation_time_value']

@@ -22,8 +22,8 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 6
-        self.time_step_length = 5
+        self.time_sequence = 4
+        self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
@@ -58,7 +58,7 @@ class dynamic_hgm():
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size])
         self.input_icu_intubation = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2])
         self.input_x = tf.concat([self.input_x_vital, self.input_x_lab], 3)
-        self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
+        #self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
         self.input_x_demo = tf.keras.backend.placeholder(
             [None, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size])
         self.input_x_com = tf.keras.backend.placeholder(
@@ -170,7 +170,7 @@ class dynamic_hgm():
         self.bias_projection_b = tf.Variable(self.init_projection_b(shape=(self.latent_dim,)))
         self.init_projection_w = tf.keras.initializers.he_normal(seed=None)
         self.weight_projection_w = tf.Variable(
-            self.init_projection_w(shape=(self.lab_size+self.item_size+2, self.latent_dim)))
+            self.init_projection_w(shape=(self.lab_size+self.item_size, self.latent_dim)))
 
     def lstm_cell(self):
         cell_state = []
@@ -319,19 +319,19 @@ class dynamic_hgm():
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
 
         self.exp_hidden_att_e_variable = tf.expand_dims(self.hidden_att_e_variable,axis=3)
         self.broad_hidden_att_e_variable = tf.broadcast_to(self.exp_hidden_att_e_variable,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
 
         self.exp_hidden_att_e_broad = tf.expand_dims(self.hidden_att_e_broad,axis=3)
         self.broad_hidden_att_e = tf.broadcast_to(self.exp_hidden_att_e_broad,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
-                                                                               self.latent_dim+2,self.latent_dim])
+                                                                               self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
 
@@ -484,12 +484,12 @@ class dynamic_hgm():
         self.patient_pos_sample_icu_intubation_label = np.zeros((self.time_sequence, self.positive_lab_size+1, 2))
         self.patient_pos_sample_demo = np.zeros((self.positive_lab_size + 1, self.demo_size))
         self.patient_pos_sample_com = np.zeros((self.positive_lab_size + 1, self.com_size))
-        if self.kg.dic_patient[center_node_index]['death_flag'] == 0:
+        if self.kg.dic_patient[center_node_index]['intubation_label'] == 0:
             flag = 0
-            neighbor_patient = self.kg.dic_death[0]
+            neighbor_patient = self.kg.dic_intubation[0]
         else:
             flag = 1
-            neighbor_patient = self.kg.dic_death[1]
+            neighbor_patient = self.kg.dic_intubation[1]
         time_seq = self.kg.dic_patient[center_node_index]['prior_time_vital'].keys()
         time_seq_int = [np.int(k) for k in time_seq]
         time_seq_int.sort()
@@ -499,11 +499,11 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                start_time = self.kg.dic_patient[center_node_index][
-                                 'discharge_hour'] - self.predict_window_prior + float(j) * self.time_step_length
+                pick_intubate_hour = np.int(np.floor(np.random_normal(0,20,1)))
+                start_time = pick_intubate_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
-                start_time = self.kg.dic_patient[center_node_index]['death_hour'] - self.predict_window_prior + float(
+                start_time = self.kg.dic_patient[center_node_index]['intubation_hour'] - self.predict_window_prior + float(
                     j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             one_data_vital = self.assign_value_patient(center_node_index, start_time, end_time)
@@ -537,11 +537,12 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
+                    pick_intubate_hour = np.int(np.floor(np.random_normal(0, 20, 1)))
+                    start_time = pick_intubate_hour - self.predict_window_prior + float(
                         j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
-                    start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
+                    start_time = self.kg.dic_patient[patient_id]['intubation_hour'] - self.predict_window_prior + float(
                         j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 one_data_vital = self.assign_value_patient(patient_id, start_time, end_time)
@@ -558,7 +559,7 @@ class dynamic_hgm():
         self.patient_neg_sample_icu_intubation_label = np.zeros((self.time_sequence,self.negative_lab_size,2))
         self.patient_neg_sample_demo = np.zeros((self.negative_lab_size, self.demo_size))
         self.patient_neg_sample_com = np.zeros((self.negative_lab_size, self.com_size))
-        if self.kg.dic_patient[center_node_index]['death_flag'] == 0:
+        if self.kg.dic_patient[center_node_index]['intubation_label'] == 0:
             neighbor_patient = self.kg.dic_death[1]
             flag = 1
         else:
@@ -583,11 +584,11 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
-                        j) * self.time_step_length
+                    pick_intubate_hour = np.int(np.floor(np.random_normal(0, 20, 1)))
+                    start_time = pick_intubate_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
-                    start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
+                    start_time = self.kg.dic_patient[patient_id]['intubation_hour'] - self.predict_window_prior + float(
                         j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 one_data_vital = self.assign_value_patient(patient_id, start_time, end_time)
@@ -809,7 +810,7 @@ class dynamic_hgm():
             self.time_seq_int = [np.int(k) for k in self.time_seq]
             self.time_seq_int.sort()
             time_index = 0
-            flag = self.kg.dic_patient[self.patient_id]['death_flag']
+            flag = self.kg.dic_patient[self.patient_id]['intubation_label']
             """
             if flag == 0:
                 one_batch_logit[i,0,0] = 1
@@ -843,49 +844,6 @@ class dynamic_hgm():
             train_one_batch_icu_intubation[i,:,:,:] = train_one_data_icu_intubation
 
         return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com,train_one_batch_icu_intubation
-
-
-    def get_batch_test(self, data_length, start_index, data):
-        """
-        get training batch data
-        """
-        train_one_batch = np.zeros(
-            (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size))
-        # train_one_batch_item = np.zeros((data_length,self.positive_lab_size+self.negative_lab_size,self.item_size))
-        train_one_batch_mortality = np.zeros((data_length, 2, 2))
-        one_batch_logit = np.zeros((data_length, 2))
-        self.real_logit = np.zeros(data_length)
-        # self.item_neg_sample = np.zeros((self.negative_lab_size, self.item_size))
-        # self.item_pos_sample = np.zeros((self.positive_lab_size, self.item_size))
-        index_batch = 0
-        index_increase = 0
-        # while index_batch < data_length:
-        for i in range(data_length):
-            self.patient_id = data[start_index + i]
-            # if self.kg.dic_patient[self.patient_id]['item_id'].keys() == {}:
-            #   index_increase += 1
-            #  continue
-            # index_batch += 1
-            self.time_seq = self.kg.dic_patient[self.patient_id]['prior_time'].keys()
-            self.time_seq_int = [np.int(k) for k in self.time_seq]
-            self.time_seq_int.sort()
-            time_index = 0
-            flag = self.kg.dic_patient[self.patient_id]['flag']
-            if flag == 0:
-                train_one_batch_mortality[i, 0, :] = [1, 0]
-                train_one_batch_mortality[i, 1, :] = [0, 1]
-                one_batch_logit[i, 0] = 1
-            else:
-                train_one_batch_mortality[i, 0, :] = [0, 1]
-                train_one_batch_mortality[i, 1, :] = [1, 0]
-                one_batch_logit[i, 1] = 1
-
-            self.get_positive_patient(self.patient_id)
-            self.get_negative_patient(self.patient_id)
-            train_one_data = np.concatenate((self.patient_pos_sample, self.patient_neg_sample), axis=1)
-            train_one_batch[i, :, :, :] = train_one_data
-
-        return train_one_batch, one_batch_logit, train_one_batch_mortality
 
     # def get_pos_neg_neighbor(self):
 

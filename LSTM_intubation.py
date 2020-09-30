@@ -206,7 +206,10 @@ class LSTM_model():
         #self.bce = tf.keras.losses.BinaryCrossentropy()
         #self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
-        self.cross_entropy = tf.keras.losses.hinge(self.input_y_logit, self.output_layer)
+        self.cross_entropy = tf.compat.v1.losses.hinge_loss(
+            self.input_y_logit, self.output_layer, weights=1.0, scope=None, loss_collection=tf.GraphKeys.LOSSES,
+            reduction=Reduction.SUM_BY_NONZERO_WEIGHTS
+        )
 
         """
         Get interpretation matrix

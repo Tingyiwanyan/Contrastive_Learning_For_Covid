@@ -210,7 +210,8 @@ class LSTM_model():
 
         """
         Get interpretation matrix
-        """self.cross_entropy = tf.compat.v1.losses.hinge_loss(
+        """
+        self.cross_entropy = tf.compat.v1.losses.hinge_loss(
             self.input_y_logit, self.output_layer, weights=1.0, scope=None, loss_collection=tf.GraphKeys.LOSSES)
         """
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w, [tf.shape(self.input_x_vital)[0],

@@ -22,7 +22,7 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 8
+        self.time_sequence = 4
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -382,19 +382,19 @@ class LSTM_model():
         one_batch_logit = np.zeros((data_length, 1))
         for i in range(data_length):
             self.patient_id = data[start_index + i]
-            flag = self.kg.dic_patient[self.patient_id]['intubation_label']
+            flag = self.kg.dic_patient[self.patient_id]['icu_label']
             for j in range(self.time_sequence):
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
                     #start_time = self.kg.dic_patient[self.patient_id][
                     #                 'discharge_hour'] - self.predict_window_prior + float(j) * self.time_step_length
-                    pick_intubate_hour = self.kg.mean_intubate_time + np.int(np.floor(np.random.normal(0, 20, 1)))
-                    start_time = pick_intubate_hour - self.predict_window_prior + float(j) * self.time_step_length
+                    pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_icu_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                     self.check_start_time = start_time
                 else:
-                    start_time = self.kg.dic_patient[self.patient_id]['intubation_hour'] - self.predict_window_prior + float(
+                    start_time = self.kg.dic_patient[self.patient_id]['in_icu_hour'] - self.predict_window_prior + float(
                         j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                     self.check_start_time = start_time

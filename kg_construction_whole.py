@@ -6,7 +6,7 @@ import pandas as pd
 import json
 from LSTM_icu import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_intubation_whole import dynamic_hgm
+from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
 
 

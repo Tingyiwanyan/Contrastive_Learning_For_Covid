@@ -22,7 +22,7 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 4
+        self.time_sequence = 8
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -210,7 +210,8 @@ class LSTM_model():
 
         """
         Get interpretation matrix
-        """
+        """self.cross_entropy = tf.compat.v1.losses.hinge_loss(
+            self.input_y_logit, self.output_layer, weights=1.0, scope=None, loss_collection=tf.GraphKeys.LOSSES)
         """
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w, [tf.shape(self.input_x_vital)[0],
                                                                                 self.time_sequence,

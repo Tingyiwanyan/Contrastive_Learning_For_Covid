@@ -986,6 +986,7 @@ class dynamic_hgm():
         self.correct = 0
         self.tp_correct = 0
         self.tp_neg = 0
+        self.correct_predict_death = []
         for i in range(test_length):
             if self.test_logit[i, 1] == 1:
                 self.tp_correct += 1
@@ -994,6 +995,7 @@ class dynamic_hgm():
             if self.score[i] < 0 and self.test_logit[i, 0] == 1:
                 self.correct += 1
             if self.score[i] > 0 and self.test_logit[i, 1] == 1:
+                self.correct_predict_death.append(i)
                 self.correct += 1
 
         self.acc = np.float(self.correct) / test_length

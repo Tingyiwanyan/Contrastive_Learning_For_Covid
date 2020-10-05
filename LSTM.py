@@ -483,10 +483,12 @@ class LSTM_model():
             if self.test_logit[i,1] == 0 and self.logit_out[i,1] < self.threshold:
                 self.correct += 1
         """
+        self.correct_predict_death = []
         for i in range(test_length):
             if self.test_logit[i,0] == 1:
                 self.tp_correct += 1
             if self.test_logit[i,0] == 1 and self.logit_out[i,0] > self.threshold:
+                self.correct_predict_death.append(i)
                 self.correct += 1
                 self.tp_test += 1
             if self.test_logit[i,0] == 0:
@@ -497,6 +499,28 @@ class LSTM_model():
                 self.fp_test += 1
             if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] < self.threshold:
                 self.correct += 1
+
+        self.correct_predict_death = np.array(self.correct_predict_death)
+
+        feature_len = self.item_size + self.lab_size
+
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, 0, :]
+        self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
+
+        count = 0
+        value = 0
+
+        for j in range(self.time_sequence):
+            for p in range(feature_len):
+                for i in range(self.correct_predict_death.shape[0]):
+                    if self.test_data_scores[i, j, p] != 0:
+                        count += 1
+                        value += self.test_data_scores[i, j, p]
+                    if count == 0:
+                        continue
+                    self.ave_data_scores[j, p] = float(value / count)
+                    count = 0
+                    value = 0
 
         """
         self.tp_test = 0

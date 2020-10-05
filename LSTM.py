@@ -518,11 +518,11 @@ class LSTM_model():
                     if self.test_data_scores[i, j, p] != 0:
                         count += 1
                         value += self.test_data_scores[i, j, p]
-                    if count == 0:
-                        continue
-                    self.ave_data_scores[j, p] = float(value / count)
-                    count = 0
-                    value = 0
+                if count == 0:
+                    continue
+                self.ave_data_scores[j, p] = float(value / count)
+                count = 0
+                value = 0
 
         """
         self.tp_test = 0

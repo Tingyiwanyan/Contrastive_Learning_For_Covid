@@ -504,7 +504,7 @@ class LSTM_model():
 
         feature_len = self.item_size + self.lab_size
 
-        self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, 0, :]
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, :]
         self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
 
         count = 0

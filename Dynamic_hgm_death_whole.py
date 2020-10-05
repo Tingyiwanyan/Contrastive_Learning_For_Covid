@@ -1016,8 +1016,8 @@ class dynamic_hgm():
                     if self.test_data_scores[i,j,p]!=0:
                         count += 1
                         value += self.test_data_scores[i,j,p]
-                    if count == 0:
-                        continue
+                if count == 0:
+                    continue
                 self.ave_data_scores[j,p] = float(value/count)
                 count = 0
                 value = 0

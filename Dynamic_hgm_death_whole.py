@@ -728,6 +728,8 @@ class dynamic_hgm():
                 self.times_lab.append(i)
         for j in self.times_lab:
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
+                if i[-1] == 'A':
+                    continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])
                 ave_value = np.mean([np.float(k) for k in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)][i]])

@@ -503,6 +503,7 @@ class LSTM_model():
             if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] < self.threshold:
                 self.correct += 1
 
+        """
         self.correct_predict_death = np.array(self.correct_predict_death)
 
         feature_len = self.item_size + self.lab_size
@@ -524,6 +525,7 @@ class LSTM_model():
                 self.ave_data_scores[j, p] = float(value / count)
                 count = 0
                 value = 0
+        """
 
         """
         self.tp_test = 0

@@ -294,6 +294,8 @@ class LSTM_model():
                 self.times_lab.append(i)
         for j in self.times_lab:
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
+                if i[-1] == 'A':
+                    continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])
                 ave_value = np.mean([np.float(k) for k in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)][i]])
@@ -403,10 +405,10 @@ class LSTM_model():
                     end_time = start_time + self.time_step_length
                     self.check_start_time = start_time
 
-            self.one_data_vital = self.assign_value_patient(self.patient_id, start_time, end_time)
-            self.one_data_lab = self.assign_value_lab(self.patient_id, start_time, end_time)
-            train_one_batch_vital[i, j, :] = self.one_data_vital
-            train_one_batch_lab[i, j, :] = self.one_data_lab
+                self.one_data_vital = self.assign_value_patient(self.patient_id, start_time, end_time)
+                self.one_data_lab = self.assign_value_lab(self.patient_id, start_time, end_time)
+                train_one_batch_vital[i, j, :] = self.one_data_vital
+                train_one_batch_lab[i, j, :] = self.one_data_lab
             # flag = self.kg.dic_patient[self.patient_id]['death_flag']
             if flag == 1:
                 one_batch_logit[i, 0] = 1

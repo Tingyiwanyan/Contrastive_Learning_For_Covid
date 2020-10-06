@@ -22,7 +22,7 @@ class LSTM_model():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 8
+        self.time_sequence = 4
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -203,11 +203,11 @@ class LSTM_model():
                              tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
         """
 
-        #self.bce = tf.keras.losses.BinaryCrossentropy()
-        #self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
-        self.cross_entropy = tf.compat.v1.losses.hinge_loss(
-            self.input_y_logit, self.output_layer, weights=1.0, scope=None, loss_collection=tf.GraphKeys.LOSSES)
+        #self.cross_entropy = tf.compat.v1.losses.hinge_loss(
+            #self.input_y_logit, self.output_layer, weights=1.0, scope=None, loss_collection=tf.GraphKeys.LOSSES)
 
         """
         Get interpretation matrix

@@ -470,6 +470,30 @@ if __name__ == "__main__":
                 continue
     kg.total_data = total_data_check
     """
+    EXP_patient = np.where(kg.reg_ar[:,13]=='EXP')[0]
+    Exclude = np.where(kg.reg_ar[:,13]=='20')[0]
+
+    EXP_patient_inter = np.intersect1d(list(EXP_patient),list(kg.dic_patient.keys()))
+    Exclude_inter = np.intersect1d(list(Exclude),list(kg.dic_patient.keys()))
+
+    for i in EXP_patient_inter:
+        if kg.dic_patient[i]['death_flag'] == 1:
+            continue
+        if 'discharge_hour' in kg.dic_patient[i].keys():
+            kg.dic_patient[i]['death_flag'] = 1
+            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
+        else:
+            kg.total_data.remove(i)
+
+    for i in Exclude_inter:
+        if kg.dic_patient[i]['death_flag'] == 1:
+            continue
+        if 'discharge_hour' in kg.dic_patient[i].keys():
+            kg.dic_patient[i]['death_flag'] = 1
+            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
+        else:
+            kg.total_data.remove(i)
+
     kg.dic_death = {}
     kg.dic_intubation = {}
     kg.dic_in_icu = {}
@@ -480,6 +504,7 @@ if __name__ == "__main__":
     kg.total_data_extubate = []
     kg.total_intubation_time = []
     kg.total_in_icu_time = []
+    kg.total_death_time = []
     for i in kg.total_data:
         if kg.dic_patient[i]['icu_label'] == 1:
             kg.dic_in_icu.setdefault(1, []).append(i)
@@ -520,6 +545,7 @@ if __name__ == "__main__":
 
 
 
+
     for i in kg.total_death_data:
         if kg.dic_patient[i]['death_flag'] == 0:
             kg.dic_death.setdefault(0, []).append(i)
@@ -554,6 +580,14 @@ if __name__ == "__main__":
             kg.dic_patient[i]['death_value'] = total_dead_time_value
             kg.dic_patient[i]['death_hour'] = np.int(
                 np.floor((total_dead_time_value - kg.dic_patient[i]['total_in_admit_time_value']) / 60))
+            kg.total_death_time.append(kg.dic_patient[i]['death_hour'])
+
+    kg.filtered_death_hour = [kg.total_death_time[i] for i in range(len(kg.total_death_time)) if
+                                 ((kg.total_death_time[i] > 0 or kg.total_death_time[i] == 0) and
+                                  kg.total_death_time[i] < 1000)]
+
+    kg.mean_death_time = np.mean(kg.filtered_death_hour)
+    kg.std_death_time = np.std(kg.filtered_death_hour)
 
     age_total = []
     for i in kg.dic_demographic.keys():

@@ -499,8 +499,8 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                start_time = self.kg.dic_patient[center_node_index][
-                                 'discharge_hour'] - self.predict_window_prior + float(j) * self.time_step_length
+                pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
                 start_time = self.kg.dic_patient[center_node_index]['death_hour'] - self.predict_window_prior + float(
@@ -537,8 +537,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
-                        j) * self.time_step_length
+                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
@@ -583,8 +583,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
-                        j) * self.time_step_length
+                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(

@@ -391,8 +391,8 @@ class LSTM_model():
                 #start_time = float(j)*self.time_step_length
                 #end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[self.patient_id]['discharge_hour'] - self.predict_window_prior + float(j)*self.time_step_length
-                    end_time = start_time + self.time_step_length
+                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     self.check_start_time = start_time
                 else:
                     start_time = self.kg.dic_patient[self.patient_id]['death_hour'] - self.predict_window_prior + float(j)*self.time_step_length

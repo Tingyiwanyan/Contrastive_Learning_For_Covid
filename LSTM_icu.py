@@ -295,6 +295,14 @@ class LSTM_model():
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
                 if i[-1] == 'A':
                     continue
+                if i == "EOSINO":
+                    continue
+                if i == "EOSINO_PERC":
+                    continue
+                if i == "BASOPHIL":
+                    continue
+                if i == "BASOPHIL_PERC":
+                    continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])
                 ave_value = np.mean([np.float(k) for k in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)][i]])

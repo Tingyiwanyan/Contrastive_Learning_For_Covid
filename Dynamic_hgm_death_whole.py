@@ -12,6 +12,7 @@ class dynamic_hgm():
     """
 
     def __init__(self, kg, data_process):
+        print("Im here in death")
         # tf.compat.v1.disable_v2_behavior()
         # tf.compat.v1.disable_eager_execution()
         self.kg = kg
@@ -729,6 +730,14 @@ class dynamic_hgm():
         for j in self.times_lab:
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
                 if i[-1] == 'A':
+                    continue
+                if i == "EOSINO":
+                    continue
+                if i == "EOSINO_PERC":
+                    continue
+                if i == "BASOPHIL":
+                    continue
+                if i == "BASOPHIL_PERC":
                     continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])

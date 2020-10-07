@@ -557,7 +557,7 @@ class LSTM_model():
         self.acc = np.float(self.correct)/test_length
 
         threshold = 0.0
-        self.resolution = 0.05
+        self.resolution = 0.01
         tp_test = 0
         fp_test = 0
         self.tp_total = []

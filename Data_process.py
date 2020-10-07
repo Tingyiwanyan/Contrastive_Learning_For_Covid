@@ -20,6 +20,7 @@ class kg_process_data():
         for i in self.kg.total_data[0:self.train_num]:
             self.train_patient.append(i)
         test_whole = [i for i in self.kg.total_data if i not in self.train_patient]
+
         for i in test_whole:
             self.test_patient.append(i)
 

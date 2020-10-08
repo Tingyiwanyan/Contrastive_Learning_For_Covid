@@ -1055,7 +1055,7 @@ class dynamic_hgm():
         self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
 
         threshold = -1.01
-        self.resolution = 0.05
+        self.resolution = 0.01
         tp_test = 0
         fp_test = 0
         self.tp_total = []

@@ -46,6 +46,7 @@ class dynamic_hgm():
         self.neighbor_pick_neg = 10
         self.neighbor_death = len(kg.dic_death[1])
         self.neighbor_discharge = len(kg.dic_death[0])
+        self.resolution = 0.01
         """
         define LSTM variables
         """
@@ -973,7 +974,6 @@ class dynamic_hgm():
         self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
 
         threshold = -1.01
-        self.resolution = 0.05
         tp_test = 0
         fp_test = 0
         self.tp_total = []

@@ -178,7 +178,7 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.project_input, i, axis=1)
+            x_input_cur = tf.gather(self.input_x, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
             else:
@@ -268,27 +268,15 @@ class dynamic_hgm():
         """
         Build dynamic HGM model
         """
-        #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        self.Dense_patient = tf.expand_dims(self.hidden_last,1)
+        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
+        """
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
                                                                              self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
-        #self.hidden_mul = tf.multiply(self.hidden_att_e_broad,self.project_input)
-        #self.hidden_final = tf.reduce_sum(self.hidden_mul,1)
-        #self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
-
-        """
-        self.hidden_att_e = tf.math.sigmoid(
-            tf.math.add(tf.matmul(self.hidden_last, self.weight_retain_variable_w), self.bias_retain_variable_b))
-        # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
-        self.hidden_mul_variable = tf.multiply(self.hidden_att_e, self.hidden_last)
-        # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
-        self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
-
-
+        
         self.hidden_att_e_variable = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))
         # self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, -1)
@@ -301,7 +289,7 @@ class dynamic_hgm():
 
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
-
+        """
 
         self.Dense_mortality_ = \
             tf.nn.relu(tf.math.add(tf.matmul(self.mortality, self.weight_mortality), self.bias_mortality))
@@ -315,6 +303,7 @@ class dynamic_hgm():
 
         """
         Get interpretation matrix
+        """
         """
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
@@ -334,17 +323,17 @@ class dynamic_hgm():
                                                                                self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
-
+        """
         """
         Get score important
         """
-
+        """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-
+        """
 
 
         """
@@ -931,89 +920,15 @@ class dynamic_hgm():
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})[:,
                             0, :]
+        """
         self.test_att_score = self.sess.run([self.score_attention,self.input_importance],feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
+        """
 
-        single_mortality = np.zeros((1, 2, 2))
-        single_mortality[0][0][0] = 1
-        single_mortality[0][1][1] = 1
-        self.mortality_test = self.sess.run(self.Dense_mortality, feed_dict={self.mortality: single_mortality})[0]
-        self.score = np.zeros(test_length)
-        for i in range(test_length):
-            embed_single_patient = self.test_patient[i] / np.linalg.norm(self.test_patient[i])
-            embed_mortality = self.mortality_test[1] / np.linalg.norm(self.mortality_test[1])
-            self.score[i] = np.matmul(embed_single_patient, embed_mortality.T)
-
-        self.correct = 0
-        self.tp_correct = 0
-        self.tp_neg = 0
-        for i in range(test_length):
-            if self.test_logit[i, 1] == 1:
-                self.tp_correct += 1
-            if self.test_logit[i, 0] == 1:
-                self.tp_neg += 1
-            if self.score[i] < 0 and self.test_logit[i, 0] == 1:
-                self.correct += 1
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.correct += 1
-
-        self.acc = np.float(self.correct) / test_length
-
-        self.tp_test = 0
-        self.fp_test = 0
-        self.fn_test = 0
-        for i in range(test_length):
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.tp_test += 1
-            if self.score[i] < 0 and self.test_logit[i, 1] == 1:
-                self.fn_test += 1
-            if self.score[i] > 0 and self.test_logit[i, 0] == 1:
-                self.fp_test += 1
-
-        self.precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
-        self.recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
-        self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
-
-        threshold = -1.01
-        self.resolution = 0.05
-        tp_test = 0
-        fp_test = 0
-        self.tp_total = []
-        self.fp_total = []
-
-        while (threshold < 1.01):
-            tp_test = 0
-            fp_test = 0
-            for i in range(test_length):
-                if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
-                    tp_test += 1
-                if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
-                    fp_test += 1
-
-            tp_rate = tp_test / self.tp_correct
-            fp_rate = fp_test / self.tp_neg
-            self.tp_total.append(tp_rate)
-            self.fp_total.append(fp_rate)
-            threshold += self.resolution
-
-    def test_att(self, data):
-        test_length = len(data)
-        init_hidden_state = np.zeros(
-            (test_length,
-             1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-             self.latent_dim))
-        self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com = self.get_batch_train_att(
-            test_length, 0, data)
-        self.test_patient = self.sess.run(self.Dense_patient,
-                                          feed_dict={self.input_x_vital_att: self.test_data_batch_vital,
-                                                     self.input_x_lab_att: self.test_one_batch_lab,
-                                                     self.input_x_demo_att: self.test_one_batch_demo,
-                                                     # self.input_x_com: self.test_com,
-                                                     self.init_hiddenstate_att: init_hidden_state})[:, 0, :]
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
         single_mortality[0][1][1] = 1

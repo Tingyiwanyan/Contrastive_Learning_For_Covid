@@ -23,7 +23,7 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 4
+        self.time_sequence = 8
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -47,6 +47,7 @@ class dynamic_hgm():
         self.neighbor_pick_neg = 10
         self.neighbor_death = len(kg.dic_death[1])
         self.neighbor_discharge = len(kg.dic_death[0])
+        self.resolution = 0.01
         """
         define LSTM variables
         """
@@ -1042,7 +1043,6 @@ class dynamic_hgm():
         self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
 
         threshold = -1.01
-        self.resolution = 0.05
         tp_test = 0
         fp_test = 0
         self.tp_total = []

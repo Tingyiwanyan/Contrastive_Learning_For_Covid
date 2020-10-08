@@ -1,0 +1,97 @@
+Variable Name,Time Step,Positive Contribute Value
+Systolic Blood Pressure,1,0.39534392
+Diastolic Blood Pressure,1,0.46318875
+Temperature,1,-0.00589575
+Pulse Oximetry,1,1.29483486
+Heart Rate,1,0.26673587
+Height,1,1.04345892
+Albumin,1,0.05860237
+Amylase,1,0
+Anion gap,1,0.44764164
+Band Count,1,0.30056792
+BNP,1,0.43038977
+Blood Urea Nitrogen,1,0.89866816
+C Reactive Protein,1,0.82507614
+Creatinine,1,0.99655979
+Ferritin,1,0.00519451
+Glucose,1,0.36886299
+International Normalized Ratio,1,0.0163812
+Lactate,1,0.45170863
+Lactate Dehydrogenase,1,0.69453097
+Lymphocyte Percentage,1,0.10292167
+Monocyte Percentage,1,0.28784859
+Oxygen Saturation,1,0.10469111
+Platelets,1,0.11080389
+Prothrombin Time,1,0.00699061
+Systolic Blood Pressure,2,0.14092775
+Diastolic Blood Pressure,2,0.18525311
+Temperature,2,0.01259758
+Pulse Oximetry,2,0.91001585
+Heart Rate,2,0.09568254
+Height,2,0.79754857
+Albumin,2,0.02432067
+Amylase,2,0.00198232
+Anion gap,2,0.31002992
+Band Count,2,0.87451686
+BNP,2,1.44128819
+Blood Urea Nitrogen,2,0.36056275
+C Reactive Protein,2,0.50695918
+Creatinine,2,0.29734908
+Ferritin,2,-0.03038217
+Glucose,2,0.02049182
+International Normalized Ratio,2,0.01112382
+Lactate,2,0.77688131
+Lactate Dehydrogenase,2,0.11324601
+Lymphocyte Percentage,2,0.04666067
+Monocyte Percentage,2,0.28774931
+Oxygen Saturation,2,0.25279792
+Platelets,2,0.0679267
+Prothrombin Time,2,0.00437911
+Systolic Blood Pressure,3,0.41062917
+Diastolic Blood Pressure,3,0.62790376
+Temperature,3,0.04711751
+Pulse Oximetry,3,2.32902676
+Heart Rate,3,0.28765947
+Height,3,1.0666418
+Albumin,3,0.05776034
+Amylase,3,0
+Anion gap,3,0.56987752
+Band Count,3,0.70002574
+BNP,3,1.07701544
+Blood Urea Nitrogen,3,0.44784552
+C Reactive Protein,3,0.77235125
+Creatinine,3,0.25779702
+Ferritin,3,0.1400141
+Glucose,3,0.07274855
+International Normalized Ratio,3,0.08693962
+Lactate,3,7.2173754
+Lactate Dehydrogenase,3,0.63063193
+Lymphocyte Percentage,3,0.15664603
+Monocyte Percentage,3,0.25447263
+Oxygen Saturation,3,0.32272102
+Platelets,3,0.04169433
+Prothrombin Time,3,0.03551919
+Systolic Blood Pressure,4,1.17012872
+Diastolic Blood Pressure,4,1.6603368
+Temperature,4,0.21861824
+Pulse Oximetry,4,9.34309483
+Heart Rate,4,0.50640321
+Height,4,0.64186811
+Albumin,4,0.31991048
+Amylase,4,1.33926058
+Anion gap,4,0.49726432
+Band Count,4,0.28057667
+BNP,4,2.22677715
+Blood Urea Nitrogen,4,1.71364957
+C Reactive Protein,4,3.08632827
+Creatinine,4,1.00344265
+Ferritin,4,1.11714766
+Glucose,4,0.5480182
+International Normalized Ratio,4,0.86109099
+Lactate,4,3.64522546
+Lactate Dehydrogenase,4,0.60822371
+Lymphocyte Percentage,4,0.32947045
+Monocyte Percentage,4,0.7971855
+Oxygen Saturation,4,0.34834625
+Platelets,4,0.31792539
+Prothrombin Time,4,0.29071121

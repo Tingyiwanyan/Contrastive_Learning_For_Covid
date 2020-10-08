@@ -205,34 +205,6 @@ class dynamic_hgm():
         self.hidden_rep = tf.concat(hidden_rep, 1)
         self.check = concat_cur
 
-    def lstm_cell_att(self):
-        """
-        build att model
-        """
-        cell_state = []
-        hidden_rep = []
-        for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x_att, i, axis=1)
-            if i == 0:
-                concat_cur = tf.concat([self.init_hiddenstate_att, x_input_cur], 2)
-            else:
-                concat_cur = tf.concat([hidden_rep[i - 1], x_input_cur], 2)
-            forget_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
-            info_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_info_gate), self.bias_info_gate))
-            cellstate_cur = \
-                tf.math.tanh(tf.math.add(tf.matmul(concat_cur, self.weight_cell_state), self.bias_cell_state))
-            info_cell_state = tf.multiply(info_cur, cellstate_cur)
-            if not i == 0:
-                forget_cell_state = tf.multiply(forget_cur, cell_state[i - 1])
-                cellstate_cur = tf.math.add(forget_cell_state, info_cell_state)
-            output_gate = \
-                tf.nn.relu(tf.math.add(tf.matmul(concat_cur, self.weight_output_gate), self.bias_output_gate))
-            hidden_current = tf.multiply(output_gate, cellstate_cur)
-            cell_state.append(cellstate_cur)
-            hidden_rep.append(hidden_current)
-        self.hidden_last = hidden_rep[self.time_sequence - 1]
 
     def demo_layer(self):
         self.Dense_demo = tf.compat.v1.layers.dense(inputs=self.input_x_demo,

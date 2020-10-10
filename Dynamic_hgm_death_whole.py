@@ -23,7 +23,7 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 8
+        self.time_sequence = 4
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -270,10 +270,10 @@ class dynamic_hgm():
         """
         Build dynamic HGM model
         """
-        self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
+        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-        """
+
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
@@ -289,7 +289,7 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
+
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
 
@@ -966,14 +966,14 @@ class dynamic_hgm():
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})[:,
                             0, :]
-        """
+
         self.test_att_score = self.sess.run([self.score_attention,self.input_importance,self.input_x],feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
-        """
+
 
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1

@@ -464,7 +464,7 @@ class LSTM_model():
                                             self.init_hiddenstate:init_hidden_state})
 
 
-        self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.input_x],
+        self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],
                                             feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,

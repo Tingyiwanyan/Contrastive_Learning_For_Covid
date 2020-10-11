@@ -174,6 +174,14 @@ class dynamic_hgm():
         self.weight_projection_w = tf.Variable(
             self.init_projection_w(shape=(self.lab_size+self.item_size, self.latent_dim)))
 
+        """
+        Define classification matrix for lstm
+        """
+        self.init_bias_classification_b = tf.keras.initializers.he_normal(seed=None)
+        self.init_weight_classification_w = tf.keras.initializers.he_normal(seed=None)
+        self.bias_classification_b = tf.Variable(self.init_bias_classification_b(shape=(1,)))
+        self.weight_classification_w = tf.Variable(self.init_weight_classification_w(shape=(self.latent_dim, 1)))
+
     def lstm_cell(self):
         cell_state = []
         hidden_rep = []
@@ -261,8 +269,11 @@ class dynamic_hgm():
                                                       activation=tf.nn.relu)
         # self.logit_sig = tf.math.sigmoid(self.output_layer)
         self.logit_sig = tf.nn.softmax(self.output_layer)
-        bce = tf.keras.losses.BinaryCrossentropy()
-        self.cross_entropy = bce(self.logit_sig, self.input_y_logit)
+        #bce = tf.keras.losses.BinaryCrossentropy()
+        #self.cross_entropy = bce(self.logit_sig, self.input_y_logit)
+
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
         # self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
         # self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
 
@@ -304,6 +315,15 @@ class dynamic_hgm():
             tf.nn.relu(tf.math.add(tf.matmul(self.Death_input, self.weight_mortality), self.bias_mortality))
 
         self.Dense_death_rep = tf.math.subtract(self.Dense_death_rep_, self.relation_mortality)
+
+        self.output_layer = tf.math.sigmoid(
+            tf.math.add(tf.matmul(self.Dense_patient, self.weight_classification_w), self.bias_classification_b))
+
+        """
+        cross entropy loss
+        """
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
         """
         Get interpretation matrix
@@ -414,8 +434,8 @@ class dynamic_hgm():
 
         #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
         #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-        self.x_skip = self.x_skip_mor
-        self.x_negative = self.x_negative_mor
+        self.x_skip = self.x_skip_patient
+        self.x_negative = self.x_negative_patient
 
     def process_patient_att(self):
         """
@@ -644,7 +664,7 @@ class dynamic_hgm():
         self.build_dhgm_model()
         self.get_latent_rep_hetero()
         self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.cross_entropy+self.negative_sum)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()

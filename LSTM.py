@@ -170,7 +170,7 @@ class LSTM_model():
         self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 1)
 
 
-        self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_last_comb,self.weight_classification_w),self.bias_classification_b))
+        self.output_layer = tf.math.sigmoid(tf.math.add(tf.matmul(self.hidden_final,self.weight_classification_w),self.bias_classification_b))
         #self.logit_sig = tf.math.sigmoid(self.output_layer)
         #self.logit_sig = tf.nn.softmax(self.output_layer)
         #self.cross_entropy = tf.reduce_mean(tf.math.negative(

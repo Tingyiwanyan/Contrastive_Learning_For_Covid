@@ -410,8 +410,9 @@ class dynamic_hgm():
         self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
         # self.x_origin = self.hidden_last
 
+        self.x_origin_classify = tf.squeeze(self.x_origin,1)
         self.output_layer = tf.math.sigmoid(
-            tf.math.add(tf.matmul(self.x_origin, self.weight_classification_w), self.bias_classification_b))
+            tf.math.add(tf.matmul(self.x_origin_classify, self.weight_classification_w), self.bias_classification_b))
 
         """
         cross entropy loss
@@ -444,61 +445,8 @@ class dynamic_hgm():
         self.x_skip = self.x_skip_patient
         self.x_negative = self.x_negative_patient
 
-    def process_patient_att(self):
-        """
-        Process att on patient importance, for feeding the relational learning layer
-        """
-        self.weight_att_x_skip = tf.matmul(self.x_skip_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip, axis=1)
-        self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,
-                                                               [self.batch_size, self.positive_lab_size,
-                                                                self.latent_dim + self.latent_dim_demo])
 
-        self.x_skip_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_skip_patient, self.weight_att_x_skip_softmax_broad), 1), 1)
 
-        self.weight_att_x_neg = tf.matmul(self.x_negative_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg, axis=1)
-        self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,
-                                                              [self.batch_size, self.negative_lab_size,
-                                                               self.latent_dim + self.latent_dim_demo])
-
-        self.x_negative_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_negative_patient, self.weight_att_x_neg_softmax_broad), 1), 1)
-
-    def get_latent_rep_hetero_att(self):
-        """
-        Prepare data for att SGNS loss
-        """
-        idx_origin = tf.constant([0])
-        self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
-
-        idx_skip_mortality = tf.constant([0])
-        self.x_skip_mor = tf.gather(self.Dense_mortality, idx_skip_mortality, axis=1)
-        idx_neg_mortality = tf.constant([1])
-        self.x_negative_mor = tf.gather(self.Dense_mortality, idx_neg_mortality, axis=1)
-
-        patient_idx_skip = tf.constant([i + 1 for i in range(self.positive_lab_size)])
-        self.x_skip_patient = tf.gather(self.Dense_patient, patient_idx_skip, axis=1)
-        patient_idx_negative = tf.constant([i + self.positive_lab_size + 1 for i in range(self.negative_lab_size)])
-        self.x_negative_patient = tf.gather(self.Dense_patient, patient_idx_negative, axis=1)
-
-        att_idx_skip = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + 1 for i in range(self.neighbor_pick_skip)])
-        self.x_att_skip = tf.gather(self.Dense_patient, att_idx_skip, axis=1)
-        att_idx_neg = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + 1 for i in
-             range(self.neighbor_pick_neg)])
-        self.x_att_neg = tf.gather(self.Dense_patient, att_idx_neg, axis=1)
-
-        # self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        # self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-
-        self.build_att_mortality()
-
-        self.x_skip = tf.concat([tf.expand_dims(self.att_rep_skip_mor_final, axis=1), self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([tf.expand_dims(self.att_rep_neg_mor_final, axis=1), self.x_negative_patient],
-                                    axis=1)
 
     def get_positive_patient(self, center_node_index):
         self.patient_pos_sample_vital = np.zeros((self.time_sequence, self.positive_lab_size + 1, self.item_size))

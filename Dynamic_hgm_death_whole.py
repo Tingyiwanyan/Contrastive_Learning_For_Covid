@@ -108,7 +108,7 @@ class dynamic_hgm():
         """
         Define relation model
         """
-        self.shape_relation = (self.latent_dim)# + self.latent_dim_demo,)
+        self.shape_relation = (self.latent_dim,)# + self.latent_dim_demo,)
         self.init_mortality = tf.keras.initializers.he_normal(seed=None)
         self.init_lab = tf.keras.initializers.he_normal(seed=None)
         """

@@ -609,7 +609,7 @@ class dynamic_hgm():
 
         skip_training = tf.broadcast_to(self.x_origin,
                                         [self.batch_size, self.negative_sample_size,
-                                         self.latent_dim + self.latent_dim_demo])
+                                         self.latent_dim])# + self.latent_dim_demo])
 
         skip_training_norm = tf.math.l2_normalize(skip_training, axis=2)
 
@@ -620,7 +620,7 @@ class dynamic_hgm():
         sum_log_dot_prod = tf.math.log(tf.math.sigmoid(tf.math.negative(tf.reduce_mean(dot_prod_sum, 1))))
 
         positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, self.positive_sample_size,
-                                                            self.latent_dim + self.latent_dim_demo])
+                                                            self.latent_dim])# + self.latent_dim_demo])
 
         positive_skip_norm = tf.math.l2_normalize(self.x_skip, axis=2)
 

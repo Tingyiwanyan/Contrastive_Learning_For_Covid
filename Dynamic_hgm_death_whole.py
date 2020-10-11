@@ -316,14 +316,6 @@ class dynamic_hgm():
 
         self.Dense_death_rep = tf.math.subtract(self.Dense_death_rep_, self.relation_mortality)
 
-        self.output_layer = tf.math.sigmoid(
-            tf.math.add(tf.matmul(self.Dense_patient, self.weight_classification_w), self.bias_classification_b))
-
-        """
-        cross entropy loss
-        """
-        self.bce = tf.keras.losses.BinaryCrossentropy()
-        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
         """
         Get interpretation matrix
@@ -411,6 +403,15 @@ class dynamic_hgm():
         idx_origin = tf.constant([0])
         self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
         # self.x_origin = self.hidden_last
+
+        self.output_layer = tf.math.sigmoid(
+            tf.math.add(tf.matmul(self.x_origin, self.weight_classification_w), self.bias_classification_b))
+
+        """
+        cross entropy loss
+        """
+        self.bce = tf.keras.losses.BinaryCrossentropy()
+        self.cross_entropy = self.bce(self.input_y_logit, self.output_layer)
 
         idx_skip_mortality = tf.constant([0])
         self.x_skip_mor = tf.gather(self.Dense_mortality, idx_skip_mortality, axis=1)

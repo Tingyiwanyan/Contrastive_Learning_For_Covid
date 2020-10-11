@@ -108,7 +108,7 @@ class dynamic_hgm():
         """
         Define relation model
         """
-        self.shape_relation = (self.latent_dim + self.latent_dim_demo,)
+        self.shape_relation = (self.latent_dim)# + self.latent_dim_demo,)
         self.init_mortality = tf.keras.initializers.he_normal(seed=None)
         self.init_lab = tf.keras.initializers.he_normal(seed=None)
         """
@@ -118,8 +118,8 @@ class dynamic_hgm():
         self.Death_input = tf.keras.backend.placeholder([1, 2])
         self.init_weight_mortality = tf.keras.initializers.he_normal(seed=None)
         self.weight_mortality = \
-            tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim + self.latent_dim_demo)))
-        self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.item_size+self.lab_size + self.latent_dim_demo,)))
+            tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim)))# + self.latent_dim_demo)))
+        self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.item_size+self.lab_size,)))# + self.latent_dim_demo,)))
 
         self.lab_test = \
             tf.keras.backend.placeholder([None, self.positive_lab_size + self.negative_lab_size, self.item_size])
@@ -180,7 +180,7 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x, i, axis=1)
+            x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
             else:
@@ -254,7 +254,7 @@ class dynamic_hgm():
         """
         idx_origin = tf.constant([0])
         self.hidden_last_comb = tf.concat([self.hidden_last, self.Dense_demo], 2)
-        self.patient_lstm = tf.gather(self.hidden_last_comb, idx_origin, axis=1)
+        self.patient_lstm = tf.gather(self.hidden_last, idx_origin, axis=1)
         self.output_layer = tf.compat.v1.layers.dense(inputs=self.patient_lstm,
                                                       units=2,
                                                       kernel_initializer=tf.keras.initializers.he_normal(seed=None),
@@ -287,7 +287,8 @@ class dynamic_hgm():
         self.hidden_mul_variable = tf.multiply(self.parameter_mul, self.project_input)
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
-        self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
+        #self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
+        self.Dense_patient = self.hidden_final
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
 
         #self.Dense_patient = self.hidden_last_comb

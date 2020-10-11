@@ -352,6 +352,7 @@ class dynamic_hgm():
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
         """
 
+        """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.weight_classification_w, self.time_feature_index, axis=0)
         # self.score_attention_ = tf.matmul(self.project_weight_variable_final,
@@ -360,7 +361,7 @@ class dynamic_hgm():
         self.score_attention_ = tf.matmul(self.project_weight_variable_final, self.mortality_hidden_rep)
         self.score_attention = tf.squeeze(self.score_attention_, [3])
         self.input_importance = tf.multiply(self.score_attention, self.input_x)
-
+        """
 
 
     def build_att_mortality(self):
@@ -990,14 +991,15 @@ class dynamic_hgm():
                                             self.input_x_com:self.test_com,
                                             self.init_hiddenstate:init_hidden_state})
 
-
+        """
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],
                                             feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,
                                             self.input_x_com:self.test_com,
                                             self.init_hiddenstate:init_hidden_state})
-
+        
+        """
         self.correct = 0
         self.tp_test = 0
         self.fp_test = 0

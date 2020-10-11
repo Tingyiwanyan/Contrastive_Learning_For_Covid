@@ -53,7 +53,8 @@ class dynamic_hgm():
         """
         self.init_hiddenstate = tf.keras.backend.placeholder(
             [None, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim])
-        self.input_y_logit = tf.keras.backend.placeholder([None, 2])
+        #self.input_y_logit = tf.keras.backend.placeholder([None, 2])
+        self.input_y_logit = tf.keras.backend.placeholder([None, 1])
         self.input_x_vital = tf.keras.backend.placeholder(
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder(
@@ -343,20 +344,24 @@ class dynamic_hgm():
         """
         Get score important
         """
-
+        """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-
-
-
         """
-        self.Dense_lab_ = \
-            tf.nn.relu(tf.math.add(tf.matmul(self.lab_test,self.weight_lab),self.bias_lab))
-        self.Dense_lab = tf.math.add(self.Dense_lab_,self.relation_lab)
-        """
+
+        self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
+        self.mortality_hidden_rep = tf.gather(self.weight_classification_w, self.time_feature_index, axis=0)
+        # self.score_attention_ = tf.matmul(self.project_weight_variable_final,
+        #                                  tf.expand_dims(tf.squeeze(self.mortality_hidden_rep), 1))
+
+        self.score_attention_ = tf.matmul(self.project_weight_variable_final, self.mortality_hidden_rep)
+        self.score_attention = tf.squeeze(self.score_attention_, [3])
+        self.input_importance = tf.multiply(self.score_attention, self.input_x)
+
+
 
     def build_att_mortality(self):
         """
@@ -817,7 +822,7 @@ class dynamic_hgm():
             (data_length, 1 + self.positive_lab_size + self.negative_lab_size, self.com_size))
         # train_one_batch_item = np.zeros((data_length,self.positive_lab_size+self.negative_lab_size,self.item_size))
         train_one_batch_mortality = np.zeros((data_length, 2, 2))
-        one_batch_logit = np.zeros((data_length, 2))
+        one_batch_logit = np.zeros((data_length, 1))
         self.real_logit = np.zeros(data_length)
         # self.item_neg_sample = np.zeros((self.negative_lab_size, self.item_size))
         # self.item_pos_sample = np.zeros((self.positive_lab_size, self.item_size))
@@ -836,14 +841,8 @@ class dynamic_hgm():
             self.time_seq_int.sort()
             time_index = 0
             flag = self.kg.dic_patient[self.patient_id]['death_flag']
-            """
-            if flag == 0:
-                one_batch_logit[i,0,0] = 1
-                one_batch_logit[i,1,1] = 1
-            else:
-                one_batch_logit[i,0,1] = 1
-                one_batch_logit[i,1,0] = 1
-                self.real_logit[i] = 1
+            if flag == 1:
+                one_batch_logit[i,0] = 1
             """
             if flag == 0:
                 train_one_batch_mortality[i, 0, :] = [1, 0]
@@ -853,6 +852,7 @@ class dynamic_hgm():
                 train_one_batch_mortality[i, 0, :] = [0, 1]
                 train_one_batch_mortality[i, 1, :] = [1, 0]
                 one_batch_logit[i, 1] = 1
+            """
 
             self.get_positive_patient(self.patient_id)
             self.get_negative_patient(self.patient_id)
@@ -936,6 +936,7 @@ class dynamic_hgm():
                                                      self.input_x_demo: self.train_one_batch_demo,
                                                      # self.input_x_com: self.one_batch_com,
                                                      # self.lab_test: self.one_batch_item,
+                                                     self.input_y_logit: self.one_batch_logit,
                                                      self.mortality: self.one_batch_mortality,
                                                      self.init_hiddenstate: init_hidden_state,
                                                      self.input_icu_intubation:self.one_batch_icu_intubation})
@@ -975,6 +976,7 @@ class dynamic_hgm():
                                                      self.init_hiddenstate_att: init_hidden_state})
                 print(self.err_[0])
 
+    """
     def test(self, data):
         Death = np.zeros([1,2])
         Death[0][1] = 1
@@ -1031,6 +1033,7 @@ class dynamic_hgm():
         feature_len = self.item_size + self.lab_size
 
         """
+        """
         self.test_data_scores = self.test_att_score[1][self.correct_predict_death,:,0,:]
         self.ave_data_scores = np.zeros((self.time_sequence,feature_len))
 
@@ -1048,6 +1051,7 @@ class dynamic_hgm():
                 self.ave_data_scores[j,p] = float(value/count)
                 count = 0
                 value = 0
+        """
         """
 
 
@@ -1083,6 +1087,137 @@ class dynamic_hgm():
 
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
+            self.tp_total.append(tp_rate)
+            self.fp_total.append(fp_rate)
+            threshold += self.resolution
+    """
+
+    def test(self,data):
+        """
+        test the system, return the accuracy of the model
+        """
+        test_length = len(data)
+        init_hidden_state = np.zeros((test_length, self.latent_dim))
+        test_data, self.test_data_lab,self.test_logit,self.test_demo,self.test_com = self.get_batch_train_period(test_length,0,data)
+        self.logit_out = self.sess.run(self.output_layer,feed_dict={self.input_x_vital: test_data,
+                                            self.input_demo_:self.test_demo,
+                                            self.input_x_lab:self.test_data_lab,
+                                            self.input_x_com:self.test_com,
+                                            self.init_hiddenstate:init_hidden_state})
+
+
+        self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],
+                                            feed_dict={self.input_x_vital: test_data,
+                                            self.input_demo_:self.test_demo,
+                                            self.input_x_lab:self.test_data_lab,
+                                            self.input_x_com:self.test_com,
+                                            self.init_hiddenstate:init_hidden_state})
+
+        self.correct = 0
+        self.tp_test = 0
+        self.fp_test = 0
+        self.fn_test = 0
+        self.tp_correct = 0
+        self.tp_neg = 0
+        """
+        for i in range(test_length):
+            if self.test_logit[i,1] == 1:
+                self.tp_correct += 1
+            if self.test_logit[i,1] == 1 and self.logit_out[i,1] > self.threshold:
+                print("im here")
+                self.correct += 1
+                self.tp_test += 1
+                print(self.tp_test)
+            if self.test_logit[i,1] == 0:
+                self.tp_neg += 1
+            if self.test_logit[i,1] == 1 and self.logit_out[i,1] < self.threshold:
+                self.fn_test += 1
+            if self.test_logit[i,1] == 0 and self.logit_out[i,1] > self.threshold:
+                self.fp_test += 1
+            if self.test_logit[i,1] == 0 and self.logit_out[i,1] < self.threshold:
+                self.correct += 1
+        """
+        self.correct_predict_death = []
+        for i in range(test_length):
+            if self.test_logit[i,0] == 1:
+                self.tp_correct += 1
+            if self.test_logit[i,0] == 1 and self.logit_out[i,0] > self.threshold:
+                self.correct_predict_death.append(i)
+                self.correct += 1
+                self.tp_test += 1
+            if self.test_logit[i,0] == 0:
+                self.tp_neg += 1
+            if self.test_logit[i,0] == 1 and self.logit_out[i,0] < self.threshold:
+                self.fn_test += 1
+            if self.test_logit[i,0] == 0 and self.logit_out[i,0] > self.threshold:
+                self.fp_test += 1
+            if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] < self.threshold:
+                self.correct += 1
+
+
+        self.correct_predict_death = np.array(self.correct_predict_death)
+
+        feature_len = self.item_size + self.lab_size
+
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, :]
+        self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
+
+        count = 0
+        value = 0
+
+        for j in range(self.time_sequence):
+            for p in range(feature_len):
+                for i in range(self.correct_predict_death.shape[0]):
+                    if self.test_data_scores[i, j, p] != 0:
+                        count += 1
+                        value += self.test_data_scores[i, j, p]
+                if count == 0:
+                    continue
+                self.ave_data_scores[j, p] = float(value / count)
+                count = 0
+                value = 0
+
+
+        """
+        self.tp_test = 0
+        self.fp_test = 0
+        self.fn_test = 0
+        for i in range(test_length):
+            if self.test_logit[i,1] == 1 and self.logit_out[i,1] > self.threshold:
+                self.tp_test += 1
+            if self.test_logit[i,1] == 1 and self.logit_out[i,1] < self.threshold:
+                self.fn_test += 1
+            if self.test_logit[i,1] == 0 and self.logit_out[i,1] > self.threshold:
+                self.fp_test += 1
+        """
+        self.precision_test = np.float(self.tp_test)/(self.tp_test+self.fp_test)
+        self.recall_test = np.float(self.tp_test)/(self.tp_test+self.fn_test)
+
+        self.f1_test = 2*(self.precision_test*self.recall_test)/(self.precision_test+self.recall_test)
+
+
+        self.acc = np.float(self.correct)/test_length
+
+        threshold = 0.0
+        self.resolution = 0.01
+        tp_test = 0
+        fp_test = 0
+        self.tp_total = []
+        self.fp_total = []
+        while(threshold<1.01):
+            tp_test = 0
+            fp_test = 0
+            for i in range(test_length):
+                if self.test_logit[i,0] == 1 and self.logit_out[i,0] > threshold:
+                    tp_test += 1
+                if self.test_logit[i,0] == 0 and self.logit_out[i,0] > threshold:
+                    fp_test += 1
+            self.check_fp_test = fp_test
+            print(self.check_fp_test)
+            self.check_tp_test = tp_test
+            print(self.check_tp_test)
+            tp_rate = tp_test/self.tp_correct
+            fp_rate = fp_test/self.tp_neg
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
             threshold += self.resolution

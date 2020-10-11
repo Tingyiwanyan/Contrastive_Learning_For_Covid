@@ -842,7 +842,7 @@ class dynamic_hgm():
                 self.train_one_batch_vital, self.train_one_batch_lab, self.train_one_batch_demo, self.one_batch_logit, self.one_batch_mortality, self.one_batch_com,self.one_batch_icu_intubation = self.get_batch_train(
                     self.batch_size, i * self.batch_size, self.train_data)
 
-                self.err_ = self.sess.run([self.negative_sum, self.train_step_neg],
+                self.err_ = self.sess.run([self.cross_entropy,self.negative_sum, self.train_step_neg],
                                           feed_dict={self.input_x_vital: self.train_one_batch_vital,
                                                      self.input_x_lab: self.train_one_batch_lab,
                                                      self.input_x_demo: self.train_one_batch_demo,
@@ -895,7 +895,7 @@ class dynamic_hgm():
         """
         test_length = len(data)
         init_hidden_state = np.zeros((test_length, self.latent_dim))
-        test_data, self.test_data_lab,self.test_logit,self.test_demo,self.test_com = self.get_batch_train_period(test_length,0,data)
+        test_data, self.test_data_lab,self.test_logit,self.test_demo,self.test_com = self.get_batch_train(test_length,0,data)
         self.logit_out = self.sess.run(self.output_layer,feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,

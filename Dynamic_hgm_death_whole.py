@@ -39,9 +39,9 @@ class dynamic_hgm():
         self.threshold = 0.5
         self.positive_lab_size = 5
         self.negative_lab_size = 10
-        self.positive_sample_size = self.positive_lab_size + 1
+        self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
-        self.negative_sample_size = self.negative_lab_size + 1
+        self.negative_sample_size = self.negative_lab_size# + 1
         # self.negative_sample_size = 2
         self.neighbor_pick_skip = 5
         self.neighbor_pick_neg = 10
@@ -56,16 +56,16 @@ class dynamic_hgm():
         #self.input_y_logit = tf.keras.backend.placeholder([None, 2])
         self.input_y_logit = tf.keras.backend.placeholder([None, 1])
         self.input_x_vital = tf.keras.backend.placeholder(
-            [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size])
+            [None, self.time_sequence, 1+ self.positive_lab_size + self.negative_lab_size, self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder(
-            [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size])
+            [None, self.time_sequence, 1+ self.positive_lab_size + self.negative_lab_size, self.lab_size])
         self.input_icu_intubation = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2])
         self.input_x = tf.concat([self.input_x_vital, self.input_x_lab], 3)
         #self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
         self.input_x_demo = tf.keras.backend.placeholder(
-            [None, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size])
+            [None, 1+ self.positive_lab_size + self.negative_lab_size, self.demo_size])
         self.input_x_com = tf.keras.backend.placeholder(
-            [None, 1 + self.positive_lab_size + self.negative_lab_size, self.com_size])
+            [None, 1+ self.positive_lab_size + self.negative_lab_size, self.com_size])
         # self.input_x_demo = tf.concat([self.input_x_demo_,self.input_x_com],2)
         self.init_forget_gate = tf.keras.initializers.he_normal(seed=None)
         self.init_info_gate = tf.keras.initializers.he_normal(seed=None)
@@ -89,22 +89,6 @@ class dynamic_hgm():
         self.bias_cell_state = tf.Variable(self.init_cell_state_weight(shape=(self.latent_dim,)))
         self.bias_output_gate = tf.Variable(self.init_output_gate(shape=(self.latent_dim,)))
 
-        """
-        Define LSTM variables plus attention
-        """
-        self.init_hiddenstate_att = tf.keras.backend.placeholder([None,
-                                                                  1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                                                  self.latent_dim])
-        self.input_x_vital_att = tf.keras.backend.placeholder([None, self.time_sequence,
-                                                               1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                                               self.item_size])
-        self.input_x_lab_att = tf.keras.backend.placeholder([None, self.time_sequence,
-                                                             1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                                             self.lab_size])
-        self.input_x_att = tf.concat([self.input_x_vital_att, self.input_x_lab_att], 3)
-        self.input_x_demo_att = tf.keras.backend.placeholder([None,
-                                                              1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                                              self.demo_size])
 
         """
         Define relation model
@@ -122,33 +106,12 @@ class dynamic_hgm():
             tf.Variable(self.init_weight_mortality(shape=(2, self.latent_dim)))# + self.latent_dim_demo)))
         self.bias_mortality = tf.Variable(self.init_weight_mortality(shape=(self.item_size+self.lab_size,)))# + self.latent_dim_demo,)))
 
-        self.lab_test = \
-            tf.keras.backend.placeholder([None, self.positive_lab_size + self.negative_lab_size, self.item_size])
-        self.weight_lab = \
-            tf.Variable(self.init_weight_mortality(shape=(self.item_size, self.latent_dim)))
-        self.bias_lab = tf.Variable(self.init_weight_mortality(shape=(self.latent_dim,)))
         """
         relation type 
         """
         self.relation_mortality = tf.Variable(self.init_mortality(shape=self.shape_relation))
         self.relation_lab = tf.Variable(self.init_lab(shape=self.shape_relation))
 
-        """
-        Define attention mechanism
-        """
-        self.init_weight_att_W = tf.keras.initializers.he_normal(seed=None)
-        self.init_weight_vec_a = tf.keras.initializers.he_normal(seed=None)
-        self.weight_att_W = tf.Variable(self.init_weight_att_W(
-            shape=(self.latent_dim + self.latent_dim_demo, self.latent_dim_att + self.latent_dim_demo)))
-        self.weight_vec_a = tf.Variable(
-            self.init_weight_vec_a(shape=(2 * (self.latent_dim_att + self.latent_dim_demo), 1)))
-
-        """
-        Define attention on sample neighbors
-        """
-        self.init_weight_vec_a_neighbor = tf.keras.initializers.he_normal(seed=None)
-        self.weight_vec_a_neighbor = tf.Variable(
-            self.init_weight_vec_a_neighbor(shape=(self.latent_dim + self.latent_dim_demo, 1)))
 
         """
         Define attention on Retain model for time

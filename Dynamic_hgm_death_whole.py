@@ -43,8 +43,8 @@ class dynamic_hgm():
         # self.positive_sample_size = 2
         self.negative_sample_size = self.negative_lab_size# + 1
         # self.negative_sample_size = 2
-        self.neighbor_pick_skip = 5
-        self.neighbor_pick_neg = 10
+        self.neighbor_pick_skip = 2
+        self.neighbor_pick_neg = 3
         self.neighbor_death = len(kg.dic_death[1])
         self.neighbor_discharge = len(kg.dic_death[0])
         self.resolution = 0.01
@@ -879,6 +879,11 @@ class dynamic_hgm():
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state})
+
+        self.test_patient = self.sess.run(self.Dense_patient, feed_dict={self.input_x_vital: self.test_data_batch_vital,
+                                                                     self.input_x_lab: self.test_one_batch_lab,
+                                                                     self.input_x_demo: self.test_one_batch_demo,
+                                                                     self.init_hiddenstate: init_hidden_state})
 
         """
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],

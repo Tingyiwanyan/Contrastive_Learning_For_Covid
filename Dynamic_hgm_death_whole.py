@@ -875,10 +875,10 @@ class dynamic_hgm():
 
         self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com, self.one_batch_icu_intubation = self.get_batch_train(
             test_length, 0, data)
-        self.test_patient = self.sess.run(self.output_layer, feed_dict={self.input_x_vital: self.test_data_batch_vital,
+        self.logit_out = self.sess.run(self.output_layer, feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
-                                                                         self.init_hiddenstate: init_hidden_state})[:,0, :]
+                                                                         self.init_hiddenstate: init_hidden_state})
 
         """
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],

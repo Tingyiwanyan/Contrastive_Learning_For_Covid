@@ -876,11 +876,7 @@ class dynamic_hgm():
         self.test_patient = self.sess.run(self.output_layer, feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
-                                                                         # self.input_x_com: self.test_com,
-                                                                         self.init_hiddenstate: init_hidden_state,
-                                                                         self.input_icu_intubation: self.one_batch_icu_intubation})[
-                            :,
-                            0, :]
+                                                                         self.init_hiddenstate: init_hidden_state})[:,0, :]
 
         """
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],

@@ -862,31 +862,6 @@ class dynamic_hgm():
                 print(self.err_lstm[0])
                 """
 
-    def train_att(self):
-        """
-        train the system
-        """
-        init_hidden_state = np.zeros((self.batch_size,
-                                      1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                      self.latent_dim))
-        iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))
-
-        for j in range(self.epoch):
-            print('epoch')
-            print(j)
-            for i in range(iteration):
-                self.train_one_batch_vital, self.train_one_batch_lab, self.train_one_batch_demo, self.one_batch_logit, self.one_batch_mortality, self.one_batch_com = self.get_batch_train_att(
-                    self.batch_size, i * self.batch_size, self.train_data)
-
-                self.err_ = self.sess.run([self.negative_sum, self.train_step_neg],
-                                          feed_dict={self.input_x_vital_att: self.train_one_batch_vital,
-                                                     self.input_x_lab_att: self.train_one_batch_lab,
-                                                     self.input_x_demo_att: self.train_one_batch_demo,
-                                                     # self.input_x_com: self.one_batch_com,
-                                                     # self.lab_test: self.one_batch_item,
-                                                     self.mortality: self.one_batch_mortality,
-                                                     self.init_hiddenstate_att: init_hidden_state})
-                print(self.err_[0])
 
 
     def test(self,data):
@@ -895,12 +870,17 @@ class dynamic_hgm():
         """
         test_length = len(data)
         init_hidden_state = np.zeros((test_length, self.latent_dim))
-        test_data, self.test_data_lab,self.test_logit,self.test_demo,self.test_com = self.get_batch_train(test_length,0,data)
-        self.logit_out = self.sess.run(self.output_layer,feed_dict={self.input_x_vital: test_data,
-                                            self.input_demo_:self.test_demo,
-                                            self.input_x_lab:self.test_data_lab,
-                                            self.input_x_com:self.test_com,
-                                            self.init_hiddenstate:init_hidden_state})
+
+        self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com, self.one_batch_icu_intubation = self.get_batch_train(
+            test_length, 0, data)
+        self.test_patient = self.sess.run(self.output_layer, feed_dict={self.input_x_vital: self.test_data_batch_vital,
+                                                                         self.input_x_lab: self.test_one_batch_lab,
+                                                                         self.input_x_demo: self.test_one_batch_demo,
+                                                                         # self.input_x_com: self.test_com,
+                                                                         self.init_hiddenstate: init_hidden_state,
+                                                                         self.input_icu_intubation: self.one_batch_icu_intubation})[
+                            :,
+                            0, :]
 
         """
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance,self.hidden_final],
@@ -940,6 +920,7 @@ class dynamic_hgm():
 
         feature_len = self.item_size + self.lab_size
 
+        """
         self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, :]
         self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
 
@@ -957,6 +938,7 @@ class dynamic_hgm():
                 self.ave_data_scores[j, p] = float(value / count)
                 count = 0
                 value = 0
+        """
 
         self.precision_test = np.float(self.tp_test)/(self.tp_test+self.fp_test)
         self.recall_test = np.float(self.tp_test)/(self.tp_test+self.fn_test)

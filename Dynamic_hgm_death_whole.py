@@ -37,8 +37,8 @@ class dynamic_hgm():
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5
-        self.positive_lab_size = 5
-        self.negative_lab_size = 10
+        self.positive_lab_size = 1
+        self.negative_lab_size = 1
         self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
         self.negative_sample_size = self.negative_lab_size# + 1
@@ -179,34 +179,6 @@ class dynamic_hgm():
         self.hidden_rep = tf.concat(hidden_rep, 1)
         self.check = concat_cur
 
-    def lstm_cell_att(self):
-        """
-        build att model
-        """
-        cell_state = []
-        hidden_rep = []
-        for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x_att, i, axis=1)
-            if i == 0:
-                concat_cur = tf.concat([self.init_hiddenstate_att, x_input_cur], 2)
-            else:
-                concat_cur = tf.concat([hidden_rep[i - 1], x_input_cur], 2)
-            forget_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
-            info_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_info_gate), self.bias_info_gate))
-            cellstate_cur = \
-                tf.math.tanh(tf.math.add(tf.matmul(concat_cur, self.weight_cell_state), self.bias_cell_state))
-            info_cell_state = tf.multiply(info_cur, cellstate_cur)
-            if not i == 0:
-                forget_cell_state = tf.multiply(forget_cur, cell_state[i - 1])
-                cellstate_cur = tf.math.add(forget_cell_state, info_cell_state)
-            output_gate = \
-                tf.nn.relu(tf.math.add(tf.matmul(concat_cur, self.weight_output_gate), self.bias_output_gate))
-            hidden_current = tf.multiply(output_gate, cellstate_cur)
-            cell_state.append(cellstate_cur)
-            hidden_rep.append(hidden_current)
-        self.hidden_last = hidden_rep[self.time_sequence - 1]
 
     def demo_layer(self):
         self.Dense_demo = tf.compat.v1.layers.dense(inputs=self.input_x_demo,
@@ -716,6 +688,7 @@ class dynamic_hgm():
                 one_batch_logit[i, 1] = 1
             """
 
+
             self.get_positive_patient(self.patient_id)
             self.get_negative_patient(self.patient_id)
             train_one_data_vital = np.concatenate((self.patient_pos_sample_vital, self.patient_neg_sample_vital),
@@ -724,6 +697,7 @@ class dynamic_hgm():
             train_one_data_demo = np.concatenate((self.patient_pos_sample_demo, self.patient_neg_sample_demo), axis=0)
             train_one_data_com = np.concatenate((self.patient_pos_sample_com, self.patient_neg_sample_com), axis=0)
             train_one_data_icu_intubation = np.concatenate((self.patient_pos_sample_icu_intubation_label,self.patient_neg_sample_icu_intubation_label),axis=1)
+
             train_one_batch_vital[i, :, :, :] = train_one_data_vital
             train_one_batch_lab[i, :, :, :] = train_one_data_lab
             train_one_batch_demo[i, :, :] = train_one_data_demo

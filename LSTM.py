@@ -242,8 +242,6 @@ class LSTM_model():
 
 
 
-
-
     def config_model(self):
         """
         Model configuration

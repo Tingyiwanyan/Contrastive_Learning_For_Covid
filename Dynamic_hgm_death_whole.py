@@ -869,7 +869,9 @@ class dynamic_hgm():
         test the system, return the accuracy of the model
         """
         test_length = len(data)
-        init_hidden_state = np.zeros((test_length, self.latent_dim))
+        #init_hidden_state = np.zeros((test_length, self.latent_dim))
+        init_hidden_state = np.zeros(
+            (test_length, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim))
 
         self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com, self.one_batch_icu_intubation = self.get_batch_train(
             test_length, 0, data)

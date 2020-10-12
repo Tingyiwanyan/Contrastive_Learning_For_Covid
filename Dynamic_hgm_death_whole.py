@@ -37,8 +37,8 @@ class dynamic_hgm():
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5
-        self.positive_lab_size = 5
-        self.negative_lab_size = 10
+        self.positive_lab_size = 1
+        self.negative_lab_size = 2
         self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
         self.negative_sample_size = self.negative_lab_size# + 1
@@ -327,44 +327,6 @@ class dynamic_hgm():
         """
 
 
-    def build_att_mortality(self):
-        """
-        build attention model for mortality node
-        """
-        self.att_skip_latent = tf.matmul(self.x_att_skip, self.weight_att_W)
-        self.x_skip_center_brod = tf.broadcast_to(self.x_skip_mor, [self.batch_size, self.neighbor_pick_skip,
-                                                                    self.latent_dim_att + self.latent_dim_demo])
-        self.att_skip_center = tf.matmul(self.x_skip_center_brod, self.weight_att_W)
-        self.concat_att_skip = tf.concat([self.att_skip_center, self.att_skip_latent], axis=2)
-
-        self.att_neg_latent = tf.matmul(self.x_att_neg, self.weight_att_W)
-        self.x_neg_center_brod = tf.broadcast_to(self.x_negative_mor, [self.batch_size, self.neighbor_pick_neg,
-                                                                       self.latent_dim_att + self.latent_dim_demo])
-        self.att_neg_center = tf.matmul(self.x_neg_center_brod, self.weight_att_W)
-        self.concat_att_neg = tf.concat([self.att_neg_center, self.att_neg_latent], axis=2)
-
-        """
-        times the weight vector a
-        """
-        self.weight_att_skip_a = tf.matmul(self.concat_att_skip, self.weight_vec_a)
-        self.weight_att_neg_a = tf.matmul(self.concat_att_neg, self.weight_vec_a)
-
-        self.soft_max_att_skip = tf.broadcast_to(tf.nn.softmax(self.weight_att_skip_a, axis=1),
-                                                 [self.batch_size, self.neighbor_pick_skip,
-                                                  self.latent_dim_att + self.latent_dim_demo])
-        self.soft_max_att_neg = tf.broadcast_to(tf.nn.softmax(self.weight_att_neg_a, axis=1),
-                                                [self.batch_size, self.neighbor_pick_neg,
-                                                 self.latent_dim_att + self.latent_dim_demo])
-
-        self.att_rep_skip_mor = tf.multiply(self.soft_max_att_skip, self.att_skip_latent)
-        self.att_rep_neg_mor = tf.multiply(self.soft_max_att_neg, self.att_neg_latent)
-
-        self.att_rep_skip_mor_sum = tf.reduce_sum(self.att_rep_skip_mor, 1)
-        self.att_rep_neg_mor_sum = tf.reduce_sum(self.att_rep_neg_mor, 1)
-
-        self.att_rep_skip_mor_final = tf.nn.relu(self.att_rep_skip_mor_sum)
-        self.att_rep_neg_mor_final = tf.nn.relu(self.att_rep_neg_mor_sum)
-
     def get_latent_rep_hetero(self):
         """
         Prepare data for SGNS loss function
@@ -582,24 +544,12 @@ class dynamic_hgm():
         self.build_dhgm_model()
         self.get_latent_rep_hetero()
         self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)#+self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.cross_entropy+self.negative_sum)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-    def config_model_att(self):
-        self.lstm_cell_att()
-        self.demo_layer_att()
-        self.build_dhgm_model()
-        self.get_latent_rep_hetero_att()
-        # self.build_att_mortality()
-        self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        tf.local_variables_initializer().run()
 
     def assign_value_patient(self, patientid, start_time, end_time):
         self.one_sample = np.zeros(self.item_size)
@@ -852,7 +802,10 @@ class dynamic_hgm():
                                                      self.mortality: self.one_batch_mortality,
                                                      self.init_hiddenstate: init_hidden_state,
                                                      self.input_icu_intubation:self.one_batch_icu_intubation})
+                print("in epoch")
+                print(j)
                 print(self.err_[0])
+                print(self.err_[1])
 
                 """
                 self.err_lstm = self.sess.run([self.cross_entropy, self.train_step_cross_entropy,self.init_hiddenstate,self.output_layer,self.logit_sig],
@@ -975,81 +928,6 @@ class dynamic_hgm():
             self.fp_total.append(fp_rate)
             threshold += self.resolution
 
-    def test_att(self, data):
-        test_length = len(data)
-        init_hidden_state = np.zeros(
-            (test_length,
-             1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-             self.latent_dim))
-        self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com = self.get_batch_train_att(
-            test_length, 0, data)
-        self.test_patient = self.sess.run(self.Dense_patient,
-                                          feed_dict={self.input_x_vital_att: self.test_data_batch_vital,
-                                                     self.input_x_lab_att: self.test_one_batch_lab,
-                                                     self.input_x_demo_att: self.test_one_batch_demo,
-                                                     # self.input_x_com: self.test_com,
-                                                     self.init_hiddenstate_att: init_hidden_state})[:, 0, :]
-        single_mortality = np.zeros((1, 2, 2))
-        single_mortality[0][0][0] = 1
-        single_mortality[0][1][1] = 1
-        self.mortality_test = self.sess.run(self.Dense_mortality, feed_dict={self.mortality: single_mortality})[0]
-        self.score = np.zeros(test_length)
-        for i in range(test_length):
-            embed_single_patient = self.test_patient[i] / np.linalg.norm(self.test_patient[i])
-            embed_mortality = self.mortality_test[1] / np.linalg.norm(self.mortality_test[1])
-            self.score[i] = np.matmul(embed_single_patient, embed_mortality.T)
-
-        self.correct = 0
-        self.tp_correct = 0
-        self.tp_neg = 0
-        for i in range(test_length):
-            if self.test_logit[i, 1] == 1:
-                self.tp_correct += 1
-            if self.test_logit[i, 0] == 1:
-                self.tp_neg += 1
-            if self.score[i] < 0 and self.test_logit[i, 0] == 1:
-                self.correct += 1
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.correct += 1
-
-        self.acc = np.float(self.correct) / test_length
-
-        self.tp_test = 0
-        self.fp_test = 0
-        self.fn_test = 0
-        for i in range(test_length):
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.tp_test += 1
-            if self.score[i] < 0 and self.test_logit[i, 1] == 1:
-                self.fn_test += 1
-            if self.score[i] > 0 and self.test_logit[i, 0] == 1:
-                self.fp_test += 1
-
-        self.precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
-        self.recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
-        self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
-
-        threshold = -1.01
-        self.resolution = 0.05
-        tp_test = 0
-        fp_test = 0
-        self.tp_total = []
-        self.fp_total = []
-
-        while (threshold < 1.01):
-            tp_test = 0
-            fp_test = 0
-            for i in range(test_length):
-                if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
-                    tp_test += 1
-                if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
-                    fp_test += 1
-
-            tp_rate = tp_test / self.tp_correct
-            fp_rate = fp_test / self.tp_neg
-            self.tp_total.append(tp_rate)
-            self.fp_total.append(fp_rate)
-            threshold += self.resolution
 
     def cal_auc(self):
         self.area = 0

@@ -582,7 +582,7 @@ class dynamic_hgm():
         self.build_dhgm_model()
         self.get_latent_rep_hetero()
         self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.cross_entropy+self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)#+self.negative_sum)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()

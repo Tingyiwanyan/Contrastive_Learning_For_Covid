@@ -565,12 +565,15 @@ class LSTM_model():
         while(threshold<1.01):
             tp_test = 0
             fp_test = 0
+            fn_test = 0
             precision_test = 0
             for i in range(test_length):
                 if self.test_logit[i,0] == 1 and self.logit_out[i,0] > threshold:
                     tp_test += 1
                 if self.test_logit[i,0] == 0 and self.logit_out[i,0] > threshold:
                     fp_test += 1
+                if self.test_logit[i, 0] == 1 and self.logit_out[i, 0] < threshold:
+                    fn_test += 1
             self.check_fp_test = fp_test
             print(self.check_fp_test)
             self.check_tp_test = tp_test
@@ -578,8 +581,8 @@ class LSTM_model():
            # if (tp_test + fp_test) == 0:
                # precision_test = 1
             #else:
-            precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
-            recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
+            precision_test = np.float(tp_test) / (tp_test + fp_test)
+            recall_test = np.float(tp_test) / (tp_test + fn_test)
             tp_rate = tp_test/self.tp_correct
             fp_rate = fp_test/self.tp_neg
             self.tp_total.append(tp_rate)

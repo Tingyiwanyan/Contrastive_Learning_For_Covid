@@ -117,7 +117,7 @@ class LSTM_model():
         hidden_rep = []
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.project_input, i, axis=1)
+            x_input_cur = tf.gather(self.input_x, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 1)
             else:
@@ -154,9 +154,9 @@ class LSTM_model():
         """
         Implement softmax loss layer
         """
-        #self.hidden_last_comb = tf.concat([self.hidden_last, self.Dense_demo], 1)
+        self.hidden_last_comb = tf.concat([self.hidden_last, self.Dense_demo], 1)
 
-
+        """
         self.hidden_att_e = tf.matmul(self.hidden_rep, self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, 1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax, [tf.shape(self.input_x_vital)[0],
@@ -170,7 +170,7 @@ class LSTM_model():
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 1)
-
+        """
 
         self.output_layer = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_last_comb, self.weight_classification_w), self.bias_classification_b))

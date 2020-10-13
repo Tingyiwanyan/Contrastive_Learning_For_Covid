@@ -12,6 +12,7 @@ class dynamic_hgm():
     """
 
     def __init__(self, kg, data_process):
+        print("Im here in death")
         # tf.compat.v1.disable_v2_behavior()
         # tf.compat.v1.disable_eager_execution()
         self.kg = kg
@@ -287,10 +288,11 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
+        """
 
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
-        """
+
 
         self.Dense_mortality_ = \
             tf.nn.relu(tf.math.add(tf.matmul(self.mortality, self.weight_mortality), self.bias_mortality))
@@ -304,7 +306,6 @@ class dynamic_hgm():
 
         """
         Get interpretation matrix
-        """
         """
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
@@ -324,17 +325,17 @@ class dynamic_hgm():
                                                                                self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
-        """
+
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-        """
+
 
 
         """
@@ -489,8 +490,8 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                start_time = self.kg.dic_patient[center_node_index][
-                                 'discharge_hour'] - self.predict_window_prior + float(j) * self.time_step_length
+                pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
                 start_time = self.kg.dic_patient[center_node_index]['death_hour'] - self.predict_window_prior + float(
@@ -527,8 +528,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
-                        j) * self.time_step_length
+                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
@@ -573,8 +574,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
-                        j) * self.time_step_length
+                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
@@ -719,6 +720,14 @@ class dynamic_hgm():
         for j in self.times_lab:
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
                 if i[-1] == 'A':
+                    continue
+                if i == "EOSINO":
+                    continue
+                if i == "EOSINO_PERC":
+                    continue
+                if i == "BASOPHIL":
+                    continue
+                if i == "BASOPHIL_PERC":
                     continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])
@@ -1001,7 +1010,7 @@ class dynamic_hgm():
 
         count = 0
         value = 0
-        
+
         for j in range(self.time_sequence):
             for p in range(feature_len):
                 for i in range(self.correct_predict_death.shape[0]):
@@ -1014,6 +1023,7 @@ class dynamic_hgm():
                 count = 0
                 value = 0
         """
+
 
 
         self.tp_test = 0

@@ -269,10 +269,10 @@ class dynamic_hgm():
         """
         Build dynamic HGM model
         """
-        self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
+        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-        """
+
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
@@ -288,7 +288,7 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
+
 
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)

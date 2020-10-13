@@ -12,7 +12,6 @@ class dynamic_hgm():
     """
 
     def __init__(self, kg, data_process):
-        print("Im here in death")
         # tf.compat.v1.disable_v2_behavior()
         # tf.compat.v1.disable_eager_execution()
         self.kg = kg
@@ -276,8 +275,8 @@ class dynamic_hgm():
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
-                                                                          self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
-        
+                                                                             self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,self.latent_dim])
+
 
         self.hidden_att_e_variable = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_rep, self.weight_retain_variable_w), self.bias_retain_variable_b))
@@ -410,10 +409,8 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        self.x_skip = self.x_skip_mor
-        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-        self.x_negative = self.x_negative_mor
+        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
 
     def process_patient_att(self):
         """
@@ -492,8 +489,8 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
-                start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
+                start_time = self.kg.dic_patient[center_node_index][
+                                 'discharge_hour'] - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
                 start_time = self.kg.dic_patient[center_node_index]['death_hour'] - self.predict_window_prior + float(
@@ -530,8 +527,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
-                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
+                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
+                        j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
@@ -576,8 +573,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
-                    start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
+                    start_time = self.kg.dic_patient[patient_id]['discharge_hour'] - self.predict_window_prior + float(
+                        j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
                     start_time = self.kg.dic_patient[patient_id]['death_hour'] - self.predict_window_prior + float(
@@ -722,14 +719,6 @@ class dynamic_hgm():
         for j in self.times_lab:
             for i in self.kg.dic_patient[patientid]['prior_time_lab'][str(j)].keys():
                 if i[-1] == 'A':
-                    continue
-                if i == "EOSINO":
-                    continue
-                if i == "EOSINO_PERC":
-                    continue
-                if i == "BASOPHIL":
-                    continue
-                if i == "BASOPHIL_PERC":
                     continue
                 mean = np.float(self.kg.dic_lab[i]['mean_value'])
                 std = np.float(self.kg.dic_lab[i]['std'])
@@ -975,6 +964,7 @@ class dynamic_hgm():
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
         """
+
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
         single_mortality[0][1][1] = 1
@@ -1011,7 +1001,7 @@ class dynamic_hgm():
 
         count = 0
         value = 0
-
+        
         for j in range(self.time_sequence):
             for p in range(feature_len):
                 for i in range(self.correct_predict_death.shape[0]):
@@ -1042,37 +1032,25 @@ class dynamic_hgm():
         self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
 
         threshold = -1.01
-        self.resolution = 0.01
+        self.resolution = 0.05
         tp_test = 0
         fp_test = 0
         self.tp_total = []
         self.fp_total = []
-        self.precision_total = []
-        self.recall_total = []
 
         while (threshold < 1.01):
             tp_test = 0
             fp_test = 0
-            fn_test = 0
             for i in range(test_length):
                 if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
                     tp_test += 1
                 if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
                     fp_test += 1
-                if self.score[i] < threshold and self.test_logit[i, 1] == 1:
-                    fn_test += 1
 
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
-            if (tp_test + fp_test) == 0:
-                precision_test = 1
-            else:
-                precision_test = np.float(tp_test) / (tp_test + fp_test)
-            recall_test = np.float(tp_test) / (tp_test + fn_test)
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
-            self.precision_total.append(precision_test)
-            self.recall_total.append(recall_test)
             threshold += self.resolution
 
     def test_att(self, data):

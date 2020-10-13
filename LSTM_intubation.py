@@ -542,22 +542,35 @@ class LSTM_model():
         fp_test = 0
         self.tp_total = []
         self.fp_total = []
+        self.precision_total = []
+        self.recall_total = []
         while (threshold < 1.01):
             tp_test = 0
             fp_test = 0
+            fn_test = 0
+            precision_test = 0
             for i in range(test_length):
                 if self.test_logit[i, 0] == 1 and self.logit_out[i, 0] > threshold:
                     tp_test += 1
                 if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] > threshold:
                     fp_test += 1
+                if self.test_logit[i, 0] == 1 and self.logit_out[i, 0] < threshold:
+                    fn_test += 1
             self.check_fp_test = fp_test
             print(self.check_fp_test)
             self.check_tp_test = tp_test
             print(self.check_tp_test)
+            # if (tp_test + fp_test) == 0:
+            # precision_test = 1
+            # else:
+            precision_test = np.float(tp_test) / (tp_test + fp_test)
+            recall_test = np.float(tp_test) / (tp_test + fn_test)
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
+            self.precision_total.append(precision_test)
+            self.recall_total.append(recall_test)
             threshold += self.resolution
 
     def cal_auc(self):

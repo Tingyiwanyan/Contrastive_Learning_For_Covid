@@ -22,7 +22,7 @@ class dynamic_hgm():
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
-        self.time_sequence = 8
+        self.time_sequence = 4
         self.time_step_length = 6
         self.predict_window_prior = self.time_sequence * self.time_step_length
         self.latent_dim_cell_state = 100
@@ -947,20 +947,33 @@ class dynamic_hgm():
         fp_test = 0
         self.tp_total = []
         self.fp_total = []
+        self.precision_total = []
+        self.recall_total = []
 
         while (threshold < 1.01):
             tp_test = 0
             fp_test = 0
+            fn_test = 0
             for i in range(test_length):
                 if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
                     tp_test += 1
                 if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
                     fp_test += 1
+                if self.score[i] < threshold and self.test_logit[i, 1] == 1:
+                    fn_test += 1
 
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
+            if (tp_test + fp_test) == 0:
+                precision_test = 1
+            else:
+                precision_test = np.float(tp_test) / (tp_test + fp_test)
+            # precision_test = np.float(tp_test) / (tp_test + fp_test)
+            recall_test = np.float(tp_test) / (tp_test + fn_test)
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
+            self.precision_total.append(precision_test)
+            self.recall_total.append(recall_test)
             threshold += self.resolution
 
     def cal_auc(self):

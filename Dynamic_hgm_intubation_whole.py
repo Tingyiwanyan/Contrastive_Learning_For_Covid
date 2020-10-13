@@ -28,7 +28,7 @@ class dynamic_hgm():
         self.latent_dim_cell_state = 100
         self.latent_dim_att = 100
         self.latent_dim_demo = 50
-        self.epoch = 10
+        self.epoch = 2
         self.item_size = len(list(kg.dic_vital.keys()))
         self.demo_size = len(list(kg.dic_race.keys()))
         self.lab_size = len(list(kg.dic_lab.keys()))
@@ -995,7 +995,11 @@ class dynamic_hgm():
 
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
-            precision_test = np.float(tp_test) / (tp_test + fp_test)
+            if (tp_test + fp_test) == 0:
+                precision_test = 1
+            else:
+                precision_test = np.float(tp_test) / (tp_test + fp_test)
+            #precision_test = np.float(tp_test) / (tp_test + fp_test)
             recall_test = np.float(tp_test) / (tp_test + fn_test)
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)

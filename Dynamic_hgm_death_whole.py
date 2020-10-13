@@ -1076,8 +1076,8 @@ class dynamic_hgm():
             if (tp_test + fp_test) == 0:
                 precision_test = 1
             else:
-                precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
-            recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
+                precision_test = np.float(tp_test) / (tp_test + fp_test)
+            recall_test = np.float(tp_test) / (tp_test + fn_test)
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
             self.precision_total.append(precision_test)

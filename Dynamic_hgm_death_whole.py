@@ -420,8 +420,10 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        self.x_skip = self.x_skip_mor
+        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        self.x_negative = self.x_negative_mor
 
     def process_patient_att(self):
         """

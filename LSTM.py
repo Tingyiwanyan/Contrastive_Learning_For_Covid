@@ -578,10 +578,10 @@ class LSTM_model():
             print(self.check_fp_test)
             self.check_tp_test = tp_test
             print(self.check_tp_test)
-           # if (tp_test + fp_test) == 0:
-               # precision_test = 1
-            #else:
-            precision_test = np.float(tp_test) / (tp_test + fp_test)
+            if (tp_test + fp_test) == 0:
+                precision_test = 1
+            else:
+                precision_test = np.float(tp_test) / (tp_test + fp_test)
             recall_test = np.float(tp_test) / (tp_test + fn_test)
             tp_rate = tp_test/self.tp_correct
             fp_rate = fp_test/self.tp_neg

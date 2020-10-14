@@ -1236,15 +1236,15 @@ plt.ylim(0.0, 1.0)
 x = [0.0, 1.0]
 #plt.plot(x, x, linestyle='dashed', color='red', linewidth=2, label='random')
 
-plt.plot(RNN_ce_recall, RNN_ce_precision, color='green', linewidth=1, label='RNN+CE(AUC=0.827)')
+plt.plot(RNN_ce_recall, RNN_ce_precision, color='green', linestyle='dashed',linewidth=1, label='RNN+CE(AUC=0.827)')
 
 
-plt.plot(Retain_ce_recall,Retain_ce_precision,color='blue',label='RETAIN+CE(AUC=0.836)')
+plt.plot(Retain_ce_recall,Retain_ce_precision,color='blue',linestyle='dashed',label='RETAIN+CE(AUC=0.836)')
 
 #plt.plot(fp_rate_hl_retain,tp_rate_hl_retain,color='orange',label='RETAIN+HL')
 
-plt.plot(rnn_cl_recall,rnn_cl_precision,color='violet',label='RNN+CL(AUC=0.856)')
-plt.plot(retain_cl_recall, retain_cl_precision, color='red', linewidth=1, label='RETAIN+CL(AUC=0.840)')
+plt.plot(rnn_cl_recall,rnn_cl_precision,color='violet',linewidth=1.5,label='RNN+CL(AUC=0.856)')
+plt.plot(retain_cl_recall, retain_cl_precision, color='red', linewidth=1.5, label='RETAIN+CL(AUC=0.840)')
 
 
 plt.legend(loc='lower right')

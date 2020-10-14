@@ -264,7 +264,7 @@ class pretrain_dhgm():
         self.Dense_death_rep = tf.math.subtract(self.Dense_death_rep_, self.relation_mortality)
 
         idx_origin = tf.constant([0])
-        self.x_origin_entropy = tf.gather(self.Dense_patient, idx_origin, axis=1)
+        self.x_origin_entropy = tf.squeeze(tf.gather(self.Dense_patient, idx_origin, axis=1),axis=1)
 
         self.output_layer = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.x_origin_entropy, self.weight_classification_w), self.bias_classification_b))

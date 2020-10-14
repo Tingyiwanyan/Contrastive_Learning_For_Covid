@@ -6,7 +6,7 @@ import copy
 from itertools import groupby
 
 
-class dynamic_hgm():
+class pretrain_dhgm():
     """
     Create dynamic HGM model
     """

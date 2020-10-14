@@ -4,7 +4,7 @@ import math
 import time
 import pandas as pd
 import json
-from pretrain import LSTM_model
+from pretrain import pretrain_dhgm
 from Data_process import kg_process_data
 from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
@@ -620,7 +620,8 @@ if __name__ == "__main__":
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
-    LSTM_ = LSTM_model(kg, process_data)
+    #LSTM_ = LSTM_model(kg, process_data)
+    pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()
     # LSTM_.train()
     dhgm = dynamic_hgm(kg, process_data)

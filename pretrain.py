@@ -166,6 +166,15 @@ class pretrain_dhgm():
             self.init_retain_variable_w(shape=(self.latent_dim, self.latent_dim)))
 
         """
+        Define classification matrix for lstm
+        """
+        self.init_bias_classification_b = tf.keras.initializers.he_normal(seed=None)
+        self.init_weight_classification_w = tf.keras.initializers.he_normal(seed=None)
+        self.bias_classification_b = tf.Variable(self.init_bias_classification_b(shape=(1,)))
+        self.weight_classification_w = tf.Variable(
+            self.init_weight_classification_w(shape=(self.latent_dim + self.latent_dim_demo, 1)))
+
+        """
         Define input projection
         """
         self.init_projection_b = tf.keras.initializers.he_normal(seed=None)

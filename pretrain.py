@@ -863,7 +863,7 @@ class pretrain_dhgm():
                                self.input_x_lab: self.train_one_batch_lab,
                                self.input_y_logit_intubate: self.logit_one_batch,
                                self.init_hiddenstate: init_hidden_state,
-                               self.input_demo_: self.train_one_batch_demo})
+                               self.input_demo: self.train_one_batch_demo})
                 # self.input_x_com:self.train_one_batch_com})
                 print(self.err_[0])
 

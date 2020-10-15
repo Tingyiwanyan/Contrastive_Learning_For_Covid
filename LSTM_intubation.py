@@ -212,7 +212,7 @@ class LSTM_model():
         """
         Get interpretation matrix
         """
-        """
+
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w, [tf.shape(self.input_x_vital)[0],
                                                                                 self.time_sequence,
                                                                                 self.latent_dim, self.latent_dim])
@@ -229,11 +229,11 @@ class LSTM_model():
                                                                                 self.latent_dim, self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e, self.project_weight_variable)
-        """
+
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.weight_classification_w, self.time_feature_index, axis=0)
         #self.score_attention_ = tf.matmul(self.project_weight_variable_final,
@@ -242,7 +242,7 @@ class LSTM_model():
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
         self.score_attention = tf.squeeze(self.score_attention_, [3])
         self.input_importance = tf.multiply(self.score_attention, self.input_x)
-        """
+
 
     def config_model(self):
         """
@@ -470,14 +470,14 @@ class LSTM_model():
                                                                      self.input_x_lab: self.test_data_lab,
                                                                      self.input_x_com: self.test_com,
                                                                      self.init_hiddenstate: init_hidden_state})
-        """
+
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance],
                                             feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,
                                             self.input_x_com:self.test_com,
                                             self.init_hiddenstate:init_hidden_state})
-        """
+
         self.correct = 0
         self.tp_test = 0
         self.fp_test = 0
@@ -502,10 +502,12 @@ class LSTM_model():
             if self.test_logit[i,1] == 0 and self.logit_out[i,1] < self.threshold:
                 self.correct += 1
         """
+        self.correct_predict_death = []
         for i in range(test_length):
             if self.test_logit[i, 0] == 1:
                 self.tp_correct += 1
             if self.test_logit[i, 0] == 1 and self.logit_out[i, 0] > self.threshold:
+                self.correct_predict_death.append(i)
                 self.correct += 1
                 self.tp_test += 1
             if self.test_logit[i, 0] == 0:
@@ -516,6 +518,28 @@ class LSTM_model():
                 self.fp_test += 1
             if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] < self.threshold:
                 self.correct += 1
+
+        self.correct_predict_death = np.array(self.correct_predict_death)
+
+        feature_len = self.item_size + self.lab_size
+
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_death, :, :]
+        self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
+
+        count = 0
+        value = 0
+
+        for j in range(self.time_sequence):
+            for p in range(feature_len):
+                for i in range(self.correct_predict_death.shape[0]):
+                    if self.test_data_scores[i, j, p] != 0:
+                        count += 1
+                        value += self.test_data_scores[i, j, p]
+                if count == 0:
+                    continue
+                self.ave_data_scores[j, p] = float(value / count)
+                count = 0
+                value = 0
 
         """
         self.tp_test = 0

@@ -14,6 +14,7 @@ class dynamic_hgm():
     def __init__(self, kg, data_process):
         # tf.compat.v1.disable_v2_behavior()
         # tf.compat.v1.disable_eager_execution()
+        print("Im here in intubate")
         self.kg = kg
         self.data_process = data_process
         # self.hetro_model = hetro_model
@@ -946,7 +947,7 @@ class dynamic_hgm():
         self.correct = 0
         self.tp_correct = 0
         self.tp_neg = 0
-        self.correct_predict_death = []
+        self.correct_predict_intubate = []
         for i in range(test_length):
             if self.test_logit[i, 1] == 1:
                 self.tp_correct += 1
@@ -960,11 +961,11 @@ class dynamic_hgm():
 
         self.acc = np.float(self.correct) / test_length
 
-        self.correct_predict_death = np.array(self.correct_predict_death)
+        self.correct_predict_intubate = np.array(self.correct_predict_intubate)
 
         feature_len = self.item_size + self.lab_size
 
-        self.test_data_scores = self.test_att_score[1][self.correct_predict_death,:,0,:]
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_intubate,:,0,:]
         self.ave_data_scores = np.zeros((self.time_sequence,feature_len))
 
         count = 0

@@ -871,7 +871,7 @@ class pretrain_dhgm():
         test_data, self.test_data_lab, self.test_logit, self.test_demo, self.test_com = self.get_batch_train_intubate(
             test_length, 0, data)
         self.logit_out = self.sess.run(self.output_layer, feed_dict={self.input_x_vital: test_data,
-                                                                     self.input_demo: self.test_demo,
+                                                                     self.input_x_demo: self.test_demo,
                                                                      self.input_x_lab: self.test_data_lab,
                                                                      self.input_x_com: self.test_com,
                                                                      self.init_hiddenstate: init_hidden_state})

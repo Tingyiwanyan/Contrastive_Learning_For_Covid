@@ -563,18 +563,6 @@ class pretrain_dhgm():
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-    def config_model_att(self):
-        self.lstm_cell_att()
-        self.demo_layer_att()
-        self.build_dhgm_model()
-        self.get_latent_rep_hetero_att()
-        # self.build_att_mortality()
-        self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        tf.local_variables_initializer().run()
 
     def assign_value_patient(self, patientid, start_time, end_time):
         self.one_sample = np.zeros(self.item_size)
@@ -762,7 +750,7 @@ class pretrain_dhgm():
 
         return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com,train_one_batch_icu_intubation
 
-    def get_batch_train_period(self, data_length, start_index, data):
+    def get_batch_train_intubate(self, data_length, start_index, data):
         """
         get period train data
         """
@@ -854,7 +842,8 @@ class pretrain_dhgm():
         """
         train the system
         """
-        init_hidden_state = np.zeros((self.batch_size, self.latent_dim))
+        init_hidden_state = np.zeros(
+            (self.batch_size, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim))
         iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))
         for j in range(self.epoch):
             print('epoch')
@@ -869,7 +858,6 @@ class pretrain_dhgm():
                                self.input_y_logit_intubate: self.logit_one_batch,
                                self.init_hiddenstate: init_hidden_state,
                                self.input_x_demo: self.train_one_batch_demo})
-                # self.input_x_com:self.train_one_batch_com})
                 print(self.err_[0])
 
 

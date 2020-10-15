@@ -956,7 +956,7 @@ class dynamic_hgm():
             if self.score[i] < 0 and self.test_logit[i, 0] == 1:
                 self.correct += 1
             if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.correct_predict_death.append(i)
+                self.correct_predict_intubate.append(i)
                 self.correct += 1
 
         self.acc = np.float(self.correct) / test_length
@@ -973,7 +973,7 @@ class dynamic_hgm():
 
         for j in range(self.time_sequence):
             for p in range(feature_len):
-                for i in range(self.correct_predict_death.shape[0]):
+                for i in range(self.correct_predict_intubate.shape[0]):
                     if self.test_data_scores[i,j,p]!=0:
                         count += 1
                         value += self.test_data_scores[i,j,p]

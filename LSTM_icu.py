@@ -117,7 +117,7 @@ class LSTM_model():
         hidden_rep = []
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x, i, axis=1)
+            x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 1)
             else:
@@ -154,8 +154,8 @@ class LSTM_model():
         """
         Implement softmax loss layer
         """
-        self.hidden_last_comb = tf.concat([self.hidden_last, self.Dense_demo], 1)
-        """
+        #self.hidden_last_comb = tf.concat([self.hidden_last, self.Dense_demo], 1)
+
         self.hidden_att_e = tf.matmul(self.hidden_rep, self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e, 1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax, [tf.shape(self.input_x_vital)[0],
@@ -169,7 +169,7 @@ class LSTM_model():
         # self.hidden_final = tf.reduce_sum(self.hidden_mul, 1)
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.hidden_last_comb = tf.concat([self.hidden_final, self.Dense_demo], 1)
-        """
+
 
         self.output_layer = tf.math.sigmoid(
             tf.math.add(tf.matmul(self.hidden_last_comb, self.weight_classification_w), self.bias_classification_b))
@@ -211,7 +211,7 @@ class LSTM_model():
         """
         Get interpretation matrix
         """
-        """
+
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w, [tf.shape(self.input_x_vital)[0],
                                                                                 self.time_sequence,
                                                                                 self.latent_dim, self.latent_dim])
@@ -228,11 +228,11 @@ class LSTM_model():
                                                                                 self.latent_dim, self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e, self.project_weight_variable)
-        """
+
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size + self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.weight_classification_w, self.time_feature_index, axis=0)
         #self.score_attention_ = tf.matmul(self.project_weight_variable_final,
@@ -241,7 +241,7 @@ class LSTM_model():
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,self.mortality_hidden_rep)
         self.score_attention = tf.squeeze(self.score_attention_, [3])
         self.input_importance = tf.multiply(self.score_attention, self.input_x)
-        """
+
 
     def config_model(self):
         """
@@ -469,14 +469,14 @@ class LSTM_model():
                                                                      self.input_x_lab: self.test_data_lab,
                                                                      self.input_x_com: self.test_com,
                                                                      self.init_hiddenstate: init_hidden_state})
-        """
+
         self.test_att_score = self.sess.run([self.score_attention, self.input_importance],
                                             feed_dict={self.input_x_vital: test_data,
                                             self.input_demo_:self.test_demo,
                                             self.input_x_lab:self.test_data_lab,
                                             self.input_x_com:self.test_com,
                                             self.init_hiddenstate:init_hidden_state})
-        """
+
         self.correct = 0
         self.tp_test = 0
         self.fp_test = 0
@@ -501,10 +501,12 @@ class LSTM_model():
             if self.test_logit[i,1] == 0 and self.logit_out[i,1] < self.threshold:
                 self.correct += 1
         """
+        self.correct_predict_icu = []
         for i in range(test_length):
             if self.test_logit[i, 0] == 1:
                 self.tp_correct += 1
             if self.test_logit[i, 0] == 1 and self.logit_out[i, 0] > self.threshold:
+                self.correct_predict_icu.append(i)
                 self.correct += 1
                 self.tp_test += 1
             if self.test_logit[i, 0] == 0:
@@ -515,6 +517,28 @@ class LSTM_model():
                 self.fp_test += 1
             if self.test_logit[i, 0] == 0 and self.logit_out[i, 0] < self.threshold:
                 self.correct += 1
+
+        self.correct_predict_icu = np.array(self.correct_predict_icu)
+
+        feature_len = self.item_size + self.lab_size
+
+        self.test_data_scores = self.test_att_score[1][self.correct_predict_icu, :, :]
+        self.ave_data_scores = np.zeros((self.time_sequence, feature_len))
+
+        count = 0
+        value = 0
+
+        for j in range(self.time_sequence):
+            for p in range(feature_len):
+                for i in range(self.correct_predict_icu.shape[0]):
+                    if self.test_data_scores[i, j, p] != 0:
+                        count += 1
+                        value += self.test_data_scores[i, j, p]
+                if count == 0:
+                    continue
+                self.ave_data_scores[j, p] = float(value / count)
+                count = 0
+                value = 0
 
         """
         self.tp_test = 0

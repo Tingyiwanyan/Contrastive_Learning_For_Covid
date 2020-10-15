@@ -53,6 +53,7 @@ class pretrain_dhgm():
         self.init_hiddenstate = tf.keras.backend.placeholder(
             [None, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim])
         self.input_y_logit = tf.keras.backend.placeholder([None, 2])
+        self.input_y_logit_intubate = tf.keras.backend.placeholder([None, 1])
         self.input_x_vital = tf.keras.backend.placeholder(
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder(

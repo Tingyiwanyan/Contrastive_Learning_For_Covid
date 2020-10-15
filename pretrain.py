@@ -849,7 +849,7 @@ class pretrain_dhgm():
             print('epoch')
             print(j)
             for i in range(iteration):
-                self.train_one_batch, self.train_one_batch_lab, self.logit_one_batch, self.train_one_batch_demo, self.train_one_batch_com = self.get_batch_train_period(
+                self.train_one_batch, self.train_one_batch_lab, self.logit_one_batch, self.train_one_batch_demo, self.train_one_batch_com = self.get_batch_train_intubate(
                     self.batch_size, i * self.batch_size, self.train_data)
                 self.err_ = self.sess.run(
                     [self.cross_entropy, self.train_step_cross_entropy, self.init_hiddenstate, self.output_layer],

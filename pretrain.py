@@ -53,7 +53,6 @@ class pretrain_dhgm():
         self.init_hiddenstate = tf.keras.backend.placeholder(
             [None, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim])
         self.input_y_logit = tf.keras.backend.placeholder([None, 2])
-        self.input_y_logit_intubate = tf.keras.backend.placeholder([None, 1])
         self.input_x_vital = tf.keras.backend.placeholder(
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder(
@@ -87,6 +86,7 @@ class pretrain_dhgm():
         self.bias_info_gate = tf.Variable(self.init_info_gate_weight(shape=(self.latent_dim,)))
         self.bias_cell_state = tf.Variable(self.init_cell_state_weight(shape=(self.latent_dim,)))
         self.bias_output_gate = tf.Variable(self.init_output_gate(shape=(self.latent_dim,)))
+
 
         """
         Define LSTM variables plus attention
@@ -765,11 +765,15 @@ class pretrain_dhgm():
         """
         get period train data
         """
-        train_one_batch_vital = np.zeros((data_length, self.time_sequence, self.item_size))
-        train_one_batch_lab = np.zeros((data_length, self.time_sequence, self.lab_size))
-        train_one_batch_demo = np.zeros((data_length, self.demo_size))
-        train_one_batch_com = np.zeros((data_length, self.com_size))
         one_batch_logit = np.zeros((data_length, 1))
+        train_one_batch_vital = np.zeros(
+            (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size))
+        train_one_batch_lab = np.zeros(
+            (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size))
+        train_one_batch_demo = np.zeros(
+            (data_length, 1 + self.positive_lab_size + self.negative_lab_size, self.demo_size))
+        train_one_batch_com = np.zeros(
+            (data_length, 1 + self.positive_lab_size + self.negative_lab_size, self.com_size))
         for i in range(data_length):
             self.patient_id = data[start_index + i]
             flag = self.kg.dic_patient[self.patient_id]['intubation_label']
@@ -791,8 +795,8 @@ class pretrain_dhgm():
 
                 self.one_data_vital = self.assign_value_patient(self.patient_id, start_time, end_time)
                 self.one_data_lab = self.assign_value_lab(self.patient_id, start_time, end_time)
-                train_one_batch_vital[i, j, :] = self.one_data_vital
-                train_one_batch_lab[i, j, :] = self.one_data_lab
+                train_one_batch_vital[i, j,0, :] = self.one_data_vital
+                train_one_batch_lab[i, j,0, :] = self.one_data_lab
             # flag = self.kg.dic_patient[self.patient_id]['death_flag']
             if flag == 1:
                 one_batch_logit[i, 0] = 1
@@ -806,7 +810,7 @@ class pretrain_dhgm():
             # one_batch_logit[i,0] = 1
             self.one_data_demo = self.assign_value_demo(self.patient_id)
             # self.one_data_com = self.assign_value_com(self.patient_id)
-            train_one_batch_demo[i, :] = self.one_data_demo
+            train_one_batch_demo[i,0, :] = self.one_data_demo
             # train_one_batch_com[i,:] = self.one_data_com
 
         return train_one_batch_vital, train_one_batch_lab, one_batch_logit, train_one_batch_demo, train_one_batch_com
@@ -863,7 +867,7 @@ class pretrain_dhgm():
                                self.input_x_lab: self.train_one_batch_lab,
                                self.input_y_logit_intubate: self.logit_one_batch,
                                self.init_hiddenstate: init_hidden_state,
-                               self.input_demo: self.train_one_batch_demo})
+                               self.input_x_demo: self.train_one_batch_demo})
                 # self.input_x_com:self.train_one_batch_com})
                 print(self.err_[0])
 

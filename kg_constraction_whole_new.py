@@ -16,7 +16,7 @@ class Kg_construct_ehr():
     """
 
     def __init__(self):
-        file_path = '/datadrive/tingyi_wanyan/Registry_2020-10-15'
+        file_path = '/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/registry_2020-06-29'
         self.reg = file_path + '/registry.csv'
         self.covid_lab = file_path + '/covid19LabTest.csv'
         self.lab = file_path + '/Lab.csv'

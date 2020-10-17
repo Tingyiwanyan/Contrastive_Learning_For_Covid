@@ -107,6 +107,8 @@ class Kg_construct_ehr():
             mrn_single = self.covid_ar[i,45]
             visit_id = self.covid_ar[i,65]
             if visit_id == visit_id:
+                if mrn_single not in self.dic_patient.keys():
+                    self.dic_filter_patient[mrn_single] = {}
                 in_admit_time_single = self.covid_ar[i,1]
                 if self.covid_ar[i,11] == self.covid_ar[i,11]:
                     death_flag = 1

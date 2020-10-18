@@ -261,7 +261,7 @@ class Kg_construct_ehr():
                     self.un_correct_icu.append(i)
 
         index_race = 0
-        for i in self.total_data:
+        for i in self.dic_patient.keys():
             index_race_ = np.where(self.covid_ar[:, 45] == i)[0]
             self.check_index = index_race_
             race = 0

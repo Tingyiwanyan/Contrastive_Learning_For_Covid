@@ -198,7 +198,7 @@ class Kg_construct_ehr():
                     continue
         self.total_data_death = total_data_check
         index_race = 0
-        for i in self.dic_patient.keys():
+        for i in self.total_data:
             index_race_ = np.where(self.covid_ar[:, 45] == i)[0]
             self.check_index = index_race_
             race = 0

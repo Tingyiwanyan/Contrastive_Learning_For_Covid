@@ -264,7 +264,7 @@ class Kg_construct_ehr():
             index += 1
             #in_icu_date = self.reg_ar
             self.single_patient_vital = np.where(self.vital_sign_ar[:, 0] == i)[0]
-            in_time_value = self.dic_patient[i]['total_in_admit_time_value']
+            in_time_value = self.dic_patient[i]['Admit_time_values'][0]
             self.single_patient_lab = np.where(self.labtest_ar[:, 0] == i)[0]
             total_value_lab = 0
 

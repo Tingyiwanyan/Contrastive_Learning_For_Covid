@@ -229,6 +229,7 @@ class Kg_construct_ehr():
             if self.dic_patient[i]['intubation_label'] == 0:
                 self.dic_intubation.setdefault(0, []).append(i)
 
+
         self.total_data_mortality = []
         self.un_correct_mortality = []
         self.total_data_intubation = []
@@ -258,6 +259,102 @@ class Kg_construct_ehr():
                     self.total_data_icu.append(i)
                 else:
                     self.un_correct_icu.append(i)
+
+        index_race = 0
+        for i in self.total_data:
+            index_race_ = np.where(self.covid_ar[:, 45] == i)[0]
+            self.check_index = index_race_
+            race = 0
+            for j in index_race_:
+                race_check = self.covid_ar[:, 61][j]
+                if race_check == race_check:
+                    race = race_check
+                    break
+            for j in index_race_:
+                age_check = self.covid_ar[:, 7][j]
+                if age_check == age_check:
+                    age = age_check
+                    break
+            for j in index_race_:
+                gender_check = self.covid_ar[:, 24][j]
+                if gender_check == gender_check:
+                    gender = gender_check
+                    break
+            # self.dic_race['Age']=age
+            # self.dic_race['gender']=gender
+            if race == 0:
+                continue
+            if race[0] == 'A':
+                if 'A' not in self.dic_race:
+                    self.dic_race['A'] = {}
+                    self.dic_race['A']['num'] = 1
+                    self.dic_race['A']['index'] = index_race
+                    index_race += 1
+                else:
+                    self.dic_race['A']['num'] += 1
+                if i not in self.dic_demographic:
+                    self.dic_demographic[i] = {}
+                    self.dic_demographic[i]['race'] = 'A'
+            elif race[0] == 'B':
+                if 'B' not in self.dic_race:
+                    self.dic_race['B'] = {}
+                    self.dic_race['B']['num'] = 1
+                    self.dic_race['B']['index'] = index_race
+                    index_race += 1
+                else:
+                    self.dic_race['B']['num'] += 1
+                if i not in self.dic_demographic:
+                    self.dic_demographic[i] = {}
+                    self.dic_demographic[i]['race'] = 'B'
+            elif race[0] == '<':
+                race_ = race.split('>')[3].split('<')[0]
+                if race_ not in self.dic_race:
+                    self.dic_race[race_] = {}
+                    self.dic_race[race_]['num'] = 1
+                    self.dic_race[race_]['index'] = index_race
+                    index_race += 1
+                else:
+                    self.dic_race[race_]['num'] += 1
+                if i not in self.dic_demographic:
+                    self.dic_demographic[i] = {}
+                    self.dic_demographic[i]['race'] = race_
+            elif race[0] == 'I' or race[0] == 'P':
+                if 'U' not in self.dic_race:
+                    self.dic_race['U'] = {}
+                    self.dic_race['U']['num'] = 1
+                    self.dic_race['U']['index'] = index_race
+                    index_race += 1
+                else:
+                    self.dic_race['U']['num'] += 1
+                if i not in self.dic_demographic:
+                    self.dic_demographic[i] = {}
+                    self.dic_demographic[i]['race'] = 'U'
+            else:
+                if race not in self.dic_race:
+                    self.dic_race[race] = {}
+                    self.dic_race[race]['num'] = 1
+                    self.dic_race[race]['index'] = index_race
+                    index_race += 1
+                else:
+                    self.dic_race[race]['num'] += 1
+                if i not in self.dic_demographic:
+                    self.dic_demographic[i] = {}
+                    self.dic_demographic[i]['race'] = race
+            if 'Age' not in self.dic_race:
+                self.dic_race['Age'] = {}
+                self.dic_race['Age']['index'] = index_race
+                index_race += 1
+            self.dic_demographic[i]['Age'] = age
+            # index_race += 1
+            if 'M' not in self.dic_race:
+                self.dic_race['M'] = {}
+                self.dic_race['M']['index'] = index_race
+                index_race += 1
+            if 'F' not in self.dic_race:
+                self.dic_race['F'] = {}
+                self.dic_race['F']['index'] = index_race
+                index_race += 1
+            self.dic_demographic[i]['gender'] = gender
 
 
         index = 0

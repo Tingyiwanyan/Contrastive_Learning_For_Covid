@@ -159,7 +159,7 @@ class Kg_construct_ehr():
             if self.dic_patient[i]['death_flag'] == 1:
                 if len(self.dic_patient[i]['Admit_time_values'])>1:
                     if self.dic_patient[i]['death_value']>self.dic_patient[i]['Admit_time_values'][1]:
-                        self.dic_patient[i]['death_flag'] = 1
+                        self.dic_patient[i]['death_flag'] = 0
                         self.dic_patient[i]['filter_first_death_visit'] = 1
 
 

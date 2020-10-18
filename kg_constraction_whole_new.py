@@ -258,6 +258,110 @@ class Kg_construct_ehr():
                     self.un_correct_icu.append(i)
 
 
+        index = 0
+        for i in self.dic_patient.keys():
+            print(index)
+            index += 1
+            #in_icu_date = self.reg_ar
+            self.single_patient_vital = np.where(self.vital_sign_ar[:, 0] == i)[0]
+            in_time_value = self.dic_patient[i]['total_in_admit_time_value']
+            self.single_patient_lab = np.where(self.labtest_ar[:, 0] == i)[0]
+            total_value_lab = 0
+
+            for k in self.single_patient_lab:
+                obv_id = self.labtest_ar[k][2]
+                patient_lab_mrn = self.labtest_ar[k][0]
+                value = self.labtest_ar[k][3]
+                self.check_data_lab = self.labtest_ar[k][4]
+                date_year_value_lab = float(str(self.labtest_ar[k][4])[0:4]) * 365
+                date_day_value_lab = float(str(self.check_data_lab)[4:6]) * 30 + float(str(self.check_data_lab)[6:8])
+                date_value_lab = (date_year_value_lab + date_day_value_lab) * 24 * 60
+                date_time_value_lab = float(str(self.check_data_lab)[8:10]) * 60 + float(
+                    str(self.check_data_lab)[10:12])
+                self.total_time_value_lab = date_value_lab + date_time_value_lab
+                self.dic_patient[i].setdefault('lab_time_check', []).append(self.check_data_lab)
+                if obv_id in self.dic_lab_category.keys():
+                    category = self.dic_lab_category[obv_id]
+                    self.prior_time = np.int(np.floor(np.float((self.total_time_value_lab - in_time_value) / 60)))
+                    if self.prior_time < 0:
+                        continue
+                    try:
+                        value = float(value)
+                    except:
+                        continue
+                    if not value == value:
+                        continue
+                    if i not in self.dic_lab[category]:
+                        # self.dic_lab[category]['patient_values'][i]={}
+                        self.dic_lab[category].setdefault('lab_value_patient', []).append(value)
+                    else:
+                        self.dic_lab[category].setdefault('lab_value_patient', []).append(value)
+                    if self.prior_time not in self.dic_patient[i]['prior_time_lab']:
+                        self.dic_patient[i]['prior_time_lab'][self.prior_time] = {}
+                        self.dic_patient[i]['prior_time_lab'][self.prior_time].setdefault(category, []).append(value)
+                    else:
+                        self.dic_patient[i]['prior_time_lab'][self.prior_time].setdefault(category, []).append(value)
+            # if not self.dic_lab[category]['patient_values'][i] == {}:
+            #   mean_value_lab_single = np.mean(self.dic_lab[category]['patient_values'][i]['lab_value_patient'])
+            #  self.dic_lab[category]['patient_values'][i]['lab_mean_value']=mean_value_lab_single
+
+            # print(index)
+            # index += 1
+            for j in self.single_patient_vital:
+                obv_id = self.vital_sign_ar[j][2]
+                if obv_id in self.crucial_vital:
+                    self.check_data = self.vital_sign_ar[j][4]
+                    self.dic_patient[i].setdefault('time_capture', []).append(self.check_data)
+                    date_year_value = float(str(self.vital_sign_ar[j][4])[0:4]) * 365
+                    date_day_value = float(str(self.check_data)[4:6]) * 30 + float(str(self.check_data)[6:8])
+                    date_value = (date_year_value + date_day_value) * 24 * 60
+                    date_time_value = float(str(self.check_data)[8:10]) * 60 + float(str(self.check_data)[10:12])
+                    total_time_value = date_value + date_time_value
+                    self.prior_time = np.int(np.floor(np.float((total_time_value - in_time_value) / 60)))
+                    if self.prior_time < 0:
+                        continue
+                    if obv_id == 'CAC - BLOOD PRESSURE':
+                        self.check_obv = obv_id
+                        self.check_ar = self.vital_sign_ar[j]
+                        self.check_value_presure = self.vital_sign_ar[j][3]
+                        try:
+                            value = self.vital_sign_ar[j][3].split('/')
+                        except:
+                            continue
+                        if self.check_value_presure == '""':
+                            continue
+                        if self.prior_time not in self.dic_patient[i]['prior_time_vital']:
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time] = {}
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault('high', []).append(
+                                value[0])
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault('low', []).append(
+                                value[1])
+                        else:
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault('high', []).append(
+                                value[0])
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault('low', []).append(
+                                value[1])
+                        self.dic_vital['high'].setdefault('value', []).append(value[0])
+                        self.dic_vital['low'].setdefault('value', []).append(value[1])
+                    else:
+                        self.check_value = self.vital_sign_ar[j][3]
+                        self.check_obv = obv_id
+                        self.check_ar = self.vital_sign_ar[j]
+                        if self.check_value == '""':
+                            continue
+                        value = float(self.vital_sign_ar[j][3])
+                        if np.isnan(value):
+                            continue
+                        if self.prior_time not in self.dic_patient[i]['prior_time_vital']:
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time] = {}
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault(obv_id, []).append(
+                                value)
+                        else:
+                            self.dic_patient[i]['prior_time_vital'][self.prior_time].setdefault(obv_id, []).append(
+                                value)
+                        self.dic_vital[obv_id].setdefault('value', []).append(value)
+
+
 
 
 

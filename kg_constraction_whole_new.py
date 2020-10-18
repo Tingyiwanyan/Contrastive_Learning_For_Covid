@@ -228,8 +228,11 @@ class Kg_construct_ehr():
                 self.dic_intubation.setdefault(0, []).append(i)
 
         self.total_data_mortality = []
+        self.un_correct_mortality = []
         self.total_data_intubation = []
+        self.un_correct_intubation = []
         self.total_data_icu = []
+        self.un_correct_icu = []
 
         for i in self.dic_patient.keys():
             if self.dic_patient[i]['death_flag'] == 0:
@@ -237,16 +240,22 @@ class Kg_construct_ehr():
             if self.dic_patient[i]['death_flag'] == 1:
                 if self.dic_patient[i]['death_hour'] > 0:
                     self.total_data_mortality.append(i)
+                else:
+                    self.un_correct_mortality.append(i)
             if self.dic_patient[i]['intubation_label'] == 0:
                 self.total_data_intubation.append(i)
             if self.dic_patient[i]['intubation_label'] == 1:
                 if self.dic_patient[i]['intubation_hour'] > 0:
                     self.total_data_intubation.append(i)
+                else:
+                    self.un_correct_intubation.append(i)
             if self.dic_patient[i]['icu_label'] == 0:
                 self.total_data_icu.append(i)
             if self.dic_patient[i]['icu_label'] == 1:
                 if self.dic_patient[i]['in_icu_hour'] > 0:
                     self.total_data_icu.append(i)
+                else:
+                    self.un_correct_icu.append(i)
 
 
 

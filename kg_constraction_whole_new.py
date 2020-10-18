@@ -134,6 +134,21 @@ class Kg_construct_ehr():
             else:
                 self.dic_patient[mrn_single]['icu_label'] = 0
 
+            if self.covid_ar[i, 11] == self.covid_ar[i, 11]:
+                death_flag = 1
+                death_time_ = kg.covid_ar[i][11]
+                kg.dic_patient[i]['death_time'] = death_time_
+                death_time = death_time_.split(' ')
+                death_date = [np.int(l) for l in death_time[0].split('-')]
+                death_date_value = (death_date[0] * 365.0 + death_date[1] * 30 + death_date[2]) * 24 * 60
+                dead_time_ = [np.int(l) for l in death_time[1].split(':')[0:-1]]
+                dead_time_value = dead_time_[0] * 60.0 + dead_time_[1]
+                total_dead_time_value = death_date_value + dead_time_value
+                kg.dic_patient[i]['death_value'] = total_dead_time_value
+            else:
+                death_flag = 0
+            self.dic_patient[mrn_single]['death_flag'] = death_flag
+
         for i in self.dic_patient.keys():
             self.dic_patient[i]['Admit_time_values'] = np.sort(self.dic_patient[i]['Admit_time_values'])
             if self.dic_patient[i]['icu_label'] == 1:
@@ -141,6 +156,11 @@ class Kg_construct_ehr():
                     if self.dic_patient[i]['total_in_icu_time_value']>self.dic_patient[i]['Admit_time_values'][1]:
                         self.dic_patient[i]['icu_label'] = 0
                         self.dic_patient[i]['filter_first_icu_visit'] = 1
+            if self.dic_patient[i]['death_flag'] == 1:
+                if len(self.dic_patient[i]['Admit_time_values'])>1:
+                    if self.dic_patient[i]['death_value']>self.dic_patient[i]['Admit_time_values'][1]:
+                        self.dic_patient[i]['death_flag'] = 1
+                        self.dic_patient[i]['filter_first_death_visit'] = 1
 
 
 

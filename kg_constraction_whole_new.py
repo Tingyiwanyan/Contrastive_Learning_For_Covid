@@ -107,13 +107,9 @@ class Kg_construct_ehr():
             mrn_single = self.covid_ar[i,45]
             visit_id = self.covid_ar[i,65]
             if visit_id == visit_id:
-                if mrn_single not in self.dic_filter_patient.keys():
-                    self.dic_filter_patient[mrn_single] = {}
+                if mrn_single not in self.dic_patient.keys():
+                    self.dic_patient[mrn_single] = {}
                 in_admit_time_single = self.covid_ar[i,1]
-                if self.covid_ar[i,11] == self.covid_ar[i,11]:
-                    death_flag = 1
-                else:
-                    death_flag = 0
 
                 self.in_admit_time = in_admit_time_single.split(' ')
                 in_admit_date = [np.int(j) for j in self.in_admit_time[0].split('-')]
@@ -121,7 +117,9 @@ class Kg_construct_ehr():
                 self.in_admit_time_ = [np.int(j) for j in self.in_admit_time[1].split(':')[0:-1]]
                 in_admit_time_value = self.in_admit_time_[0] * 60.0 + self.in_admit_time_[1]
                 total_in_admit_time_value = in_admit_date_value + in_admit_time_value
-                self.dic_filter_patient[mrn_single].setdefault(visit_id, []).append(total_in_admit_time_value)
+                self.dic_patient[mrn_single].setdefault('Admit_times', []).append(total_in_admit_time_value)
+
+
 
 
 if __name__ == "__main__":

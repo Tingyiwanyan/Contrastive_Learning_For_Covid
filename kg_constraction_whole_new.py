@@ -109,6 +109,8 @@ class Kg_construct_ehr():
             if visit_id == visit_id:
                 if mrn_single not in self.dic_patient.keys():
                     self.dic_patient[mrn_single] = {}
+                    self.dic_patient[mrn_single]['prior_time_vital'] = {}
+                    self.dic_patient[mrn_single]['prior_time_lab'] = {}
                 in_admit_time_single = self.covid_ar[i,1]
 
                 self.in_admit_time = in_admit_time_single.split(' ')

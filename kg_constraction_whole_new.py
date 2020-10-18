@@ -122,9 +122,9 @@ class Kg_construct_ehr():
                 self.dic_patient[mrn_single]['icu_label'] = 1
                 in_time_single = self.covid_ar[i, 29]
                 self.in_time = in_time_single.split(' ')
-                in_date = [np.int(i) for i in self.in_time[0].split('-')]
+                in_date = [np.int(j) for j in self.in_time[0].split('-')]
                 in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
-                self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
+                self.in_time_ = [np.int(j) for j in self.in_time[1].split(':')[0:-1]]
                 in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
                 total_in_time_value = in_date_value + in_time_value
                 self.dic_patient[mrn_single]['in_icu_time'] = self.in_time

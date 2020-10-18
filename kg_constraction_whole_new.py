@@ -158,14 +158,14 @@ class Kg_construct_ehr():
                 if self.covid_ar[i, 11] == self.covid_ar[i, 11]:
                     death_flag = 1
                     death_time_ = kg.covid_ar[i][11]
-                    kg.dic_patient[mrn_single]['death_time'] = death_time_
+                    self.dic_patient[mrn_single]['death_time'] = death_time_
                     death_time = death_time_.split(' ')
                     death_date = [np.int(l) for l in death_time[0].split('-')]
                     death_date_value = (death_date[0] * 365.0 + death_date[1] * 30 + death_date[2]) * 24 * 60
                     dead_time_ = [np.int(l) for l in death_time[1].split(':')[0:-1]]
                     dead_time_value = dead_time_[0] * 60.0 + dead_time_[1]
                     total_dead_time_value = death_date_value + dead_time_value
-                    kg.dic_patient[mrn_single]['death_value'] = total_dead_time_value
+                    self.dic_patient[mrn_single]['death_value'] = total_dead_time_value
                 else:
                     death_flag = 0
                 self.dic_patient[mrn_single]['death_flag'] = death_flag
@@ -173,7 +173,12 @@ class Kg_construct_ehr():
         """
         filter out labels
         """
-
+        self.total_in_icu_time = []
+        self.total_intubation_time = []
+        self.total_death_time = []
+        self.dic_death = {}
+        self.dic_intubation = {}
+        self.dic_in_icu = {}
         for i in self.dic_patient.keys():
             self.dic_patient[i]['Admit_time_values'] = np.sort(self.dic_patient[i]['Admit_time_values'])
             if self.dic_patient[i]['icu_label'] == 1:
@@ -193,7 +198,34 @@ class Kg_construct_ehr():
                         self.dic_patient[i]['intubation_label'] = 0
                         self.dic_patient[i]['filter_first_intubation_visit'] = 1
 
+        for i in self.dic_patient.keys():
+            if self.dic_patient[i]['icu_label'] == 1:
+                total_in_icu_time_value = self.dic_patient[i]['total_in_icu_time_value']
+                total_in_admit_time_value = self.dic_patient[i]['Admit_time_values'][0]
+                self.dic_patient[i]['in_icu_hour'] = np.int(
+                    np.floor((total_in_icu_time_value - total_in_admit_time_value) / 60))
+                self.total_in_icu_time.append(kg.dic_patient[i]['in_icu_hour'])
+                self.dic_in_icu.setdefault(1, []).append(i)
+            if self.dic_patient[i]['icu_label'] == 0:
+                self.dic_in_icu.setdefault(0, []).append(i)
 
+            if self.dic_patient[i]['death_flag'] == 1:
+                total_death_value = self.dic_patient[i]['death_value']
+                self.dic_patient[i]['death_hour'] = np.int(
+                    np.floor((total_death_value - kg.dic_patient[i]['Admit_time_values'][0]) / 60))
+                self.total_death_time.append(self.dic_patient[i]['death_hour'])
+                self.dic_death.setdefault(1, []).append(i)
+            if self.dic_patient[i]['death_flag'] == 0:
+                self.dic_death.setdefault(0, []).append(i)
+            if self.dic_patient[i]['intubation_label'] == 1:
+                total_intubation_time_value = self.dic_patient[i]['total_intubation_time_value']
+                total_in_admit_time_value = self.dic_patient[i]['Admit_time_values'][0]
+                self.dic_patient[i]['intubation_hour'] = np.int(
+                    np.floor((total_intubation_time_value - total_in_admit_time_value) / 60))
+                self.total_intubation_time.append(kg.dic_patient[i]['intubation_hour'])
+                self.dic_intubation.setdefault(1, []).append(i)
+            if self.dic_patient[i]['intubation_label'] == 0:
+                self.dic_intubation.setdefault(0, []).append(i)
 
 
 

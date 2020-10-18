@@ -118,36 +118,61 @@ class Kg_construct_ehr():
                 in_admit_time_value = self.in_admit_time_[0] * 60.0 + self.in_admit_time_[1]
                 total_in_admit_time_value = in_admit_date_value + in_admit_time_value
                 self.dic_patient[mrn_single].setdefault('Admit_time_values', []).append(total_in_admit_time_value)
-            if self.covid_ar[i, 29] == self.covid_ar[i, 29]:
-                self.dic_patient[mrn_single]['icu_label'] = 1
-                in_time_single = self.covid_ar[i, 29]
-                self.in_time = in_time_single.split(' ')
-                in_date = [np.int(j) for j in self.in_time[0].split('-')]
-                in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
-                self.in_time_ = [np.int(j) for j in self.in_time[1].split(':')[0:-1]]
-                in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
-                total_in_time_value = in_date_value + in_time_value
-                self.dic_patient[mrn_single]['in_icu_time'] = self.in_time
-                self.dic_patient[mrn_single]['in_date'] = in_date
-                self.dic_patient[mrn_single]['in_time'] = self.in_time_
-                self.dic_patient[mrn_single]['total_in_icu_time_value'] = total_in_time_value
-            else:
-                self.dic_patient[mrn_single]['icu_label'] = 0
+                if self.covid_ar[i, 29] == self.covid_ar[i, 29]:
+                    self.dic_patient[mrn_single]['icu_label'] = 1
+                    in_time_single = self.covid_ar[i, 29]
+                    self.in_time = in_time_single.split(' ')
+                    in_date = [np.int(j) for j in self.in_time[0].split('-')]
+                    in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
+                    self.in_time_ = [np.int(j) for j in self.in_time[1].split(':')[0:-1]]
+                    in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
+                    total_in_time_value = in_date_value + in_time_value
+                    self.dic_patient[mrn_single]['in_icu_time'] = self.in_time
+                    self.dic_patient[mrn_single]['in_date'] = in_date
+                    self.dic_patient[mrn_single]['in_time'] = self.in_time_
+                    self.dic_patient[mrn_single]['total_in_icu_time_value'] = total_in_time_value
+                else:
+                    self.dic_patient[mrn_single]['icu_label'] = 0
+                """
+                filter intubation
+                """
+                if self.covid_ar[i, 35] == self.covid_ar[i, 35]:
+                    self.dic_patient[mrn_single]['intubation_label'] = 1
+                    in_time_single = self.covid_ar[i, 35]
+                    self.in_time = in_time_single.split(' ')
+                    in_date = [np.int(i) for i in self.in_time[0].split('-')]
+                    in_date_value = (in_date[0] * 365.0 + in_date[1] * 30 + in_date[2]) * 24 * 60
+                    self.in_time_ = [np.int(i) for i in self.in_time[1].split(':')[0:-1]]
+                    in_time_value = self.in_time_[0] * 60.0 + self.in_time_[1]
+                    total_in_time_value = in_date_value + in_time_value
+                    self.dic_patient[mrn_single]['intubation_time'] = self.in_time
+                    self.dic_patient[mrn_single]['intubation_date'] = in_date
+                    self.dic_patient[mrn_single]['intubation_time'] = self.in_time_
+                    self.dic_patient[mrn_single]['total_intubation_time_value'] = total_in_time_value
+                else:
+                    self.dic_patient[mrn_single]['intubation_label'] = 0
 
-            if self.covid_ar[i, 11] == self.covid_ar[i, 11]:
-                death_flag = 1
-                death_time_ = kg.covid_ar[i][11]
-                kg.dic_patient[mrn_single]['death_time'] = death_time_
-                death_time = death_time_.split(' ')
-                death_date = [np.int(l) for l in death_time[0].split('-')]
-                death_date_value = (death_date[0] * 365.0 + death_date[1] * 30 + death_date[2]) * 24 * 60
-                dead_time_ = [np.int(l) for l in death_time[1].split(':')[0:-1]]
-                dead_time_value = dead_time_[0] * 60.0 + dead_time_[1]
-                total_dead_time_value = death_date_value + dead_time_value
-                kg.dic_patient[mrn_single]['death_value'] = total_dead_time_value
-            else:
-                death_flag = 0
-            self.dic_patient[mrn_single]['death_flag'] = death_flag
+                """
+                filter mortality
+                """
+                if self.covid_ar[i, 11] == self.covid_ar[i, 11]:
+                    death_flag = 1
+                    death_time_ = kg.covid_ar[i][11]
+                    kg.dic_patient[mrn_single]['death_time'] = death_time_
+                    death_time = death_time_.split(' ')
+                    death_date = [np.int(l) for l in death_time[0].split('-')]
+                    death_date_value = (death_date[0] * 365.0 + death_date[1] * 30 + death_date[2]) * 24 * 60
+                    dead_time_ = [np.int(l) for l in death_time[1].split(':')[0:-1]]
+                    dead_time_value = dead_time_[0] * 60.0 + dead_time_[1]
+                    total_dead_time_value = death_date_value + dead_time_value
+                    kg.dic_patient[mrn_single]['death_value'] = total_dead_time_value
+                else:
+                    death_flag = 0
+                self.dic_patient[mrn_single]['death_flag'] = death_flag
+
+        """
+        filter out labels
+        """
 
         for i in self.dic_patient.keys():
             self.dic_patient[i]['Admit_time_values'] = np.sort(self.dic_patient[i]['Admit_time_values'])
@@ -161,6 +186,12 @@ class Kg_construct_ehr():
                     if self.dic_patient[i]['death_value']>self.dic_patient[i]['Admit_time_values'][1]:
                         self.dic_patient[i]['death_flag'] = 0
                         self.dic_patient[i]['filter_first_death_visit'] = 1
+
+            if self.dic_patient[i]['intubation_label'] == 1:
+                if len(self.dic_patient[i]['Admit_time_values'])>1:
+                    if self.dic_patient[i]['total_intubation_time_value']>self.dic_patient[i]['Admit_time_values'][1]:
+                        self.dic_patient[i]['intubation_label'] = 0
+                        self.dic_patient[i]['filter_first_intubation_visit'] = 1
 
 
 

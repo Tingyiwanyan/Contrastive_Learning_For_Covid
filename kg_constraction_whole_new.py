@@ -4,9 +4,9 @@ import math
 import time
 import pandas as pd
 import json
-from LSTM_icu import LSTM_model
+from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_icu_whole import dynamic_hgm
+from Dynamic_hgm_death_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -586,5 +586,13 @@ if __name__ == "__main__":
     kg.age_mean = np.mean(age_total)
     kg.age_std = np.std(age_total)
 
+
+    process_data = kg_process_data(kg)
+    process_data.separate_train_test()
+    LSTM_ = LSTM_model(kg, process_data)
+    #pretrain = pretrain_dhgm(kg,process_data)
+    # LSTM_.config_model()
+    # LSTM_.train()
+    dhgm = dynamic_hgm(kg, process_data)
 
 

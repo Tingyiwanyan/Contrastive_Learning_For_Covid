@@ -38,10 +38,10 @@ class dynamic_hgm():
         self.input_seq = []
         self.threshold = 0.5
         self.positive_lab_size = 1
-        self.negative_lab_size = 3
-        self.positive_sample_size = self.positive_lab_size + 1
+        self.negative_lab_size = 1
+        self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
-        self.negative_sample_size = self.negative_lab_size + 1
+        self.negative_sample_size = self.negative_lab_size# + 1
         # self.negative_sample_size = 2
         self.neighbor_pick_skip = 5
         self.neighbor_pick_neg = 10
@@ -411,10 +411,12 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-        #self.x_skip = self.x_skip_mor
-        #self.x_negative = self.x_negative_mor
+        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        self.x_skip = self.x_skip_mor
+        self.x_negative = self.x_negative_mor
+        self.x_skip_contrast = self.x_skip_patient
+        self.x_negative_contrast = self.x_negative_patient
 
     def process_patient_att(self):
         """
@@ -609,6 +611,40 @@ class dynamic_hgm():
         negative_training_norm = tf.math.l2_normalize(self.x_negative, axis=2)
 
         skip_training = tf.broadcast_to(self.x_origin,
+                                        [self.batch_size, 1,#self.negative_sample_size,
+                                         self.latent_dim + self.latent_dim_demo])
+
+        skip_training_norm = tf.math.l2_normalize(skip_training, axis=2)
+
+        dot_prod = tf.multiply(skip_training_norm, negative_training_norm)
+
+        dot_prod_sum = tf.reduce_sum(dot_prod, 2)
+
+        sum_log_dot_prod = tf.math.log(tf.math.sigmoid(tf.math.negative(tf.reduce_mean(dot_prod_sum, 1))))
+
+        positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, 1,#self.positive_sample_size,
+                                                            self.latent_dim + self.latent_dim_demo])
+
+        positive_skip_norm = tf.math.l2_normalize(self.x_skip, axis=2)
+
+        positive_training_norm = tf.math.l2_normalize(positive_training, axis=2)
+
+        dot_prod_positive = tf.multiply(positive_skip_norm, positive_training_norm)
+
+        dot_prod_sum_positive = tf.reduce_sum(dot_prod_positive, 2)
+
+        sum_log_dot_prod_positive = tf.math.log(tf.math.sigmoid(tf.reduce_mean(dot_prod_sum_positive, 1)))
+
+        self.negative_sum = tf.math.negative(
+            tf.reduce_sum(tf.math.add(sum_log_dot_prod, sum_log_dot_prod_positive)))
+
+    def SGNN_loss_contrast(self):
+        """
+        mplement sgnn loss contrast
+        """
+        negative_training_norm = tf.math.l2_normalize(self.x_negative_contrast, axis=2)
+
+        skip_training = tf.broadcast_to(self.x_origin,
                                         [self.batch_size, self.negative_sample_size,
                                          self.latent_dim + self.latent_dim_demo])
 
@@ -623,7 +659,7 @@ class dynamic_hgm():
         positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, self.positive_sample_size,
                                                             self.latent_dim + self.latent_dim_demo])
 
-        positive_skip_norm = tf.math.l2_normalize(self.x_skip, axis=2)
+        positive_skip_norm = tf.math.l2_normalize(self.x_skip_contrast, axis=2)
 
         positive_training_norm = tf.math.l2_normalize(positive_training, axis=2)
 
@@ -633,7 +669,7 @@ class dynamic_hgm():
 
         sum_log_dot_prod_positive = tf.math.log(tf.math.sigmoid(tf.reduce_mean(dot_prod_sum_positive, 1)))
 
-        self.negative_sum = tf.math.negative(
+        self.negative_sum_contrast = tf.math.negative(
             tf.reduce_sum(tf.math.add(sum_log_dot_prod, sum_log_dot_prod_positive)))
 
     def config_model(self):

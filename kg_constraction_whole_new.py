@@ -193,7 +193,7 @@ class Kg_construct_ehr():
                     total_discharge_time_value = discharge_date_value + discharge_time_value
                     self.dic_patient[mrn_single]['discharge_value'] = total_discharge_time_value
                     self.dic_patient[mrn_single]['discharge_hour'] = np.int(
-                        np.floor((total_discharge_time_value - self.dic_patient[i]['total_in_admit_time_value']) / 60))
+                        np.floor((total_discharge_time_value - self.dic_patient[mrn_single]['total_in_admit_time_value']) / 60))
                     if self.dic_patient[mrn_single]['death_flag'] == 0:
                         self.changed_death.append(mrn_single)
                         self.dic_patient[mrn_single]['death_flag'] = 1

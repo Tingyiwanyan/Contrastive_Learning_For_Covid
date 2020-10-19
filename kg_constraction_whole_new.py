@@ -537,7 +537,7 @@ if __name__ == "__main__":
     kg.total_data_icu = []
     kg.un_correct_icu = []
 
-    for i in kg.dic_patient.keys():
+    for i in kg.dic_demographic.keys():
         if kg.dic_patient[i]['death_flag'] == 0:
             kg.total_data_mortality.append(i)
             kg.dic_death.setdefault(0, []).append(i)
@@ -577,10 +577,14 @@ if __name__ == "__main__":
             keys = kg.dic_patient[i]['prior_time_vital'].keys()
             pick_time = np.median([float(i) for i in keys if float(i) < upper_bound])
             kg.dic_patient[i]['pick_time'] = pick_time
+            if not pick_time == pick_time:
+                kg.dic_patient[i]['pick_time'] = 0
         else:
             keys = kg.dic_patient[i]['prior_time_vital'].keys()
             pick_time = np.median([float(i) for i in keys])
             kg.dic_patient[i]['pick_time'] = pick_time
+            if not pick_time == pick_time:
+                kg.dic_patient[i]['pick_time'] = 0
 
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)

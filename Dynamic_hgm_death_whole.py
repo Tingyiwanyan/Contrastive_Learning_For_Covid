@@ -491,7 +491,7 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                pick_death_hour = self.kg.dic_patient[center_node_index]['pick_time']#self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
                 start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
@@ -529,7 +529,7 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_death_hour = self.kg.dic_patient[center_node_index]['pick_time']#self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
                     start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
@@ -575,7 +575,7 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_death_hour = self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_death_hour = self.kg.dic_patient[center_node_index]['pick_time']#self.kg.mean_death_time + np.int(np.floor(np.random.normal(0, 20, 1)))
                     start_time = pick_death_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:

@@ -185,19 +185,19 @@ class LSTM_model():
                             self.input_y_diag,tf.log(
                                 self.logit_softmax)),reduction_indices=[1]),reduction_indices=[1])))
         """
-        """
+
         self.cross_entropy = tf.reduce_mean(tf.math.negative(
-            tf.reduce_sum(tf.math.multiply(self.input_y_logit, tf.log(self.logit_sig)), axis=1)),
+            tf.reduce_sum(tf.math.multiply(self.input_y_logit, tf.log(self.output_layer)), axis=1)),
             axis=0)
-        """
+
 
         #self.L2_norm = tf.math.square(tf.math.subtract(self.input_y_logit,self.logit_sig))
         #self.cross_entropy = tf.reduce_mean(tf.reduce_sum(self.L2_norm,axis=1),axis=0)
 
-        a = tf.constant((float(1)),shape=[self.batch_size,1])
+        #a = tf.constant((float(1)),shape=[self.batch_size,1])
 
-        self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))+\
-                             tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
+        #self.cross_entropy = tf.math.negative(tf.reduce_sum(tf.math.multiply(self.input_y_logit,tf.log(self.output_layer)),axis=0))+\
+                             #tf.math.negative(tf.reduce_sum(tf.math.multiply((a-self.input_y_logit),tf.log(a-self.output_layer)),axis=0))
 
 
         #self.bce = tf.keras.losses.BinaryCrossentropy()

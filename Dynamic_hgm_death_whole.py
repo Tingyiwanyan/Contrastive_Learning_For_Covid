@@ -38,7 +38,7 @@ class dynamic_hgm():
         self.input_seq = []
         self.threshold = 0.5
         self.positive_lab_size = 1
-        self.negative_lab_size = 1
+        self.negative_lab_size = 3
         self.positive_sample_size = self.positive_lab_size + 1
         # self.positive_sample_size = 2
         self.negative_sample_size = self.negative_lab_size + 1
@@ -411,10 +411,10 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-        self.x_skip = self.x_skip_mor
-        self.x_negative = self.x_negative_mor
+        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        #self.x_skip = self.x_skip_mor
+        #self.x_negative = self.x_negative_mor
 
     def process_patient_att(self):
         """

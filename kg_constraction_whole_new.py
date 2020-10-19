@@ -603,6 +603,14 @@ if __name__ == "__main__":
     kg.age_mean = np.mean(age_total)
     kg.age_std = np.std(age_total)
 
+    death_data = []
+    for i in kg.dic_patient.keys():
+        if kg.dic_patient[i]['death_flag']==1:
+            death_data.append(i)
+
+    random_pick_death = random.sample(death_data,1100)
+    reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
+    kg.total_data_mortality = reduced_data
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()

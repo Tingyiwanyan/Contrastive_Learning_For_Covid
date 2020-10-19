@@ -571,10 +571,10 @@ if __name__ == "__main__":
 
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)
-    kg.mean_intubate_time = np.mean(kg.filtered_intubate_hour)
-    kg.std_intubate_time = np.std(kg.filtered_intubate_hour)
-    kg.mean_icu_time = np.mean(kg.filtered_in_icu_time)
-    kg.std_icu_time = np.std(kg.filtered_in_icu_time)
+    kg.mean_intubate_time = np.mean(kg.total_intubation_time)
+    kg.std_intubate_time = np.std(kg.total_intubation_time)
+    kg.mean_icu_time = np.mean(kg.total_in_icu_time)
+    kg.std_icu_time = np.std(kg.total_in_icu_time)
 
     age_total = []
     for i in kg.dic_demographic.keys():

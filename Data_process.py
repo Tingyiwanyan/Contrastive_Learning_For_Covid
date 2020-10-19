@@ -19,7 +19,7 @@ class kg_process_data():
     def separate_train_test(self):
         self.data_patient_num = len(self.kg.total_data_mortality)
         self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
-        for i in self.kg.total_data[0:self.train_num]:
+        for i in self.kg.total_data_mortality[0:self.train_num]:
             self.train_patient.append(i)
         test_whole = [i for i in self.kg.total_data_mortality if i not in self.train_patient]
 

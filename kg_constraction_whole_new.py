@@ -46,6 +46,7 @@ class Kg_construct_ehr():
         self.dic_lab_category = {}
         self.dic_demographic = {}
         self.dic_race = {}
+        self.changed_death = []
         self.crucial_vital = ['CAC - BLOOD PRESSURE', 'CAC - TEMPERATURE', 'CAC - PULSE OXIMETRY',
                               'CAC - RESPIRATIONS', 'CAC - PULSE', 'CAC - HEIGHT', 'CAC - WEIGHT/SCALE']
         index_keep = np.where(self.lab_comb_ar[:, -1] == 1)[0]
@@ -120,6 +121,9 @@ class Kg_construct_ehr():
                 in_admit_time_value = self.in_admit_time_[0] * 60.0 + self.in_admit_time_[1]
                 total_in_admit_time_value = in_admit_date_value + in_admit_time_value
                 self.dic_patient[mrn_single].setdefault('Admit_time_values', []).append(total_in_admit_time_value)
+                """
+                filter intubation
+                """
                 if self.covid_ar[i, 29] == self.covid_ar[i, 29]:
                     self.dic_patient[mrn_single]['icu_label'] = 1
                     in_time_single = self.covid_ar[i, 29]
@@ -171,6 +175,30 @@ class Kg_construct_ehr():
                 else:
                     death_flag = 0
                 self.dic_patient[mrn_single]['death_flag'] = death_flag
+
+        """
+        change EXP and 20 to death
+        """
+        for i in range(self.covid_ar.shape[0]):
+            if self.covid_ar[i,13]=='EXP' or self.covid_ar[i,13]=='20':
+                mrn_single = self.covid_ar[i, 45]
+                if self.covid_ar[i][12] == self.covid_ar[i][12]:
+                    discharge_time_ = self.covid_ar[i][12]
+                    self.dic_patient[mrn_single]['discharge_time'] = discharge_time_
+                    discharge_time = discharge_time_.split(' ')
+                    discharge_date = [np.int(l) for l in discharge_time[0].split('-')]
+                    discharge_date_value = (discharge_date[0] * 365.0 + discharge_date[1] * 30 + discharge_date[2]) * 24 * 60
+                    dischar_time_ = [np.int(l) for l in discharge_time[1].split(':')[0:-1]]
+                    discharge_time_value = dischar_time_[0] * 60.0 + dischar_time_[1]
+                    total_discharge_time_value = discharge_date_value + discharge_time_value
+                    kg.dic_patient[mrn_single]['discharge_value'] = total_discharge_time_value
+                    kg.dic_patient[mrn_single]['discharge_hour'] = np.int(
+                        np.floor((total_discharge_time_value - kg.dic_patient[i]['total_in_admit_time_value']) / 60))
+                    if self.dic_patient[mrn_single]['death_flag'] = 0:
+                        self.changed_death.append(mrn_single)
+                        self.dic_patient[mrn_single]['death_flag'] = 1
+                        self.dic_patient[mrn_single]['death_value'] = total_discharge_time_value
+
 
         """
         filter out labels
@@ -469,3 +497,56 @@ if __name__ == "__main__":
     kg = Kg_construct_ehr()
     kg.read_csv()
     kg.create_kg_dic()
+    """
+    with open('/datadrive/tingyi_wanyan/dic_patient_whole.json', 'r') as fp:
+        kg.dic_patient = json.load(fp)
+    with open('/datadrive/tingyi_wanyan/dic_vital_whole.json','r') as tp:
+        kg.dic_vital = json.load(tp)
+    with open('/datadrive/tingyi_wanyan/dic_demographic_whole.json','r') as fp_:
+        kg.dic_demographic = json.load(fp_)
+    with open('/datadrive/tingyi_wanyan/dic_race_whole.json','r') as tp_:
+        kg.dic_race = json.load(tp_)
+    with open('/datadrive/tingyi_wanyan/dic_lab_whole.json','r') as lab:
+        kg.dic_lab = json.load(lab)
+
+
+    for i in kg.dic_lab.keys():
+        mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
+        std_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])
+        kg.dic_lab[i]['mean_value'] = mean_lab
+        kg.dic_lab[i]['std'] = std_lab
+
+    for i in kg.dic_vital.keys():
+        values = [np.float(j) for j in kg.dic_vital[i]['value']]
+        mean = np.mean(values)
+        std = np.std(values)
+        kg.dic_vital[i]['mean_value'] = mean
+        kg.dic_vital[i]['std'] = std
+
+
+    pick_exp = np.where(kg.reg_ar[:,13]=='EXP')[0]
+    EXP_patient = kg.reg_ar[:,45][pick_exp]
+    pick_exclude = np.where(kg.reg_ar[:,13]=='20')[0]
+    Exclude = kg.reg_ar[:,45][pick_exclude]
+
+    EXP_patient_inter = np.intersect1d(list(EXP_patient),list(kg.dic_patient.keys()))
+    Exclude_inter = np.intersect1d(list(Exclude),list(kg.dic_patient.keys()))
+
+    for i in EXP_patient_inter:
+        if kg.dic_patient[i]['death_flag'] == 1:
+            continue
+        if 'discharge_hour' in kg.dic_patient[i].keys():
+            kg.dic_patient[i]['death_flag'] = 1
+            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
+        else:
+            kg.total_data.remove(i)
+
+    for i in Exclude_inter:
+        if kg.dic_patient[i]['death_flag'] == 1:
+            continue
+        if 'discharge_hour' in kg.dic_patient[i].keys():
+            kg.dic_patient[i]['death_flag'] = 1
+            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
+        else:
+            kg.total_data.remove(i)
+    """

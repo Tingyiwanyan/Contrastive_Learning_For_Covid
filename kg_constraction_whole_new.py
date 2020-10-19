@@ -569,8 +569,8 @@ if __name__ == "__main__":
             else:
                 kg.un_correct_icu.append(i)
 
-    kg.mean_death_time = np.mean(kg.total_death_hour)
-    kg.std_death_time = np.std(kg.total_death_hour)
+    kg.mean_death_time = np.mean(kg.total_death_time)
+    kg.std_death_time = np.std(kg.total_death_time)
     kg.mean_intubate_time = np.mean(kg.filtered_intubate_hour)
     kg.std_intubate_time = np.std(kg.filtered_intubate_hour)
     kg.mean_icu_time = np.mean(kg.filtered_in_icu_time)

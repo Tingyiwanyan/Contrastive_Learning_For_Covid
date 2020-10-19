@@ -570,7 +570,7 @@ if __name__ == "__main__":
                 kg.un_correct_icu.append(i)
 
     for i in kg.dic_patient.keys():
-        if len(kg.dic_patient[center_node_index]['Admit_time_values']) > 1:
+        if len(kg.dic_patient[i]['Admit_time_values']) > 1:
             first = kg.dic_patient[i]['Admit_time_values'][0]
             sec = kg.dic_patient[i]['Admit_time_values'][1]
             upper_bound = np.floor((sec - first) / 60)

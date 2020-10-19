@@ -569,6 +569,19 @@ if __name__ == "__main__":
             else:
                 kg.un_correct_icu.append(i)
 
+    for i in kg.dic_patient.keys():
+        if len(kg.dic_patient[center_node_index]['Admit_time_values']) > 1:
+            first = kg.dic_patient[i]['Admit_time_values'][0]
+            sec = kg.dic_patient[i]['Admit_time_values'][1]
+            upper_bound = np.floor((sec - first) / 60)
+            keys = kg.dic_patient[i]['prior_time_vital'].keys()
+            pick_time = np.median([float(i) for i in keys if float(i) < upper_bound])
+            kg.dic_patient[i]['pick_time'] = pick_time
+        else:
+            keys = kg.dic_patient[i]['prior_time_vital'].keys()
+            pick_time = np.median([float(i) for i in keys])
+            kg.dic_patient[i]['pick_time'] = pick_time
+
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)
     kg.mean_intubate_time = np.mean(kg.total_intubation_time)

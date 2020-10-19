@@ -240,7 +240,7 @@ class Kg_construct_ehr():
             if self.dic_patient[i]['death_flag'] == 1:
                 total_death_value = self.dic_patient[i]['death_value']
                 self.dic_patient[i]['death_hour'] = np.int(
-                    np.floor((total_death_value - kg.dic_patient[i]['Admit_time_values'][0]) / 60))
+                    np.floor((total_death_value - self.dic_patient[i]['Admit_time_values'][0]) / 60))
                 self.total_death_time.append(self.dic_patient[i]['death_hour'])
                 self.dic_death.setdefault(1, []).append(i)
             if self.dic_patient[i]['death_flag'] == 0:
@@ -250,7 +250,7 @@ class Kg_construct_ehr():
                 total_in_admit_time_value = self.dic_patient[i]['Admit_time_values'][0]
                 self.dic_patient[i]['intubation_hour'] = np.int(
                     np.floor((total_intubation_time_value - total_in_admit_time_value) / 60))
-                self.total_intubation_time.append(kg.dic_patient[i]['intubation_hour'])
+                self.total_intubation_time.append(self.dic_patient[i]['intubation_hour'])
                 self.dic_intubation.setdefault(1, []).append(i)
             if self.dic_patient[i]['intubation_label'] == 0:
                 self.dic_intubation.setdefault(0, []).append(i)
@@ -494,8 +494,8 @@ class Kg_construct_ehr():
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
     kg.read_csv()
-    kg.create_kg_dic()
-    """
+    #kg.create_kg_dic()
+
     with open('/datadrive/tingyi_wanyan/dic_patient_whole.json', 'r') as fp:
         kg.dic_patient = json.load(fp)
     with open('/datadrive/tingyi_wanyan/dic_vital_whole.json','r') as tp:
@@ -522,29 +522,69 @@ if __name__ == "__main__":
         kg.dic_vital[i]['std'] = std
 
 
-    pick_exp = np.where(kg.reg_ar[:,13]=='EXP')[0]
-    EXP_patient = kg.reg_ar[:,45][pick_exp]
-    pick_exclude = np.where(kg.reg_ar[:,13]=='20')[0]
-    Exclude = kg.reg_ar[:,45][pick_exclude]
+    kg.dic_death = {}
+    kg.dic_intubation = {}
+    kg.dic_in_icu = {}
 
-    EXP_patient_inter = np.intersect1d(list(EXP_patient),list(kg.dic_patient.keys()))
-    Exclude_inter = np.intersect1d(list(Exclude),list(kg.dic_patient.keys()))
+    kg.total_intubation_time = []
+    kg.total_in_icu_time = []
+    kg.total_death_time = []
 
-    for i in EXP_patient_inter:
+    kg.total_data_mortality = []
+    kg.un_correct_mortality = []
+    kg.total_data_intubation = []
+    kg.un_correct_intubation = []
+    kg.total_data_icu = []
+    kg.un_correct_icu = []
+
+    for i in kg.dic_patient.keys():
+        if kg.dic_patient[i]['death_flag'] == 0:
+            kg.total_data_mortality.append(i)
+            kg.dic_death.setdefault(0, []).append(i)
         if kg.dic_patient[i]['death_flag'] == 1:
-            continue
-        if 'discharge_hour' in kg.dic_patient[i].keys():
-            kg.dic_patient[i]['death_flag'] = 1
-            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
-        else:
-            kg.total_data.remove(i)
+            if kg.dic_patient[i]['death_hour'] > 0:
+                kg.total_data_mortality.append(i)
+                kg.dic_death.setdefault(1, []).append(i)
+                kg.total_death_time.append(kg.dic_patient[i]['death_hour'])
+            else:
+                kg.un_correct_mortality.append(i)
+        if kg.dic_patient[i]['intubation_label'] == 0:
+            kg.total_data_intubation.append(i)
+            kg.dic_intubation.setdefault(0, []).append(i)
+        if kg.dic_patient[i]['intubation_label'] == 1:
+            if kg.dic_patient[i]['intubation_hour'] > 0:
+                kg.dic_intubation.setdefault(1, []).append(i)
+                kg.total_data_intubation.append(i)
+                kg.total_intubation_time.append(kg.dic_patient[i]['intubation_hour'])
+            else:
+                kg.un_correct_intubation.append(i)
+        if kg.dic_patient[i]['icu_label'] == 0:
+            kg.total_data_icu.append(i)
+            kg.dic_in_icu.setdefault(0, []).append(i)
+        if kg.dic_patient[i]['icu_label'] == 1:
+            if kg.dic_patient[i]['in_icu_hour'] > 0:
+                kg.total_data_icu.append(i)
+                kg.dic_in_icu.setdefault(1, []).append(i)
+                kg.total_in_icu_time.append(kg.dic_patient[i]['in_icu_hour'])
+            else:
+                kg.un_correct_icu.append(i)
 
-    for i in Exclude_inter:
-        if kg.dic_patient[i]['death_flag'] == 1:
+    kg.mean_death_time = np.mean(kg.filtered_death_hour)
+    kg.std_death_time = np.std(kg.filtered_death_hour)
+    kg.mean_intubate_time = np.mean(kg.filtered_intubate_hour)
+    kg.std_intubate_time = np.std(kg.filtered_intubate_hour)
+    kg.mean_icu_time = np.mean(kg.filtered_in_icu_time)
+    kg.std_icu_time = np.std(kg.filtered_in_icu_time)
+
+    age_total = []
+    for i in kg.dic_demographic.keys():
+        age = kg.dic_demographic[i]['Age']
+        if age == 0:
             continue
-        if 'discharge_hour' in kg.dic_patient[i].keys():
-            kg.dic_patient[i]['death_flag'] = 1
-            kg.dic_patient[i]['death_hour'] = kg.dic_patient[i]['discharge_hour']
         else:
-            kg.total_data.remove(i)
-    """
+            age_total.append(age)
+    kg.age_mean = np.mean(age_total)
+    kg.age_std = np.std(age_total)
+
+
+

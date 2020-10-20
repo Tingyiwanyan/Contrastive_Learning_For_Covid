@@ -23,7 +23,7 @@ class kg_process_data():
         self.data_patient_num = len(self.kg.total_data_mortality)
         #self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
         self.test_num = np.int(np.floor(self.data_patient_num*self.test_percent))
-        for j in range(10):
+        for j in range(5):
             for i in self.kg.total_data_mortality[j*self.test_num:(j+1)*self.test_num]:
                 self.test_patient.append(i)
             self.train_patient = [i for i in self.kg.total_data_mortality if i not in self.test_patient]

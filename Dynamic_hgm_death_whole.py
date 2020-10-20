@@ -37,7 +37,7 @@ class dynamic_hgm():
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5
-        self.positive_lab_size = 2
+        self.positive_lab_size = 1
         self.negative_lab_size = 1
         self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
@@ -681,25 +681,13 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.9*self.negative_sum+0.1*self.negative_sum_contrast)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.9*self.negative_sum+0.1*self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-    def config_model_att(self):
-        self.lstm_cell_att()
-        self.demo_layer_att()
-        self.build_dhgm_model()
-        self.get_latent_rep_hetero_att()
-        # self.build_att_mortality()
-        self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        #self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        tf.local_variables_initializer().run()
 
     def assign_value_patient(self, patientid, start_time, end_time):
         self.one_sample = np.zeros(self.item_size)
@@ -1097,15 +1085,15 @@ class dynamic_hgm():
         self.f1_score_total = []
         self.acc_total = []
         self.area_total = []
-        self.tp_total = []
-        self.fp_total = []
-        self.precision_total = []
-        self.recall_total = []
+        self.tp_score_total = []
+        self.fp_score_total = []
+        self.precision_score_total = []
+        self.recall_score_total = []
         feature_len = self.item_size + self.lab_size
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
 
-        for i in range(10):
+        for i in range(5):
             self.config_model()
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]
@@ -1113,8 +1101,10 @@ class dynamic_hgm():
             self.test(self.test_data)
             self.f1_score_total.append(self.f1_test)
             self.acc_total.append(self.acc)
-            area = self.cal_auc()
-            self.area_total.append(area)
+            self.tp_score_total.append(self.tp_total)
+            self.fp_score_total.append(self.fp_total)
+            self.cal_auc()
+            self.area_total.append(self.area)
             self.precision_total.append(self.precision_test)
             self.recall_total.append(self.recall_test)
             self.ave_data_scores_total += self.ave_data_scores
@@ -1131,6 +1121,9 @@ class dynamic_hgm():
         print(np.mean(self.precision_total))
         print("recall_ave_score")
         print(np.mean(self.recall_total))
+
+    #def gen_heap_map_csv(self):
+
 
 
 

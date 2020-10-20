@@ -1113,7 +1113,7 @@ class dynamic_hgm():
             self.f1_score_total.append(self.f1_test)
             self.acc_total.append(self.acc)
             area = self.cal_auc()
-            self.area_total,append(area)
+            self.area_total.append(area)
             self.precision_total.append(self.precision_test)
             self.recall_total.append(self.recall_test)
             self.ave_data_scores_total += self.ave_data_scores

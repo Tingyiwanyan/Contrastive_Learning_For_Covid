@@ -990,6 +990,8 @@ class dynamic_hgm():
             self.sess.close()
 
         self.ave_data_scores_total = self.ave_data_scores_total/10
+        self.norm = np.linalg.norm(self.ave_data_scores_total)
+        self.ave_data_scores_total = self.ave_data_scores_total/self.norm
         self.tp_ave_score = np.sum(self.tp_score_total,0)/5
         self.fp_ave_score = np.sum(self.fp_score_total,0)/5
         self.precision_ave_score = np.sum(self.precision_curve_total,0)/5

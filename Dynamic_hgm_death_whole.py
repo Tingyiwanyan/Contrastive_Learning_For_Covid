@@ -1106,6 +1106,7 @@ class dynamic_hgm():
 
 
         for i in range(10):
+            self.config_model()
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]
             self.train()
@@ -1117,6 +1118,7 @@ class dynamic_hgm():
             self.precision_total.append(self.precision_test)
             self.recall_total.append(self.recall_test)
             self.ave_data_scores_total += self.ave_data_scores
+            self.sess.close()
 
         self.ave_data_scores_total = self.ave_data_scores_total/10
         print("f1_ave_score")

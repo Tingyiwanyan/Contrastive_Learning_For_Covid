@@ -18,8 +18,8 @@ class dynamic_hgm():
         self.kg = kg
         self.data_process = data_process
         # self.hetro_model = hetro_model
-        self.train_data = self.data_process.train_patient
-        self.test_data = self.data_process.test_patient
+        self.train_data_whole = self.data_process.train_patient_whole
+        self.test_data_whole = self.data_process.test_patient_whole
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16
@@ -57,7 +57,8 @@ class dynamic_hgm():
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size])
         self.input_x_lab = tf.keras.backend.placeholder(
             [None, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.lab_size])
-        self.input_icu_intubation = tf.keras.backend.placeholder([None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2])
+        self.input_icu_intubation = tf.keras.backend.placeholder(
+            [None,self.time_sequence,1+self.positive_lab_size+self.negative_lab_size,2])
         self.input_x = tf.concat([self.input_x_vital, self.input_x_lab], 3)
         #self.input_x = tf.concat([self.input_x,self.input_icu_intubation],3)
         self.input_x_demo = tf.keras.backend.placeholder(
@@ -965,32 +966,6 @@ class dynamic_hgm():
                 print(self.err_lstm[0])
                 """
 
-    def train_att(self):
-        """
-        train the system
-        """
-        init_hidden_state = np.zeros((self.batch_size,
-                                      1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                      self.latent_dim))
-        iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))
-
-        for j in range(self.epoch):
-            print('epoch')
-            print(j)
-            for i in range(iteration):
-                self.train_one_batch_vital, self.train_one_batch_lab, self.train_one_batch_demo, self.one_batch_logit, self.one_batch_mortality, self.one_batch_com = self.get_batch_train_att(
-                    self.batch_size, i * self.batch_size, self.train_data)
-
-                self.err_ = self.sess.run([self.negative_sum, self.train_step_neg],
-                                          feed_dict={self.input_x_vital_att: self.train_one_batch_vital,
-                                                     self.input_x_lab_att: self.train_one_batch_lab,
-                                                     self.input_x_demo_att: self.train_one_batch_demo,
-                                                     # self.input_x_com: self.one_batch_com,
-                                                     # self.lab_test: self.one_batch_item,
-                                                     self.mortality: self.one_batch_mortality,
-                                                     self.init_hiddenstate_att: init_hidden_state})
-                print(self.err_[0])
-
     def test(self, data):
         Death = np.zeros([1,2])
         Death[0][1] = 1
@@ -1105,7 +1080,10 @@ class dynamic_hgm():
 
             tp_rate = tp_test / self.tp_correct
             fp_rate = fp_test / self.tp_neg
-            precision_test = np.float(tp_test) / (tp_test + fp_test)
+            if (tp_test+fp_test) == 0:
+                precision_test = 1.0
+            else:
+                precision_test = np.float(tp_test) / (tp_test + fp_test)
             recall_test = np.float(tp_test) / (tp_test + fn_test)
             self.tp_total.append(tp_rate)
             self.fp_total.append(fp_rate)
@@ -1113,81 +1091,44 @@ class dynamic_hgm():
             self.recall_total.append(recall_test)
             threshold += self.resolution
 
-    def test_att(self, data):
-        test_length = len(data)
-        init_hidden_state = np.zeros(
-            (test_length,
-             1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-             self.latent_dim))
-        self.test_data_batch_vital, self.test_one_batch_lab, self.test_one_batch_demo, self.test_logit, self.test_mortality, self.test_com = self.get_batch_train_att(
-            test_length, 0, data)
-        self.test_patient = self.sess.run(self.Dense_patient,
-                                          feed_dict={self.input_x_vital_att: self.test_data_batch_vital,
-                                                     self.input_x_lab_att: self.test_one_batch_lab,
-                                                     self.input_x_demo_att: self.test_one_batch_demo,
-                                                     # self.input_x_com: self.test_com,
-                                                     self.init_hiddenstate_att: init_hidden_state})[:, 0, :]
-        single_mortality = np.zeros((1, 2, 2))
-        single_mortality[0][0][0] = 1
-        single_mortality[0][1][1] = 1
-        self.mortality_test = self.sess.run(self.Dense_mortality, feed_dict={self.mortality: single_mortality})[0]
-        self.score = np.zeros(test_length)
-        for i in range(test_length):
-            embed_single_patient = self.test_patient[i] / np.linalg.norm(self.test_patient[i])
-            embed_mortality = self.mortality_test[1] / np.linalg.norm(self.mortality_test[1])
-            self.score[i] = np.matmul(embed_single_patient, embed_mortality.T)
 
-        self.correct = 0
-        self.tp_correct = 0
-        self.tp_neg = 0
-        for i in range(test_length):
-            if self.test_logit[i, 1] == 1:
-                self.tp_correct += 1
-            if self.test_logit[i, 0] == 1:
-                self.tp_neg += 1
-            if self.score[i] < 0 and self.test_logit[i, 0] == 1:
-                self.correct += 1
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.correct += 1
-
-        self.acc = np.float(self.correct) / test_length
-
-        self.tp_test = 0
-        self.fp_test = 0
-        self.fn_test = 0
-        for i in range(test_length):
-            if self.score[i] > 0 and self.test_logit[i, 1] == 1:
-                self.tp_test += 1
-            if self.score[i] < 0 and self.test_logit[i, 1] == 1:
-                self.fn_test += 1
-            if self.score[i] > 0 and self.test_logit[i, 0] == 1:
-                self.fp_test += 1
-
-        self.precision_test = np.float(self.tp_test) / (self.tp_test + self.fp_test)
-        self.recall_test = np.float(self.tp_test) / (self.tp_test + self.fn_test)
-        self.f1_test = 2 * (self.precision_test * self.recall_test) / (self.precision_test + self.recall_test)
-
-        threshold = -1.01
-        self.resolution = 0.05
-        tp_test = 0
-        fp_test = 0
+    def cross_validation(self):
+        self.f1_score_total = []
+        self.acc_total = []
+        self.area_total = []
         self.tp_total = []
         self.fp_total = []
+        self.precision_total = []
+        self.recall_total = []
+        self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
-        while (threshold < 1.01):
-            tp_test = 0
-            fp_test = 0
-            for i in range(test_length):
-                if self.test_logit[i, 1] == 1 and self.score[i] > threshold:
-                    tp_test += 1
-                if self.test_logit[i, 0] == 1 and self.score[i] > threshold:
-                    fp_test += 1
+        for i in range(10):
+            self.train_data = self.train_data_whole[i]
+            self.test_data = self.test_data_whole[i]
+            self.train()
+            self.test(self.test_data)
+            self.f1_score_total.append(self.f1_test)
+            self.acc_total.append(self.acc)
+            area = self.cal_auc()
+            self.area_total,append(area)
+            self.precision_total.append(self.precision_test)
+            self.recall_total.append(self.recall_test)
+            self.ave_data_scores_total += self.ave_data_scores
 
-            tp_rate = tp_test / self.tp_correct
-            fp_rate = fp_test / self.tp_neg
-            self.tp_total.append(tp_rate)
-            self.fp_total.append(fp_rate)
-            threshold += self.resolution
+        self.ave_data_scores_total = self.ave_data_scores_total/10
+        print("f1_ave_score")
+        print(np.mean(self.f1_score_total))
+        print("acc_ave_score")
+        print(np.mean(self.acc_total))
+        print("area_ave_score")
+        print(np.mean(self.area_total))
+        print("precision_ave_score")
+        print(np.mean(self.precision_total))
+        print("recall_ave_score")
+        print(np.mean(self.recall_total))
+
+
+
 
     def cal_auc(self):
         self.area = 0

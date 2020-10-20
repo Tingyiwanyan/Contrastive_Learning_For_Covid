@@ -4,6 +4,7 @@ import random
 import math
 import copy
 from itertools import groupby
+import pandas as pd
 
 
 class dynamic_hgm():
@@ -681,8 +682,8 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.8*self.negative_sum+0.2*self.negative_sum_contrast)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.8*self.negative_sum+0.2*self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -1126,7 +1127,22 @@ class dynamic_hgm():
         print("recall_ave_score")
         print(np.mean(self.recall_total))
 
-    #def gen_heap_map_csv(self):
+    def gen_heap_map_csv(self,name_to_store):
+        pick_num = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 13, 14, 15, 16, 19,
+       20, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 41, 43,
+       45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
+       67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
+        pick_num = np.array(pick_num)
+        feature = list(np.array(list(self.kg.dic_vital.keys())+list(self.kg.dic_lab.keys()))[pick_num])
+        feature_csv = feature+feature+feature+feature
+        time_seq = list(np.ones(63))+list(2*np.ones(63))+list(3*np.ones(63))+list(4*np.ones(63))
+        time_step1 = self.ave_data_scores_total[0,:][pick_num]
+        time_step2 = self.ave_data_scores_total[1,:][pick_num]
+        time_step3 = self.ave_data_scores_total[2,:][pick_num]
+        time_step4 = self.ave_data_scores_total[3,:][pick_num]
+        variable_scores = list(time_step1)+list(time_step2)+list(time_step3)+list(time_step4)
+        df = pd.DataFrame("Variable Names":feature_csv, "Time Step":time_seq, "Contribution Scores":variable_scores)
+        df.to_csv(name_to_store,index=False)
 
 
 

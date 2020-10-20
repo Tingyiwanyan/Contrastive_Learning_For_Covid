@@ -281,7 +281,7 @@ class dynamic_hgm():
         """
         Get interpretation matrix
         """
-
+        """
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
@@ -300,17 +300,17 @@ class dynamic_hgm():
                                                                                self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
-
+        """
         """
         Get score important
         """
-
+        """
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-
+        """
 
 
         """
@@ -599,8 +599,8 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.8*self.negative_sum+0.2*self.negative_sum_contrast)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(0.8*self.negative_sum+0.2*self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -794,50 +794,6 @@ class dynamic_hgm():
         return train_one_batch_vital, train_one_batch_lab, train_one_batch_demo, one_batch_logit, train_one_batch_mortality, train_one_batch_com,train_one_batch_icu_intubation
 
 
-    def get_batch_test(self, data_length, start_index, data):
-        """
-        get training batch data
-        """
-        train_one_batch = np.zeros(
-            (data_length, self.time_sequence, 1 + self.positive_lab_size + self.negative_lab_size, self.item_size))
-        # train_one_batch_item = np.zeros((data_length,self.positive_lab_size+self.negative_lab_size,self.item_size))
-        train_one_batch_mortality = np.zeros((data_length, 2, 2))
-        one_batch_logit = np.zeros((data_length, 2))
-        self.real_logit = np.zeros(data_length)
-        # self.item_neg_sample = np.zeros((self.negative_lab_size, self.item_size))
-        # self.item_pos_sample = np.zeros((self.positive_lab_size, self.item_size))
-        index_batch = 0
-        index_increase = 0
-        # while index_batch < data_length:
-        for i in range(data_length):
-            self.patient_id = data[start_index + i]
-            # if self.kg.dic_patient[self.patient_id]['item_id'].keys() == {}:
-            #   index_increase += 1
-            #  continue
-            # index_batch += 1
-            self.time_seq = self.kg.dic_patient[self.patient_id]['prior_time'].keys()
-            self.time_seq_int = [np.int(k) for k in self.time_seq]
-            self.time_seq_int.sort()
-            time_index = 0
-            flag = self.kg.dic_patient[self.patient_id]['flag']
-            if flag == 0:
-                train_one_batch_mortality[i, 0, :] = [1, 0]
-                train_one_batch_mortality[i, 1, :] = [0, 1]
-                one_batch_logit[i, 0] = 1
-            else:
-                train_one_batch_mortality[i, 0, :] = [0, 1]
-                train_one_batch_mortality[i, 1, :] = [1, 0]
-                one_batch_logit[i, 1] = 1
-
-            self.get_positive_patient(self.patient_id)
-            self.get_negative_patient(self.patient_id)
-            train_one_data = np.concatenate((self.patient_pos_sample, self.patient_neg_sample), axis=1)
-            train_one_batch[i, :, :, :] = train_one_data
-
-        return train_one_batch, one_batch_logit, train_one_batch_mortality
-
-    # def get_pos_neg_neighbor(self):
-
     def train(self):
         """
         train the system
@@ -888,14 +844,14 @@ class dynamic_hgm():
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})[:,
                             0, :]
-
+        """
         self.test_att_score = self.sess.run([self.score_attention,self.input_importance,self.input_x],feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
-
+        """
 
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
@@ -928,6 +884,7 @@ class dynamic_hgm():
 
         feature_len = self.item_size + self.lab_size
 
+        """
         self.test_data_scores = self.test_att_score[1][self.correct_predict_death,:,0,:]
         self.ave_data_scores = np.zeros((self.time_sequence,feature_len))
 
@@ -945,7 +902,7 @@ class dynamic_hgm():
                 self.ave_data_scores[j,p] = float(value/count)
                 count = 0
                 value = 0
-
+        """
 
 
 
@@ -1029,7 +986,7 @@ class dynamic_hgm():
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
-            self.ave_data_scores_total += self.ave_data_scores
+            #self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 
         self.ave_data_scores_total = self.ave_data_scores_total/10

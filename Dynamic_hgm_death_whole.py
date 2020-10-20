@@ -1088,7 +1088,9 @@ class dynamic_hgm():
         self.tp_score_total = []
         self.fp_score_total = []
         self.precision_score_total = []
+        self.precision_curve_total = []
         self.recall_score_total = []
+        self.recall_curve_total = []
         feature_len = self.item_size + self.lab_size
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
@@ -1105,8 +1107,10 @@ class dynamic_hgm():
             self.fp_score_total.append(self.fp_total)
             self.cal_auc()
             self.area_total.append(self.area)
-            self.precision_total.append(self.precision_test)
-            self.recall_total.append(self.recall_test)
+            self.precision_score_total.append(self.precision_test)
+            self.recall_score_total.append(self.recall_test)
+            self.precision_curve_total.append(self.precision_total)
+            self.recall_curve_total.append(self.recall_total)
             self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 

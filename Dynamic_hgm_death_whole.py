@@ -1101,7 +1101,9 @@ class dynamic_hgm():
         self.fp_total = []
         self.precision_total = []
         self.recall_total = []
+        feature_len = self.item_size + self.lab_size
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
+
 
         for i in range(10):
             self.train_data = self.train_data_whole[i]

@@ -20,8 +20,8 @@ class dynamic_hgm():
         # self.hetro_model = hetro_model
         self.train_data_whole = self.data_process.train_patient_whole
         self.test_data_whole = self.data_process.test_patient_whole
-        self.length_train = len(self.train_data)
-        self.length_test = len(self.test_data)
+        #self.length_train = len(self.train_data)
+        #self.length_test = len(self.test_data)
         self.batch_size = 16
         self.time_sequence = 4
         self.time_step_length = 6
@@ -936,6 +936,7 @@ class dynamic_hgm():
         """
         train the system
         """
+        self.length_train = len(self.train_data)
         init_hidden_state = np.zeros(
             (self.batch_size, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim))
         iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))

@@ -181,7 +181,7 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.project_input, i, axis=1)
+            x_input_cur = tf.gather(self.input_x, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
             else:
@@ -207,35 +207,6 @@ class dynamic_hgm():
             hidden_rep[i] = tf.expand_dims(hidden_rep[i], 1)
         self.hidden_rep = tf.concat(hidden_rep, 1)
         self.check = concat_cur
-
-    def lstm_cell_att(self):
-        """
-        build att model
-        """
-        cell_state = []
-        hidden_rep = []
-        for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x_att, i, axis=1)
-            if i == 0:
-                concat_cur = tf.concat([self.init_hiddenstate_att, x_input_cur], 2)
-            else:
-                concat_cur = tf.concat([hidden_rep[i - 1], x_input_cur], 2)
-            forget_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
-            info_cur = \
-                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_info_gate), self.bias_info_gate))
-            cellstate_cur = \
-                tf.math.tanh(tf.math.add(tf.matmul(concat_cur, self.weight_cell_state), self.bias_cell_state))
-            info_cell_state = tf.multiply(info_cur, cellstate_cur)
-            if not i == 0:
-                forget_cell_state = tf.multiply(forget_cur, cell_state[i - 1])
-                cellstate_cur = tf.math.add(forget_cell_state, info_cell_state)
-            output_gate = \
-                tf.nn.relu(tf.math.add(tf.matmul(concat_cur, self.weight_output_gate), self.bias_output_gate))
-            hidden_current = tf.multiply(output_gate, cellstate_cur)
-            cell_state.append(cellstate_cur)
-            hidden_rep.append(hidden_current)
-        self.hidden_last = hidden_rep[self.time_sequence - 1]
 
     def demo_layer(self):
         self.Dense_demo = tf.compat.v1.layers.dense(inputs=self.input_x_demo,
@@ -272,9 +243,9 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-
+        """
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
@@ -290,6 +261,7 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
+        """
 
 
         #self.Dense_patient = self.hidden_last_comb
@@ -420,61 +392,6 @@ class dynamic_hgm():
         self.x_skip_contrast = self.x_skip_patient
         self.x_negative_contrast = self.x_negative_patient
 
-    def process_patient_att(self):
-        """
-        Process att on patient importance, for feeding the relational learning layer
-        """
-        self.weight_att_x_skip = tf.matmul(self.x_skip_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip, axis=1)
-        self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,
-                                                               [self.batch_size, self.positive_lab_size,
-                                                                self.latent_dim + self.latent_dim_demo])
-
-        self.x_skip_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_skip_patient, self.weight_att_x_skip_softmax_broad), 1), 1)
-
-        self.weight_att_x_neg = tf.matmul(self.x_negative_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg, axis=1)
-        self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,
-                                                              [self.batch_size, self.negative_lab_size,
-                                                               self.latent_dim + self.latent_dim_demo])
-
-        self.x_negative_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_negative_patient, self.weight_att_x_neg_softmax_broad), 1), 1)
-
-    def get_latent_rep_hetero_att(self):
-        """
-        Prepare data for att SGNS loss
-        """
-        idx_origin = tf.constant([0])
-        self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
-
-        idx_skip_mortality = tf.constant([0])
-        self.x_skip_mor = tf.gather(self.Dense_mortality, idx_skip_mortality, axis=1)
-        idx_neg_mortality = tf.constant([1])
-        self.x_negative_mor = tf.gather(self.Dense_mortality, idx_neg_mortality, axis=1)
-
-        patient_idx_skip = tf.constant([i + 1 for i in range(self.positive_lab_size)])
-        self.x_skip_patient = tf.gather(self.Dense_patient, patient_idx_skip, axis=1)
-        patient_idx_negative = tf.constant([i + self.positive_lab_size + 1 for i in range(self.negative_lab_size)])
-        self.x_negative_patient = tf.gather(self.Dense_patient, patient_idx_negative, axis=1)
-
-        att_idx_skip = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + 1 for i in range(self.neighbor_pick_skip)])
-        self.x_att_skip = tf.gather(self.Dense_patient, att_idx_skip, axis=1)
-        att_idx_neg = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + 1 for i in
-             range(self.neighbor_pick_neg)])
-        self.x_att_neg = tf.gather(self.Dense_patient, att_idx_neg, axis=1)
-
-        # self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        # self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-
-        self.build_att_mortality()
-
-        self.x_skip = tf.concat([tf.expand_dims(self.att_rep_skip_mor_final, axis=1), self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([tf.expand_dims(self.att_rep_neg_mor_final, axis=1), self.x_negative_patient],
-                                    axis=1)
 
     def get_positive_patient(self, center_node_index):
         self.patient_pos_sample_vital = np.zeros((self.time_sequence, self.positive_lab_size + 1, self.item_size))

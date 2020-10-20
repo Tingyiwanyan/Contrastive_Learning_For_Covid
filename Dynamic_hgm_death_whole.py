@@ -1141,7 +1141,7 @@ class dynamic_hgm():
         time_step3 = self.ave_data_scores_total[2,:][pick_num]
         time_step4 = self.ave_data_scores_total[3,:][pick_num]
         variable_scores = list(time_step1)+list(time_step2)+list(time_step3)+list(time_step4)
-        df = pd.DataFrame("Variable Names":feature_csv, "Time Step":time_seq, "Contribution Scores":variable_scores)
+        df = pd.DataFrame({"Variable Names":feature_csv, "Time Step":time_seq, "Contribution Scores":variable_scores})
         df.to_csv(name_to_store,index=False)
 
 

@@ -18,8 +18,10 @@ class dynamic_hgm():
         self.kg = kg
         self.data_process = data_process
         # self.hetro_model = hetro_model
-        self.train_data = self.data_process.train_patient
-        self.test_data = self.data_process.test_patient
+        #self.train_data = self.data_process.train_patient
+        #self.test_data = self.data_process.test_patient
+        self.train_data_whole = self.data_process.train_patient_whole
+        self.test_data_whole = self.data_process.test_patient_whole
         self.length_train = len(self.train_data)
         self.length_test = len(self.test_data)
         self.batch_size = 16

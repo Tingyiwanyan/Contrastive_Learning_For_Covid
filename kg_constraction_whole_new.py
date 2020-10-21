@@ -608,9 +608,9 @@ if __name__ == "__main__":
         if kg.dic_patient[i]['death_flag']==1:
             death_data.append(i)
 
-    random_pick_death = random.sample(death_data,1000)
+    random_pick_death = random.sample(death_data,1100)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
-    kg.total_data_mortality = reduced_data
+    #kg.total_data_mortality = reduced_data
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()

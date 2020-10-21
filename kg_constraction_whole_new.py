@@ -617,17 +617,20 @@ if __name__ == "__main__":
     death_data = []
     for i in kg.dic_patient.keys():
         if kg.dic_patient[i]['death_flag']==1:
-            death_data.append(i)
+            if i in kg.total_data_mortality:
+                death_data.append(i)
 
     intubate_data = []
     for i in kg.dic_patient.keys():
         if kg.dic_patient[i]['intubation_label']==1:
-            intubate_data.append(i)
+            if i in kg.total_data_intubation:
+                intubate_data.append(i)
 
     icu_data = []
     for i in kg.dic_patient.keys():
         if kg.dic_patient[i]['icu_label'] == 1:
-            icu_data.append(i)
+            if i in kg.total_data_icu:
+                icu_data.append(i)
 
     random_pick_death = random.sample(death_data,1200)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]

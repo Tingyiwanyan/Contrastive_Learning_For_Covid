@@ -588,14 +588,20 @@ if __name__ == "__main__":
 
 
     BIPD_pick = np.where(kg.reg_ar[:,37]=="BIPD")
+    In_patient_pick = np.where(kg.reg_ar[:,52]=="I")[0]
+    In_patient_mrn = list(kg.reg_ar[:,45][In_patient_pick])
     BIPD_mrn_pick = list(kg.reg_ar[:,45][BIPD_pick])
-    Mortality_intersect = np.intersect1d(BIPD_mrn_pick,list(kg.dic_patient.keys()))
-    Data_mortality = [i for i in kg.total_data_mortality if i not in Mortality_intersect]
+    BIPD_intersect = np.intersect1d(BIPD_mrn_pick,list(kg.dic_patient.keys()))
+    Mortality_intersect = np.intersect1d(kg.total_data_mortality,In_patient_mrn)
+    Data_mortality = [i for i in Mortality_intersect if i not in BIPD_intersect]
     kg.total_data_mortality = Data_mortality
-    Data_intubation = [i for i in kg.total_data_intubation if i not in Mortality_intersect]
+    intubation_intersect = np.intersect1d(kg.total_data_intubation,In_patient_mrn)
+    Data_intubation = [i for i in intubation_intersect if i not in BIPD_intersect]
     kg.total_data_intubation = Data_intubation
-    Data_icu = [i for i in kg.total_data_icu if i not in Mortality_intersect]
+    icu_intersect = np.intersect1d(kg.total_data_icu,In_patient_mrn)
+    Data_icu = [i for i in icu_intersect if i not in BIPD_intersect]
     kg.total_data_icu = Data_icu
+
 
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)

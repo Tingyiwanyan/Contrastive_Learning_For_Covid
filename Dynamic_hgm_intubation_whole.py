@@ -182,7 +182,7 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x, i, axis=1)
+            x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
             else:
@@ -245,9 +245,9 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-        """
+
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
@@ -263,7 +263,7 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
+
 
         #self.Dense_patient = self.hidden_last_comb
         # self.Dense_patient = tf.expand_dims(self.hidden_rep,2)
@@ -282,7 +282,7 @@ class dynamic_hgm():
         """
         Get interpretation matrix
         """
-        """
+
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
@@ -301,17 +301,17 @@ class dynamic_hgm():
                                                                                self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
-        """
+
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-        """
+
 
 
         """
@@ -418,7 +418,8 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                pick_intubate_hour = np.int(np.floor(np.random.normal(0,20,1)))
+                #pick_intubate_hour = np.int(np.floor(np.random.normal(0,20,1)))
+                pick_intubate_hour = self.kg.dic_patient[center_node_index]['pick_time']
                 start_time = pick_intubate_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
@@ -456,7 +457,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_intubate_hour = np.int(np.floor(np.random.normal(0, 20, 1)))
+                    #pick_intubate_hour = np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_intubate_hour = self.kg.dic_patient[center_node_index]['pick_time']
                     start_time = pick_intubate_hour - self.predict_window_prior + float(
                         j) * self.time_step_length
                     end_time = start_time + self.time_step_length
@@ -503,7 +505,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_intubate_hour = np.int(np.floor(np.random.normal(0, 20, 1)))
+                    #pick_intubate_hour = np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_intubate_hour = self.kg.dic_patient[center_node_index]['pick_time']
                     start_time = pick_intubate_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
@@ -604,9 +607,9 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
-            0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+           # 0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -851,14 +854,14 @@ class dynamic_hgm():
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})[:,
                             0, :]
-        """
+
         self.test_att_score = self.sess.run([self.score_attention,self.input_importance],feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
-        """
+
 
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
@@ -890,7 +893,7 @@ class dynamic_hgm():
         self.correct_predict_intubate = np.array(self.correct_predict_intubate)
 
         feature_len = self.item_size + self.lab_size
-        """
+
         self.test_data_scores = self.test_att_score[1][self.correct_predict_intubate,:,0,:]
         self.ave_data_scores = np.zeros((self.time_sequence,feature_len))
 
@@ -908,7 +911,7 @@ class dynamic_hgm():
                 self.ave_data_scores[j,p] = float(value/count)
                 count = 0
                 value = 0
-        """
+
         self.tp_test = 0
         self.fp_test = 0
         self.fn_test = 0

@@ -586,6 +586,17 @@ if __name__ == "__main__":
             if not pick_time == pick_time:
                 kg.dic_patient[i]['pick_time'] = 0
 
+
+    BIPD_pick = np.where(kg.reg_ar[:,37]=="BIPD")
+    BIPD_mrn_pick = list(kg.reg_ar[:,45][BIPD_pick])
+    Mortality_intersect = np.intersect1d(BIPD_mrn_pick,list(kg.dic_patient.keys()))
+    Data_mortality = [i for i in kg.total_data_mortality if i not in Mortality_intersect]
+    kg.total_data_mortality = Data_mortality
+    Data_intubation = [i for i in kg.total_data_intubation if i not in Mortality_intersect]
+    kg.total_data_intubation = Data_intubation
+    Data_icu = [i for i in kg.total_data_icu if i not in Mortality_intersect]
+    kg.total_data_icu = Data_icu
+
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)
     kg.mean_intubate_time = np.mean(kg.total_intubation_time)
@@ -608,9 +619,19 @@ if __name__ == "__main__":
         if kg.dic_patient[i]['death_flag']==1:
             death_data.append(i)
 
+    intubate_data = []
+    for i in kg.dic_patient.keys():
+        if kg.dic_patient[i]['intubation_label']==1:
+            intubate_data.append(i)
+
+    icu_data = []
+    for i in kg.dic_patient.keys():
+        if kg.dic_patient[i]['icu_label'] == 1:
+            icu_data.append(i)
+
     random_pick_death = random.sample(death_data,1200)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
-    kg.total_data_mortality = reduced_data
+    #kg.total_data_mortality = reduced_data
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()

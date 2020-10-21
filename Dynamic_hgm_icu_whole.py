@@ -1004,6 +1004,74 @@ class dynamic_hgm():
             self.recall_total.append(recall_test)
             threshold += self.resolution
 
+    def cross_validation(self):
+        self.f1_score_total = []
+        self.acc_total = []
+        self.area_total = []
+        self.tp_score_total = []
+        self.fp_score_total = []
+        self.precision_score_total = []
+        self.precision_curve_total = []
+        self.recall_score_total = []
+        self.recall_curve_total = []
+        feature_len = self.item_size + self.lab_size
+        self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
+
+
+        for i in range(5):
+            self.config_model()
+            self.train_data = self.train_data_whole[i]
+            self.test_data = self.test_data_whole[i]
+            self.train()
+            self.test(self.test_data)
+            self.f1_score_total.append(self.f1_test)
+            self.acc_total.append(self.acc)
+            self.tp_score_total.append(self.tp_total)
+            self.fp_score_total.append(self.fp_total)
+            self.cal_auc()
+            self.area_total.append(self.area)
+            self.precision_score_total.append(self.precision_test)
+            self.recall_score_total.append(self.recall_test)
+            self.precision_curve_total.append(self.precision_total)
+            self.recall_curve_total.append(self.recall_total)
+            self.ave_data_scores_total += self.ave_data_scores
+            self.sess.close()
+
+        self.ave_data_scores_total = self.ave_data_scores_total/5
+        self.norm = np.linalg.norm(self.ave_data_scores_total)
+        self.ave_data_scores_total = self.ave_data_scores_total/self.norm
+        self.tp_ave_score = np.sum(self.tp_score_total,0)/5
+        self.fp_ave_score = np.sum(self.fp_score_total,0)/5
+        self.precision_ave_score = np.sum(self.precision_curve_total,0)/5
+        self.recall_ave_score = np.sum(self.recall_curve_total,0)/5
+        print("f1_ave_score")
+        print(np.mean(self.f1_score_total))
+        print("acc_ave_score")
+        print(np.mean(self.acc_total))
+        print("area_ave_score")
+        print(np.mean(self.area_total))
+        print("precision_ave_score")
+        print(np.mean(self.precision_total))
+        print("recall_ave_score")
+        print(np.mean(self.recall_total))
+
+    def gen_heap_map_csv(self,name_to_store):
+        pick_num = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 13, 14, 15, 16, 19,
+       20, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 41, 43,
+       45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
+       67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
+        pick_num = np.array(pick_num)
+        feature = list(np.array(list(self.kg.dic_vital.keys())+list(self.kg.dic_lab.keys()))[pick_num])
+        feature_csv = feature+feature+feature+feature
+        time_seq = list(np.ones(63))+list(2*np.ones(63))+list(3*np.ones(63))+list(4*np.ones(63))
+        time_step1 = self.ave_data_scores_total[0,:][pick_num]
+        time_step2 = self.ave_data_scores_total[1,:][pick_num]
+        time_step3 = self.ave_data_scores_total[2,:][pick_num]
+        time_step4 = self.ave_data_scores_total[3,:][pick_num]
+        variable_scores = list(time_step1)+list(time_step2)+list(time_step3)+list(time_step4)
+        df = pd.DataFrame({"Variable Names":feature_csv, "Time Step":time_seq, "Contribution Scores":variable_scores})
+        df.to_csv(name_to_store,index=False)
+
     def cal_auc(self):
         self.area = 0
         self.tp_total.sort()
@@ -1012,20 +1080,3 @@ class dynamic_hgm():
             x = self.fp_total[i + 1] - self.fp_total[i]
             y = (self.tp_total[i + 1] + self.tp_total[i]) / 2
             self.area += x * y
-
-    def test_lstm(self):
-        """
-        test the system, return the accuracy of the model
-        """
-        init_hidden_state = np.zeros((self.length_test, self.latent_dim))
-        self.test_data, self.test_logit, self.train_one_batch_item = self.get_batch_train(self.length_test, 0,self.test_data)
-        self.logit_out = self.sess.run(self.logit_sig, feed_dict={self.input_x: self.test_data,
-                                                                  self.init_hiddenstate: init_hidden_state})
-        self.correct = 0
-        for i in range(self.length_test):
-            if self.test_logit[i, 1] == 1 and self.logit_out[i, 1] > self.threshold:
-                self.correct += 1
-            if self.test_logit[i, 1] == 0 and self.logit_out[i, 1] < self.threshold:
-                self.correct += 1
-
-        self.acc = np.float(self.correct) / self.length_test

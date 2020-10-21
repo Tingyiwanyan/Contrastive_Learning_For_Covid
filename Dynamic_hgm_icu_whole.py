@@ -37,11 +37,11 @@ class dynamic_hgm():
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5
-        self.positive_lab_size = 5
-        self.negative_lab_size = 10
-        self.positive_sample_size = self.positive_lab_size + 1
+        self.positive_lab_size = 2
+        self.negative_lab_size = 1
+        self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
-        self.negative_sample_size = self.negative_lab_size + 1
+        self.negative_sample_size = self.negative_lab_size# + 1
         # self.negative_sample_size = 2
         self.neighbor_pick_skip = 5
         self.neighbor_pick_neg = 10
@@ -384,64 +384,12 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        self.x_skip = self.x_skip_mor
+        self.x_negative = self.x_negative_mor
+        self.x_skip_contrast = self.x_skip_patient
+        self.x_negative_contrast = self.x_negative_patient
 
-    def process_patient_att(self):
-        """
-        Process att on patient importance, for feeding the relational learning layer
-        """
-        self.weight_att_x_skip = tf.matmul(self.x_skip_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip, axis=1)
-        self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,
-                                                               [self.batch_size, self.positive_lab_size,
-                                                                self.latent_dim + self.latent_dim_demo])
 
-        self.x_skip_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_skip_patient, self.weight_att_x_skip_softmax_broad), 1), 1)
-
-        self.weight_att_x_neg = tf.matmul(self.x_negative_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg, axis=1)
-        self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,
-                                                              [self.batch_size, self.negative_lab_size,
-                                                               self.latent_dim + self.latent_dim_demo])
-
-        self.x_negative_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_negative_patient, self.weight_att_x_neg_softmax_broad), 1), 1)
-
-    def get_latent_rep_hetero_att(self):
-        """
-        Prepare data for att SGNS loss
-        """
-        idx_origin = tf.constant([0])
-        self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
-
-        idx_skip_mortality = tf.constant([0])
-        self.x_skip_mor = tf.gather(self.Dense_mortality, idx_skip_mortality, axis=1)
-        idx_neg_mortality = tf.constant([1])
-        self.x_negative_mor = tf.gather(self.Dense_mortality, idx_neg_mortality, axis=1)
-
-        patient_idx_skip = tf.constant([i + 1 for i in range(self.positive_lab_size)])
-        self.x_skip_patient = tf.gather(self.Dense_patient, patient_idx_skip, axis=1)
-        patient_idx_negative = tf.constant([i + self.positive_lab_size + 1 for i in range(self.negative_lab_size)])
-        self.x_negative_patient = tf.gather(self.Dense_patient, patient_idx_negative, axis=1)
-
-        att_idx_skip = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + 1 for i in range(self.neighbor_pick_skip)])
-        self.x_att_skip = tf.gather(self.Dense_patient, att_idx_skip, axis=1)
-        att_idx_neg = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + 1 for i in
-             range(self.neighbor_pick_neg)])
-        self.x_att_neg = tf.gather(self.Dense_patient, att_idx_neg, axis=1)
-
-        # self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        # self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-
-        self.build_att_mortality()
-
-        self.x_skip = tf.concat([tf.expand_dims(self.att_rep_skip_mor_final, axis=1), self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([tf.expand_dims(self.att_rep_neg_mor_final, axis=1), self.x_negative_patient],
-                                    axis=1)
 
     def get_positive_patient(self, center_node_index):
         self.patient_pos_sample_vital = np.zeros((self.time_sequence, self.positive_lab_size + 1, self.item_size))
@@ -580,7 +528,7 @@ class dynamic_hgm():
         negative_training_norm = tf.math.l2_normalize(self.x_negative, axis=2)
 
         skip_training = tf.broadcast_to(self.x_origin,
-                                        [self.batch_size, self.negative_sample_size,
+                                        [self.batch_size, 1,#self.negative_sample_size,
                                          self.latent_dim + self.latent_dim_demo])
 
         skip_training_norm = tf.math.l2_normalize(skip_training, axis=2)
@@ -591,7 +539,7 @@ class dynamic_hgm():
 
         sum_log_dot_prod = tf.math.log(tf.math.sigmoid(tf.math.negative(tf.reduce_mean(dot_prod_sum, 1))))
 
-        positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, self.positive_sample_size,
+        positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, 1,#self.positive_sample_size,
                                                             self.latent_dim + self.latent_dim_demo])
 
         positive_skip_norm = tf.math.l2_normalize(self.x_skip, axis=2)
@@ -607,6 +555,40 @@ class dynamic_hgm():
         self.negative_sum = tf.math.negative(
             tf.reduce_sum(tf.math.add(sum_log_dot_prod, sum_log_dot_prod_positive)))
 
+    def SGNN_loss_contrast(self):
+        """
+        mplement sgnn loss contrast
+        """
+        negative_training_norm = tf.math.l2_normalize(self.x_negative_contrast, axis=2)
+
+        skip_training = tf.broadcast_to(self.x_origin,
+                                        [self.batch_size, self.negative_sample_size,
+                                         self.latent_dim + self.latent_dim_demo])
+
+        skip_training_norm = tf.math.l2_normalize(skip_training, axis=2)
+
+        dot_prod = tf.multiply(skip_training_norm, negative_training_norm)
+
+        dot_prod_sum = tf.reduce_sum(dot_prod, 2)
+
+        sum_log_dot_prod = tf.math.log(tf.math.sigmoid(tf.math.negative(tf.reduce_mean(dot_prod_sum, 1))))
+
+        positive_training = tf.broadcast_to(self.x_origin, [self.batch_size, self.positive_sample_size,
+                                                            self.latent_dim + self.latent_dim_demo])
+
+        positive_skip_norm = tf.math.l2_normalize(self.x_skip_contrast, axis=2)
+
+        positive_training_norm = tf.math.l2_normalize(positive_training, axis=2)
+
+        dot_prod_positive = tf.multiply(positive_skip_norm, positive_training_norm)
+
+        dot_prod_sum_positive = tf.reduce_sum(dot_prod_positive, 2)
+
+        sum_log_dot_prod_positive = tf.math.log(tf.math.sigmoid(tf.reduce_mean(dot_prod_sum_positive, 1)))
+
+        self.negative_sum_contrast = tf.math.negative(
+            tf.reduce_sum(tf.math.add(sum_log_dot_prod, sum_log_dot_prod_positive)))
+
     def config_model(self):
         self.lstm_cell()
         self.demo_layer()
@@ -615,6 +597,8 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+           # 0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()

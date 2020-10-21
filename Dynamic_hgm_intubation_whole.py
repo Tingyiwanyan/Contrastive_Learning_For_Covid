@@ -412,64 +412,16 @@ class dynamic_hgm():
 
         # self.process_patient_att()
 
-        self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
+        #self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
+        #self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
 
-    def process_patient_att(self):
-        """
-        Process att on patient importance, for feeding the relational learning layer
-        """
-        self.weight_att_x_skip = tf.matmul(self.x_skip_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_skip_softmax = tf.nn.softmax(self.weight_att_x_skip, axis=1)
-        self.weight_att_x_skip_softmax_broad = tf.broadcast_to(self.weight_att_x_skip_softmax,
-                                                               [self.batch_size, self.positive_lab_size,
-                                                                self.latent_dim + self.latent_dim_demo])
+        self.x_skip = self.x_skip_mor
+        self.x_negative = self.x_negative_mor
+        self.x_skip_contrast = self.x_skip_patient
+        self.x_negative_contrast = self.x_negative_patient
 
-        self.x_skip_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_skip_patient, self.weight_att_x_skip_softmax_broad), 1), 1)
 
-        self.weight_att_x_neg = tf.matmul(self.x_negative_patient, self.weight_vec_a_neighbor)
-        self.weight_att_x_neg_softmax = tf.nn.softmax(self.weight_att_x_neg, axis=1)
-        self.weight_att_x_neg_softmax_broad = tf.broadcast_to(self.weight_att_x_neg_softmax,
-                                                              [self.batch_size, self.negative_lab_size,
-                                                               self.latent_dim + self.latent_dim_demo])
 
-        self.x_negative_patient = tf.expand_dims(
-            tf.reduce_sum(tf.multiply(self.x_negative_patient, self.weight_att_x_neg_softmax_broad), 1), 1)
-
-    def get_latent_rep_hetero_att(self):
-        """
-        Prepare data for att SGNS loss
-        """
-        idx_origin = tf.constant([0])
-        self.x_origin = tf.gather(self.Dense_patient, idx_origin, axis=1)
-
-        idx_skip_mortality = tf.constant([0])
-        self.x_skip_mor = tf.gather(self.Dense_mortality, idx_skip_mortality, axis=1)
-        idx_neg_mortality = tf.constant([1])
-        self.x_negative_mor = tf.gather(self.Dense_mortality, idx_neg_mortality, axis=1)
-
-        patient_idx_skip = tf.constant([i + 1 for i in range(self.positive_lab_size)])
-        self.x_skip_patient = tf.gather(self.Dense_patient, patient_idx_skip, axis=1)
-        patient_idx_negative = tf.constant([i + self.positive_lab_size + 1 for i in range(self.negative_lab_size)])
-        self.x_negative_patient = tf.gather(self.Dense_patient, patient_idx_negative, axis=1)
-
-        att_idx_skip = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + 1 for i in range(self.neighbor_pick_skip)])
-        self.x_att_skip = tf.gather(self.Dense_patient, att_idx_skip, axis=1)
-        att_idx_neg = tf.constant(
-            [i + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + 1 for i in
-             range(self.neighbor_pick_neg)])
-        self.x_att_neg = tf.gather(self.Dense_patient, att_idx_neg, axis=1)
-
-        # self.x_skip = tf.concat([self.x_skip_mor, self.x_skip_patient], axis=1)
-        # self.x_negative = tf.concat([self.x_negative_mor, self.x_negative_patient], axis=1)
-
-        self.build_att_mortality()
-
-        self.x_skip = tf.concat([tf.expand_dims(self.att_rep_skip_mor_final, axis=1), self.x_skip_patient], axis=1)
-        self.x_negative = tf.concat([tf.expand_dims(self.att_rep_neg_mor_final, axis=1), self.x_negative_patient],
-                                    axis=1)
 
     def get_positive_patient(self, center_node_index):
         self.patient_pos_sample_vital = np.zeros((self.time_sequence, self.positive_lab_size + 1, self.item_size))
@@ -678,19 +630,8 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        tf.local_variables_initializer().run()
-
-    def config_model_att(self):
-        self.lstm_cell_att()
-        self.demo_layer_att()
-        self.build_dhgm_model()
-        self.get_latent_rep_hetero_att()
-        # self.build_att_mortality()
-        self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+        #    0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -918,31 +859,6 @@ class dynamic_hgm():
                 print(self.err_lstm[0])
                 """
 
-    def train_att(self):
-        """
-        train the system
-        """
-        init_hidden_state = np.zeros((self.batch_size,
-                                      1 + self.positive_lab_size + self.negative_lab_size + self.neighbor_pick_skip + self.neighbor_pick_neg,
-                                      self.latent_dim))
-        iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))
-
-        for j in range(self.epoch):
-            print('epoch')
-            print(j)
-            for i in range(iteration):
-                self.train_one_batch_vital, self.train_one_batch_lab, self.train_one_batch_demo, self.one_batch_logit, self.one_batch_mortality, self.one_batch_com = self.get_batch_train_att(
-                    self.batch_size, i * self.batch_size, self.train_data)
-
-                self.err_ = self.sess.run([self.negative_sum, self.train_step_neg],
-                                          feed_dict={self.input_x_vital_att: self.train_one_batch_vital,
-                                                     self.input_x_lab_att: self.train_one_batch_lab,
-                                                     self.input_x_demo_att: self.train_one_batch_demo,
-                                                     # self.input_x_com: self.one_batch_com,
-                                                     # self.lab_test: self.one_batch_item,
-                                                     self.mortality: self.one_batch_mortality,
-                                                     self.init_hiddenstate_att: init_hidden_state})
-                print(self.err_[0])
 
     def test(self, data):
         Death = np.zeros([1,2])
@@ -1066,6 +982,74 @@ class dynamic_hgm():
             self.recall_total.append(recall_test)
             threshold += self.resolution
 
+    def cross_validation(self):
+        self.f1_score_total = []
+        self.acc_total = []
+        self.area_total = []
+        self.tp_score_total = []
+        self.fp_score_total = []
+        self.precision_score_total = []
+        self.precision_curve_total = []
+        self.recall_score_total = []
+        self.recall_curve_total = []
+        feature_len = self.item_size + self.lab_size
+        self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
+
+
+        for i in range(5):
+            self.config_model()
+            self.train_data = self.train_data_whole[i]
+            self.test_data = self.test_data_whole[i]
+            self.train()
+            self.test(self.test_data)
+            self.f1_score_total.append(self.f1_test)
+            self.acc_total.append(self.acc)
+            self.tp_score_total.append(self.tp_total)
+            self.fp_score_total.append(self.fp_total)
+            self.cal_auc()
+            self.area_total.append(self.area)
+            self.precision_score_total.append(self.precision_test)
+            self.recall_score_total.append(self.recall_test)
+            self.precision_curve_total.append(self.precision_total)
+            self.recall_curve_total.append(self.recall_total)
+            self.ave_data_scores_total += self.ave_data_scores
+            self.sess.close()
+
+        self.ave_data_scores_total = self.ave_data_scores_total/5
+        self.norm = np.linalg.norm(self.ave_data_scores_total)
+        self.ave_data_scores_total = self.ave_data_scores_total/self.norm
+        self.tp_ave_score = np.sum(self.tp_score_total,0)/5
+        self.fp_ave_score = np.sum(self.fp_score_total,0)/5
+        self.precision_ave_score = np.sum(self.precision_curve_total,0)/5
+        self.recall_ave_score = np.sum(self.recall_curve_total,0)/5
+        print("f1_ave_score")
+        print(np.mean(self.f1_score_total))
+        print("acc_ave_score")
+        print(np.mean(self.acc_total))
+        print("area_ave_score")
+        print(np.mean(self.area_total))
+        print("precision_ave_score")
+        print(np.mean(self.precision_total))
+        print("recall_ave_score")
+        print(np.mean(self.recall_total))
+
+    def gen_heap_map_csv(self,name_to_store):
+        pick_num = [ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 12, 13, 14, 15, 16, 19,
+       20, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 41, 43,
+       45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
+       67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
+        pick_num = np.array(pick_num)
+        feature = list(np.array(list(self.kg.dic_vital.keys())+list(self.kg.dic_lab.keys()))[pick_num])
+        feature_csv = feature+feature+feature+feature
+        time_seq = list(np.ones(63))+list(2*np.ones(63))+list(3*np.ones(63))+list(4*np.ones(63))
+        time_step1 = self.ave_data_scores_total[0,:][pick_num]
+        time_step2 = self.ave_data_scores_total[1,:][pick_num]
+        time_step3 = self.ave_data_scores_total[2,:][pick_num]
+        time_step4 = self.ave_data_scores_total[3,:][pick_num]
+        variable_scores = list(time_step1)+list(time_step2)+list(time_step3)+list(time_step4)
+        df = pd.DataFrame({"Variable Names":feature_csv, "Time Step":time_seq, "Contribution Scores":variable_scores})
+        df.to_csv(name_to_store,index=False)
+
     def cal_auc(self):
         self.area = 0
         self.tp_total.sort()
@@ -1074,20 +1058,3 @@ class dynamic_hgm():
             x = self.fp_total[i + 1] - self.fp_total[i]
             y = (self.tp_total[i + 1] + self.tp_total[i]) / 2
             self.area += x * y
-
-    def test_lstm(self):
-        """
-        test the system, return the accuracy of the model
-        """
-        init_hidden_state = np.zeros((self.length_test, self.latent_dim))
-        self.test_data, self.test_logit, self.train_one_batch_item = self.get_batch_train(self.length_test, 0,self.test_data)
-        self.logit_out = self.sess.run(self.logit_sig, feed_dict={self.input_x: self.test_data,
-                                                                  self.init_hiddenstate: init_hidden_state})
-        self.correct = 0
-        for i in range(self.length_test):
-            if self.test_logit[i, 1] == 1 and self.logit_out[i, 1] > self.threshold:
-                self.correct += 1
-            if self.test_logit[i, 1] == 0 and self.logit_out[i, 1] < self.threshold:
-                self.correct += 1
-
-        self.acc = np.float(self.correct) / self.length_test

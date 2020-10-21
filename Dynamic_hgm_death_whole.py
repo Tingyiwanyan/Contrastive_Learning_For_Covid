@@ -986,10 +986,10 @@ class dynamic_hgm():
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
-            #self.ave_data_scores_total += self.ave_data_scores
+            self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 
-        self.ave_data_scores_total = self.ave_data_scores_total/10
+        self.ave_data_scores_total = self.ave_data_scores_total/5
         self.norm = np.linalg.norm(self.ave_data_scores_total)
         self.ave_data_scores_total = self.ave_data_scores_total/self.norm
         self.tp_ave_score = np.sum(self.tp_score_total,0)/5

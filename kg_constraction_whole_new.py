@@ -610,7 +610,7 @@ if __name__ == "__main__":
 
     random_pick_death = random.sample(death_data,1200)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
-    kg.total_data_mortality = reduced_data
+    #kg.total_data_mortality = reduced_data
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()

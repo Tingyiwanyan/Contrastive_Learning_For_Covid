@@ -181,7 +181,7 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
-            x_input_cur = tf.gather(self.input_x, i, axis=1)
+            x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
             else:
@@ -243,9 +243,9 @@ class dynamic_hgm():
         Build dynamic HGM model
         """
         #self.Dense_patient = tf.expand_dims(self.hidden_last,1)
-        self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
+        #self.Dense_patient = tf.concat([self.hidden_last,self.Dense_demo],2)
 
-        """
+
         self.hidden_att_e = tf.matmul(self.hidden_rep,self.weight_retain_w)
         self.hidden_att_e_softmax = tf.nn.softmax(self.hidden_att_e,1)
         self.hidden_att_e_broad = tf.broadcast_to(self.hidden_att_e_softmax,[tf.shape(self.input_x_vital)[0],
@@ -261,7 +261,7 @@ class dynamic_hgm():
         self.hidden_final = tf.reduce_sum(self.hidden_mul_variable, 1)
         self.Dense_patient = tf.concat([self.hidden_final, self.Dense_demo], 2)
         #self.Dense_patient = tf.concat([self.hidden_mul_variable, self.Dense_demo], 2)
-        """
+
 
 
         #self.Dense_patient = self.hidden_last_comb
@@ -281,7 +281,7 @@ class dynamic_hgm():
         """
         Get interpretation matrix
         """
-        """
+
         self.braod_weight_variable = tf.broadcast_to(self.weight_projection_w,[tf.shape(self.input_x_vital)[0],
                                                                                self.time_sequence,
                                                                                1+self.positive_lab_size+self.negative_lab_size,
@@ -300,17 +300,17 @@ class dynamic_hgm():
                                                                                self.latent_dim,self.latent_dim])
         self.project_weight_variable = tf.multiply(self.broad_hidden_att_e_variable, self.braod_weight_variable)
         self.project_weight_variable_final = tf.multiply(self.broad_hidden_att_e,self.project_weight_variable)
-        """
+
         """
         Get score important
         """
-        """
+
         self.time_feature_index = tf.constant([i for i in range(self.lab_size+self.item_size)])
         self.mortality_hidden_rep = tf.gather(self.Dense_death_rep, self.time_feature_index, axis=1)
         self.score_attention_ = tf.matmul(self.project_weight_variable_final,tf.expand_dims(tf.squeeze(self.mortality_hidden_rep),1))
         self.score_attention = tf.squeeze(self.score_attention_,[4])
         self.input_importance = tf.multiply(self.score_attention,self.input_x)
-        """
+
 
 
         """
@@ -844,14 +844,14 @@ class dynamic_hgm():
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})[:,
                             0, :]
-        """
+
         self.test_att_score = self.sess.run([self.score_attention,self.input_importance,self.input_x],feed_dict={self.input_x_vital: self.test_data_batch_vital,
                                                                          self.input_x_lab: self.test_one_batch_lab,
                                                                          self.input_x_demo: self.test_one_batch_demo,
                                                                          self.init_hiddenstate: init_hidden_state,
                                                                          self.Death_input: Death,
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
-        """
+
 
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
@@ -884,7 +884,7 @@ class dynamic_hgm():
 
         feature_len = self.item_size + self.lab_size
 
-        """
+
         self.test_data_scores = self.test_att_score[1][self.correct_predict_death,:,0,:]
         self.ave_data_scores = np.zeros((self.time_sequence,feature_len))
 
@@ -902,7 +902,7 @@ class dynamic_hgm():
                 self.ave_data_scores[j,p] = float(value/count)
                 count = 0
                 value = 0
-        """
+
 
 
 
@@ -986,12 +986,12 @@ class dynamic_hgm():
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
-            #self.ave_data_scores_total += self.ave_data_scores
+            self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 
-        #self.ave_data_scores_total = self.ave_data_scores_total/5
-        #self.norm = np.linalg.norm(self.ave_data_scores_total)
-        #self.ave_data_scores_total = self.ave_data_scores_total/self.norm
+        self.ave_data_scores_total = self.ave_data_scores_total/5
+        self.norm = np.linalg.norm(self.ave_data_scores_total)
+        self.ave_data_scores_total = self.ave_data_scores_total/self.norm
         self.tp_ave_score = np.sum(self.tp_score_total,0)/5
         self.fp_ave_score = np.sum(self.fp_score_total,0)/5
         self.precision_ave_score = np.sum(self.precision_curve_total,0)/5

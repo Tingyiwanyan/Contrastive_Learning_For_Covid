@@ -424,11 +424,11 @@ class dynamic_hgm():
                 end_time = start_time + self.time_step_length
             one_data_vital = self.assign_value_patient(center_node_index, start_time, end_time)
             one_data_lab = self.assign_value_lab(center_node_index, start_time, end_time)
-            one_data_icu_label = self.assign_value_icu_intubation(center_node_index, start_time, end_time)
+            #one_data_icu_label = self.assign_value_icu_intubation(center_node_index, start_time, end_time)
             # one_data_demo = self.assign_value_demo(center_node_index)
             self.patient_pos_sample_vital[j, 0, :] = one_data_vital
             self.patient_pos_sample_lab[j, 0, :] = one_data_lab
-            self.patient_pos_sample_icu_intubation_label[j,0,:] = one_data_icu_label
+            #self.patient_pos_sample_icu_intubation_label[j,0,:] = one_data_icu_label
             # time_index += 1
         one_data_demo = self.assign_value_demo(center_node_index)
         # one_data_com = self.assign_value_com(center_node_index)

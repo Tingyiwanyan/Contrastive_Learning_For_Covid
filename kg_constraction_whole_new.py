@@ -6,7 +6,7 @@ import pandas as pd
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_icu_whole import dynamic_hgm
+from Dynamic_hgm_death_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -648,7 +648,7 @@ if __name__ == "__main__":
 
     random_pick_icu = random.sample(icu_data, 500)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
-    kg.total_data_icu = reduced_data_icu
+    #kg.total_data_icu = reduced_data_icu
 
     process_data = kg_process_data(kg)
     process_data.separate_train_test()

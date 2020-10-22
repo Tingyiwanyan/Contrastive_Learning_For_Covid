@@ -39,7 +39,7 @@ class dynamic_hgm():
         self.com_size = 12
         self.input_seq = []
         self.threshold = 0.5
-        self.positive_lab_size = 2
+        self.positive_lab_size = 3
         self.negative_lab_size = 1
         self.positive_sample_size = self.positive_lab_size# + 1
         # self.positive_sample_size = 2
@@ -602,9 +602,9 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
-            #0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+            0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()

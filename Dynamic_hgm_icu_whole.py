@@ -18,10 +18,12 @@ class dynamic_hgm():
         self.kg = kg
         self.data_process = data_process
         # self.hetro_model = hetro_model
-        self.train_data = self.data_process.train_patient
-        self.test_data = self.data_process.test_patient
-        self.length_train = len(self.train_data)
-        self.length_test = len(self.test_data)
+        #self.train_data = self.data_process.train_patient
+        #self.test_data = self.data_process.test_patient
+        self.train_data_whole = self.data_process.train_patient_whole
+        self.test_data_whole = self.data_process.test_patient_whole
+        #self.length_train = len(self.train_data)
+        #self.length_test = len(self.test_data)
         self.batch_size = 16
         self.time_sequence = 4
         self.time_step_length = 6
@@ -412,7 +414,8 @@ class dynamic_hgm():
             # if time_index == self.time_sequence:
             #    break
             if flag == 0:
-                pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0,20,1)))
+                #pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0,20,1)))
+                pick_icu_hour = self.kg.dic_patient[center_node_index]['pick_time']
                 start_time = pick_icu_hour - self.predict_window_prior + float(j) * self.time_step_length
                 end_time = start_time + self.time_step_length
             else:
@@ -450,7 +453,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    #pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_icu_hour = self.kg.dic_patient[center_node_index]['pick_time']
                     start_time = pick_icu_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
@@ -496,7 +500,8 @@ class dynamic_hgm():
                 # start_time = float(j)*self.time_step_length
                 # end_time = start_time + self.time_step_length
                 if flag == 0:
-                    pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    #pick_icu_hour = self.kg.mean_icu_time + np.int(np.floor(np.random.normal(0, 20, 1)))
+                    pick_icu_hour = self.kg.dic_patient[center_node_index]['pick_time']
                     start_time = pick_icu_hour - self.predict_window_prior + float(j) * self.time_step_length
                     end_time = start_time + self.time_step_length
                 else:
@@ -604,18 +609,6 @@ class dynamic_hgm():
         tf.global_variables_initializer().run()
         tf.local_variables_initializer().run()
 
-    def config_model_att(self):
-        self.lstm_cell_att()
-        self.demo_layer_att()
-        self.build_dhgm_model()
-        self.get_latent_rep_hetero_att()
-        # self.build_att_mortality()
-        self.SGNN_loss()
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
-        self.sess = tf.InteractiveSession()
-        tf.global_variables_initializer().run()
-        tf.local_variables_initializer().run()
 
     def assign_value_patient(self, patientid, start_time, end_time):
         self.one_sample = np.zeros(self.item_size)

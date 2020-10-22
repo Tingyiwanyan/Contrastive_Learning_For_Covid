@@ -802,6 +802,7 @@ class dynamic_hgm():
         """
         train the system
         """
+        self.length_train = len(self.train_data)
         init_hidden_state = np.zeros(
             (self.batch_size, 1 + self.positive_lab_size + self.negative_lab_size, self.latent_dim))
         iteration = np.int(np.floor(np.float(self.length_train) / self.batch_size))

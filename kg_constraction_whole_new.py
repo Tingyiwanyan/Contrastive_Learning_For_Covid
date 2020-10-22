@@ -642,6 +642,10 @@ if __name__ == "__main__":
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
     #kg.total_data_mortality = reduced_data
 
+    random_pick_intubate = random.sample(intubate_data, 433)
+    reduced_data_intubate = [i for i in kg.total_data_intubation if i not in random_pick_intubate]
+    kg.total_data_intubation = reduced_data_intubate
+
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
     LSTM_ = LSTM_model(kg, process_data)

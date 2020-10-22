@@ -401,10 +401,10 @@ class dynamic_hgm():
         self.patient_pos_sample_com = np.zeros((self.positive_lab_size + 1, self.com_size))
         if self.kg.dic_patient[center_node_index]['icu_label'] == 0:
             flag = 0
-            neighbor_patient = self.kg.dic_intubation[0]
+            neighbor_patient = self.kg.dic_in_icu[0]
         else:
             flag = 1
-            neighbor_patient = self.kg.dic_intubation[1]
+            neighbor_patient = self.kg.dic_in_icu[1]
         time_seq = self.kg.dic_patient[center_node_index]['prior_time_vital'].keys()
         time_seq_int = [np.int(k) for k in time_seq]
         time_seq_int.sort()
@@ -476,10 +476,10 @@ class dynamic_hgm():
         self.patient_neg_sample_demo = np.zeros((self.negative_lab_size, self.demo_size))
         self.patient_neg_sample_com = np.zeros((self.negative_lab_size, self.com_size))
         if self.kg.dic_patient[center_node_index]['icu_label'] == 0:
-            neighbor_patient = self.kg.dic_intubation[1]
+            neighbor_patient = self.kg.dic_in_icu[1]
             flag = 1
         else:
-            neighbor_patient = self.kg.dic_intubation[0]
+            neighbor_patient = self.kg.dic_in_icu[0]
             flag = 0
         for i in range(self.negative_lab_size):
             index_neighbor = np.int(np.floor(np.random.uniform(0, len(neighbor_patient), 1)))

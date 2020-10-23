@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-k = np.load('7_data_icu_retain_ce_patient_data.npy')
-logit = np.load('test_logit_icu.npy')
+k = np.load('7_data_mortality_retain_ce_patient_data.npy')
+logit = np.load('test_logit_mortality.npy')
 
 length = k.shape[0]
 x_embed =TSNE(n_components=2).fit_transform(k)

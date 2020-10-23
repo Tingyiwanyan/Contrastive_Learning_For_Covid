@@ -644,7 +644,7 @@ if __name__ == "__main__":
 
     random_pick_intubate = random.sample(intubate_data, 207)
     reduced_data_intubate = [i for i in kg.total_data_intubation if i not in random_pick_intubate]
-    #kg.total_data_intubation = reduced_data_intubate
+    kg.total_data_intubation = reduced_data_intubate
 
     random_pick_icu = random.sample(icu_data, 500)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]

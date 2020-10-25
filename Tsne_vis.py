@@ -19,7 +19,7 @@ x_embed_cl_23 = TSNE(n_components=2).fit_transform(mortality_cl_23)
 
 fig, axs = plt.subplots(2,2)
 
-fig.suptitle('Mortality Prediction Embeddings')
+fig.suptitle('Mortality Prediction')
 
 for i in range(length_23):
     if logit_23[i,0] == 1:
@@ -72,7 +72,7 @@ length_10 = intubate_ce_10.shape[0]
 length_5 = intubate_ce_5.shape[0]
 
 fig, axs = plt.subplots(2,2)
-fig.suptitle('Intubation Prediction Embeddings')
+fig.suptitle('Intubation Prediction')
 
 for i in range(length_10):
     if logit_10[i,0] == 1:

@@ -602,9 +602,9 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
-            0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+            #0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -986,6 +986,8 @@ class dynamic_hgm():
             threshold += self.resolution
 
     def cross_validation(self):
+        self.test_logit_whole = []
+        self.test_patient_whole = []
         self.f1_score_total = []
         self.acc_total = []
         self.area_total = []
@@ -999,7 +1001,7 @@ class dynamic_hgm():
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
 
-        for i in range(3):
+        for i in range(5):
             self.config_model()
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]
@@ -1015,6 +1017,8 @@ class dynamic_hgm():
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
+            self.test_patient_whole.append(self.test_patient)
+            self.test_logit_whole.append(self.test_logit)
             #self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 

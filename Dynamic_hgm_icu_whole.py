@@ -999,7 +999,7 @@ class dynamic_hgm():
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
 
-        for i in range(1):
+        for i in range(5):
             self.config_model()
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]

@@ -2,7 +2,7 @@ from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
+
 mortality_ce_7 = np.load('7_data_mortality_ce_24h.npy')
 mortality_cl_7 = np.load('7_data_mortality_cl_24h.npy')
 mortality_ce_23 = np.load('23_data_mortality_ce_24h.npy')
@@ -17,7 +17,7 @@ x_embed_cl_7 = TSNE(n_components=2).fit_transform(mortality_cl_7)
 x_embed_ce_23 = TSNE(n_components=2).fit_transform(mortality_ce_23)
 x_embed_cl_23 = TSNE(n_components=2).fit_transform(mortality_cl_23)
 
-fig, axs = plt.subplots(2,2)
+fig, axs = plt.subplots(6,2)
 
 fig.suptitle('Mortality Prediction')
 
@@ -50,7 +50,7 @@ for i in range(length_7):
     axs[1, 1].set_title('D')
 
 plt.show()
-"""
+
 """
 Vis for intubation
 """
@@ -109,7 +109,7 @@ plt.show()
 """
 Vis for ICU
 """
-
+"""
 intubate_ce_5 = np.load('7_data_icu_ce_24h.npy')
 intubate_cl_5 = np.load('7_data_icu_cl_24h.npy')
 intubate_ce_10 = np.load('17_data_icu_ce_24h.npy')
@@ -159,3 +159,4 @@ for i in range(length_5):
     axs[1, 1].set_title('D')
 
 plt.show()
+"""

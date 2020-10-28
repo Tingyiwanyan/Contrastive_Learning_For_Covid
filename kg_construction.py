@@ -20,7 +20,7 @@ class Kg_construct_ehr():
         self.covid_lab = file_path + '/covid19LabTest.csv'
         self.lab = file_path + '/Lab.csv'
         self.vital = file_path + '/vitals.csv'
-        file_path_ = '/home/tingyi.wanyan'
+        file_path_ = '/home/tingyi.wanyan/EHR_knowledge_graph'
         self.lab_comb = file_path_ + '/lab_mapping_comb.csv'
         self.file_path_comorbidity = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
 

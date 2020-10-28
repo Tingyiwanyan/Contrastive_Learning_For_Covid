@@ -374,14 +374,28 @@ if __name__ == "__main__":
         kg.dic_patient = json.load(fp)
     with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_vital.json','r') as tp:
         kg.dic_vital = json.load(tp)
-    with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/total_data.txt','r') as filehand:
-        kg.total_data = json.load(filehand)
+    #with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/total_data.txt','r') as filehand:
+        #kg.total_data = json.load(filehand)
     with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_demographic.json','r') as fp_:
         kg.dic_demographic = json.load(fp_)
     with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_race.json','r') as tp_:
         kg.dic_race = json.load(tp_)
     with open('/datadrive/tingyi_wanyan/user_tingyi.wanyan/tensorflow_venv/dhgm_sinai/dic_lab.json','r') as lab:
         kg.dic_lab = json.load(lab)
+
+    total_data_check = []
+    for i in kg.dic_patient.keys():
+        check_icu = np.where(kg.reg_ar[:, 45] == i)[0]
+        for j in check_icu:
+            if kg.reg_ar[j][11] == kg.reg_ar[j][11]:
+                if i not in total_data_check:
+                    total_data_check.append(i)
+            elif kg.reg_ar[j][30] == kg.reg_ar[j][30]:
+                if i not in total_data_check:
+                    total_data_check.append(i)
+            else:
+                continue
+    kg.total_data = total_data_check
     
     for i in kg.dic_lab.keys():
         mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])

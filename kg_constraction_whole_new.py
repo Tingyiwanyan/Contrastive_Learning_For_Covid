@@ -494,8 +494,8 @@ class Kg_construct_ehr():
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
     kg.read_csv()
-    #kg.create_kg_dic()
-
+    kg.create_kg_dic()
+    """
     with open('/datadrive/tingyi_wanyan/dic_patient_whole.json', 'r') as fp:
         kg.dic_patient = json.load(fp)
     with open('/datadrive/tingyi_wanyan/dic_vital_whole.json','r') as tp:
@@ -506,7 +506,7 @@ if __name__ == "__main__":
         kg.dic_race = json.load(tp_)
     with open('/datadrive/tingyi_wanyan/dic_lab_whole.json','r') as lab:
         kg.dic_lab = json.load(lab)
-
+    """
 
     for i in kg.dic_lab.keys():
         mean_lab = np.mean(kg.dic_lab[i]['lab_value_patient'])

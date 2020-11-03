@@ -16,7 +16,7 @@ class kg_process_data():
         self.test_patient = []
         self.train_patient_whole = []
         self.test_patient_whole = []
-
+    """
     def separate_train_test(self):
         self.data_patient_num = len(self.kg.total_data)
         self.train_num = np.int(np.floor(self.data_patient_num * self.train_percent))
@@ -25,11 +25,11 @@ class kg_process_data():
         test_whole = [i for i in self.kg.total_data if i not in self.train_patient]
         for i in test_whole:
             self.test_patient.append(i)
-
+    """
     """
     Prepare death data, 10 cross validation
     """
-    """
+
     def separate_train_test(self):
         self.data_patient_num = len(self.kg.total_data_mortality)
         #self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
@@ -41,7 +41,7 @@ class kg_process_data():
             self.train_patient_whole.append(self.train_patient)
             self.test_patient_whole.append(self.test_patient)
             self.test_pateint = []
-    """
+
 
 
 

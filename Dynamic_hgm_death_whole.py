@@ -853,6 +853,7 @@ class dynamic_hgm():
                                                                          self.input_icu_intubation:self.one_batch_icu_intubation})
 
 
+
         single_mortality = np.zeros((1, 2, 2))
         single_mortality[0][0][0] = 1
         single_mortality[0][1][1] = 1
@@ -964,6 +965,7 @@ class dynamic_hgm():
         self.precision_curve_total = []
         self.recall_score_total = []
         self.recall_curve_total = []
+        self.test_patient_whole = []
         feature_len = self.item_size + self.lab_size
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
@@ -984,6 +986,7 @@ class dynamic_hgm():
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
+            self.test_patient_whole.append(self.test_patient)
             self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 

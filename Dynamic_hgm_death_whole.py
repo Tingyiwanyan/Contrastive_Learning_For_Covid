@@ -959,6 +959,7 @@ class dynamic_hgm():
         self.f1_score_total = []
         self.acc_total = []
         self.area_total = []
+        self.test_logit_total = []
         self.tp_score_total = []
         self.fp_score_total = []
         self.precision_score_total = []
@@ -987,6 +988,7 @@ class dynamic_hgm():
             self.precision_curve_total.append(self.precision_total)
             self.recall_curve_total.append(self.recall_total)
             self.test_patient_whole.append(self.test_patient)
+            self.test_logit_total.append(self.test_logit)
             self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
 

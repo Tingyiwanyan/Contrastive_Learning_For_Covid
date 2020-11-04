@@ -634,7 +634,7 @@ if __name__ == "__main__":
             if not pick_time == pick_time:
                 kg.dic_patient[i]['pick_time'] = 0
 
-
+    """
     BIPD_pick = np.where(kg.reg_ar[:,37]=="BIPD")
     In_patient_pick = np.where(kg.reg_ar[:,52]=="I")[0]
     In_patient_mrn = list(kg.reg_ar[:,45][In_patient_pick])
@@ -649,7 +649,7 @@ if __name__ == "__main__":
     icu_intersect = np.intersect1d(kg.total_data_icu,In_patient_mrn)
     Data_icu = [i for i in icu_intersect if i not in BIPD_intersect]
     kg.total_data_icu = Data_icu
-
+    """
 
     kg.mean_death_time = np.mean(kg.total_death_time)
     kg.std_death_time = np.std(kg.total_death_time)

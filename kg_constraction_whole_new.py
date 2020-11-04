@@ -508,7 +508,7 @@ class Kg_construct_ehr():
             if i in self.dic_lab.keys():
                 self.feature_mean.append(self.dic_lab[i]['mean_value'])
                 self.feature_copy.append(i)
-                values = [np.float(i) for i in self.dic_vital[i]['lab_value_patient']]
+                values = [np.float(i) for i in self.dic_lab[i]['lab_value_patient']]
                 irq_value = iqr(values)
                 self.feature_iqr.append(irq_value)
 

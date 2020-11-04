@@ -501,14 +501,18 @@ class Kg_construct_ehr():
         for i in feature:
             if i in self.dic_vital.keys():
                 self.feature_mean.append(self.dic_vital[i]['mean_value'])
+                mean = self.dic_vital[i]['mean_value']
                 self.feature_copy.append(i)
-                values = [np.float(i) for i in self.dic_vital[i]['value']]
+                std = np.float(self.dic_vital[i]['std'])
+                values = [np.float(i) for i in self.dic_vital[i]['value'] if np.float(i)< mean + std]
                 irq_value = iqr(values)
                 self.feature_iqr.append(irq_value)
             if i in self.dic_lab.keys():
                 self.feature_mean.append(self.dic_lab[i]['mean_value'])
+                mean = self.dic_lab[i]['mean_value']
                 self.feature_copy.append(i)
-                values = [np.float(i) for i in self.dic_lab[i]['lab_value_patient']]
+                std = np.float(self.dic_labl[i]['std'])
+                values = [np.float(i) for i in self.dic_lab[i]['lab_value_patient'] if np.float(i)<mean+std]
                 irq_value = iqr(values)
                 self.feature_iqr.append(irq_value)
 

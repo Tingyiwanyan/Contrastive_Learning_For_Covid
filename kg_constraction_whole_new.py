@@ -493,17 +493,17 @@ class Kg_construct_ehr():
                     45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
                     67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
         pick_num = np.array(pick_num)
-        feature_mean = []
+        self.feature_mean = []
         feature = list(np.array(list(self.dic_vital.keys()) + list(self.dic_lab.keys()))[pick_num])
-        feature_copy = []
+        self.feature_copy = []
         feature_csv = feature #+ feature + feature + feature
         for i in feature:
             if i in self.dic_vital.keys():
-                feature_mean.append(self.dic_vital[i]['value'])
-                feature_copy.append(i)
+                self.feature_mean.append(self.dic_vital[i]['mean_value'])
+                self.feature_copy.append(i)
             if i in self.dic_lab.keys():
-                feature_mean.append(self.dic_lab[i]['mean_value'])
-                feature_copy.append(i)
+                self.feature_mean.append(self.dic_lab[i]['mean_value'])
+                self.feature_copy.append(i)
 
         #time_seq = list(np.ones(63)) + list(2 * np.ones(63)) + list(3 * np.ones(63)) + list(4 * np.ones(63))
         #time_step1 = self.ave_data_scores_total[0, :][pick_num]
@@ -512,7 +512,7 @@ class Kg_construct_ehr():
         #time_step4 = self.ave_data_scores_total[3, :][pick_num]
         #variable_scores = list(time_step1) + list(time_step2) + list(time_step3) + list(time_step4)
         df = pd.DataFrame(
-            {"Demographic Features": feature_copy, "mean_value": feature_mean})
+            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean})
         df.to_csv(name_to_store, index=False)
 
 

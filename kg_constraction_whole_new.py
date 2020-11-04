@@ -3,6 +3,7 @@ import random
 import math
 import time
 import pandas as pd
+from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
@@ -486,6 +487,34 @@ class Kg_construct_ehr():
                                 value)
                         self.dic_vital[obv_id].setdefault('value', []).append(value)
 
+    def gen_demo_csv(self, name_to_store):
+        pick_num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 19,
+                    20, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 41, 43,
+                    45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
+                    67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
+        pick_num = np.array(pick_num)
+        feature_mean = []
+        feature = list(np.array(list(self.dic_vital.keys()) + list(self.dic_lab.keys()))[pick_num])
+        feature_copy = []
+        feature_csv = feature #+ feature + feature + feature
+        for i in feature:
+            if i in self.dic_vital.keys():
+                feature_mean.append(self.dic_vital[i]['value'])
+                feature_copy.append(i)
+            if i in self.dic_lab.keys():
+                feature_mean.append(self.dic_lab[i]['mean_value'])
+                feature_copy.append(i)
+
+        #time_seq = list(np.ones(63)) + list(2 * np.ones(63)) + list(3 * np.ones(63)) + list(4 * np.ones(63))
+        #time_step1 = self.ave_data_scores_total[0, :][pick_num]
+        #time_step2 = self.ave_data_scores_total[1, :][pick_num]
+        #time_step3 = self.ave_data_scores_total[2, :][pick_num]
+        #time_step4 = self.ave_data_scores_total[3, :][pick_num]
+        #variable_scores = list(time_step1) + list(time_step2) + list(time_step3) + list(time_step4)
+        df = pd.DataFrame(
+            {"Demographic Features": feature_copy, "mean_value": feature_mean})
+        df.to_csv(name_to_store, index=False)
+
 
 
 
@@ -650,6 +679,11 @@ if __name__ == "__main__":
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
     #kg.total_data_icu = reduced_data_icu
 
+    """
+    Demographic table stat
+    """
+
+
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
     LSTM_ = LSTM_model(kg, process_data)
@@ -657,5 +691,9 @@ if __name__ == "__main__":
     # LSTM_.config_model()
     # LSTM_.train()
     dhgm = dynamic_hgm(kg, process_data)
+
+
+
+
 
 

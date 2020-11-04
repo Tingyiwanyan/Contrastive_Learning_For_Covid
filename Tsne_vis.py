@@ -19,7 +19,7 @@ x_embed_cl_23 = TSNE(n_components=2).fit_transform(mortality_cl_23)
 
 fig, axs = plt.subplots(6,2)
 
-fig.suptitle('Mortality Prediction')
+#fig.suptitle('Mortality Prediction')
 
 for i in range(length_23):
     if logit_23[i,0] == 1:
@@ -37,18 +37,19 @@ for i in range(length_23):
 
 for i in range(length_7):
     if logit_7[i,0] == 1:
-        axs[1,0].plot(x_embed_cl_7[i][0],x_embed_cl_7[i][1],'.',color='red',markersize=6)
+        axs[1,1].plot(x_embed_cl_7[i][0],x_embed_cl_7[i][1],'.',color='red',markersize=6)
     if logit_7[i,1] == 1:
-        axs[1,0].plot(x_embed_cl_7[i][0],x_embed_cl_7[i][1],'.',color='blue',markersize=10)
-    axs[1, 0].set_title('C')
+        axs[1,1].plot(x_embed_cl_7[i][0],x_embed_cl_7[i][1],'.',color='blue',markersize=10)
+    axs[1, 1].set_title('D')
 
 for i in range(length_7):
     if logit_7[i,0] == 1:
-        axs[1,1].plot(x_embed_ce_7[i][0],x_embed_ce_7[i][1],'.',color='red',markersize=6)
+        axs[1,0].plot(x_embed_ce_7[i][0],x_embed_ce_7[i][1],'.',color='red',markersize=6)
     if logit_7[i,1] == 1:
-        axs[1,1].plot(x_embed_ce_7[i][0],x_embed_ce_7[i][1],'.',color='blue',markersize=10)
-    axs[1, 1].set_title('D')
+        axs[1,0].plot(x_embed_ce_7[i][0],x_embed_ce_7[i][1],'.',color='blue',markersize=10)
+    axs[1, 0].set_title('C')
 
+#axs[0,0].text(6.1, 1.36, 'Mortality Prediction', color='r',fontsize=20)
 #plt.show()
 
 """
@@ -100,6 +101,7 @@ for i in range(length_5):
         axs[3,1].plot(x_embed_ce_5[i][0],x_embed_ce_5[i][1],'.',color='blue',markersize=10)
     axs[3, 1].set_title('D')
 
+#axs[2,0].text(6.1, 1.36, 'Intubation Prediction', color='b',fontsize=20)
 #plt.show()
 
 
@@ -153,4 +155,5 @@ for i in range(length_5):
         axs[5,1].plot(x_embed_ce_5[i][0],x_embed_ce_5[i][1],'.',color='blue',markersize=10)
     axs[5, 1].set_title('D')
 
+#axs[4,0].text(6.1, 1.36, 'ICU Transfer Precition', color='b',fontsize=20)
 plt.show()

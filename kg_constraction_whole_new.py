@@ -496,14 +496,19 @@ class Kg_construct_ehr():
         self.feature_mean = []
         feature = list(np.array(list(self.dic_vital.keys()) + list(self.dic_lab.keys()))[pick_num])
         self.feature_copy = []
+        self.feature_iqr = []
         feature_csv = feature #+ feature + feature + feature
         for i in feature:
             if i in self.dic_vital.keys():
                 self.feature_mean.append(self.dic_vital[i]['mean_value'])
                 self.feature_copy.append(i)
+                irq_value = iqr(self.dic_vital[i]['value'])
+                self.feature_iqr.append(irq_value)
             if i in self.dic_lab.keys():
                 self.feature_mean.append(self.dic_lab[i]['mean_value'])
                 self.feature_copy.append(i)
+                irq_value = iqr(self.dic_lab[i]['lab_value_patient'])
+                self.feature_iqr.append(irq_value)
 
         #time_seq = list(np.ones(63)) + list(2 * np.ones(63)) + list(3 * np.ones(63)) + list(4 * np.ones(63))
         #time_step1 = self.ave_data_scores_total[0, :][pick_num]
@@ -512,7 +517,7 @@ class Kg_construct_ehr():
         #time_step4 = self.ave_data_scores_total[3, :][pick_num]
         #variable_scores = list(time_step1) + list(time_step2) + list(time_step3) + list(time_step4)
         df = pd.DataFrame(
-            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean})
+            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
 

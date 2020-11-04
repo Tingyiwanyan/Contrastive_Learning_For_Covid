@@ -502,12 +502,14 @@ class Kg_construct_ehr():
             if i in self.dic_vital.keys():
                 self.feature_mean.append(self.dic_vital[i]['mean_value'])
                 self.feature_copy.append(i)
-                irq_value = iqr(self.dic_vital[i]['value'])
+                values = [np.float(i) for i in self.dic_vital[i]['value']]
+                irq_value = iqr(values)
                 self.feature_iqr.append(irq_value)
             if i in self.dic_lab.keys():
                 self.feature_mean.append(self.dic_lab[i]['mean_value'])
                 self.feature_copy.append(i)
-                irq_value = iqr(self.dic_lab[i]['lab_value_patient'])
+                values = [np.float(i) for i in self.dic_vital[i]['lab_value_patient']]
+                irq_value = iqr(values)
                 self.feature_iqr.append(irq_value)
 
         #time_seq = list(np.ones(63)) + list(2 * np.ones(63)) + list(3 * np.ones(63)) + list(4 * np.ones(63))

@@ -534,7 +534,6 @@ class Kg_construct_ehr():
             {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
-    def gen_race
 
 
 

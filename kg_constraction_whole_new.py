@@ -500,20 +500,28 @@ class Kg_construct_ehr():
         feature_csv = feature #+ feature + feature + feature
         for i in feature:
             if i in self.dic_vital.keys():
-                self.feature_mean.append(self.dic_vital[i]['mean_value'])
-                mean = self.dic_vital[i]['mean_value']
+                #self.feature_mean.append(self.dic_vital[i]['mean_value'])
+                #mean = self.dic_vital[i]['mean_value']
                 self.feature_copy.append(i)
-                std = np.float(self.dic_vital[i]['std'])
-                values = [np.float(i) for i in self.dic_vital[i]['value'] if np.float(i)< mean + std]
-                irq_value = iqr(values)
+                #std = np.float(self.dic_vital[i]['std'])
+                values = [np.float(i) for i in self.dic_vital[i]['value'] if np.float(i)<mean+std]
+                percent_75 = np.percentile(values,75)
+                values_correction = [i for i in values if i < percent_75]
+                mean_value = np.mean(values_correction)
+                self.feature_mean.append(mean_value)
+                irq_value = iqr(values_correction)
                 self.feature_iqr.append(irq_value)
             if i in self.dic_lab.keys():
-                self.feature_mean.append(self.dic_lab[i]['mean_value'])
-                mean = self.dic_lab[i]['mean_value']
+                #self.feature_mean.append(self.dic_lab[i]['mean_value'])
+                #mean = self.dic_lab[i]['mean_value']
                 self.feature_copy.append(i)
-                std = np.float(self.dic_labl[i]['std'])
+                #std = np.float(self.dic_labl[i]['std'])
                 values = [np.float(i) for i in self.dic_lab[i]['lab_value_patient'] if np.float(i)<mean+std]
-                irq_value = iqr(values)
+                percent_75 = np.percentile(values, 75)
+                values_correction = [i for i in values if i < percent_75]
+                mean_value = np.mean(values_correction)
+                self.feature_mean.append(mean_value)
+                irq_value = iqr(values_correction)
                 self.feature_iqr.append(irq_value)
 
         #time_seq = list(np.ones(63)) + list(2 * np.ones(63)) + list(3 * np.ones(63)) + list(4 * np.ones(63))

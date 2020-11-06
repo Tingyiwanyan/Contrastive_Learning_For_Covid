@@ -534,12 +534,6 @@ class Kg_construct_ehr():
             {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
-
-
-
-
-
-
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
     kg.read_csv()
@@ -689,7 +683,7 @@ if __name__ == "__main__":
 
     random_pick_death = random.sample(death_data,1100)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
-    #kg.total_data_mortality = reduced_data
+    kg.total_data_mortality = reduced_data
 
     random_pick_intubate = random.sample(intubate_data, 307)
     reduced_data_intubate = [i for i in kg.total_data_intubation if i not in random_pick_intubate]
@@ -702,8 +696,6 @@ if __name__ == "__main__":
     """
     Demographic table stat
     """
-
-
     process_data = kg_process_data(kg)
     process_data.separate_train_test()
     LSTM_ = LSTM_model(kg, process_data)

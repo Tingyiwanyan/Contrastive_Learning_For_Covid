@@ -540,7 +540,7 @@ class Kg_construct_ehr():
             race = self.dic_demographic[i]['race']
             if race not in self.dic_race_sec.keys():
                 self.dic_race_sec[race] = {}
-                self.dic_race_sec[race] = 0
+                self.dic_race_sec[race] = 1
             else:
                 self.dic_race_sec[race] += 1
 

@@ -534,6 +534,20 @@ class Kg_construct_ehr():
             {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
+    def gen_race_csv(self,name_to_store):
+        self.dic_race_sec = {}
+        for i in self.total_data_mortality:
+            race = self.dic_demographic[i]['race']
+            if race not in self.dic_race_sec.keys():
+                self.dic_race_sec[race] = {}
+                self.dic_race_sec[race] = 0
+            else:
+                self.dic_race_sec[race] += 1
+
+        #df = pd.DataFrame(
+           # {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean, "irq": self.feature_iqr})
+        #df.to_csv(name_to_store, index=False)
+
 if __name__ == "__main__":
     kg = Kg_construct_ehr()
     kg.read_csv()

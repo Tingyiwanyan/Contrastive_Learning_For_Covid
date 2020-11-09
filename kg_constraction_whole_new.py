@@ -547,11 +547,11 @@ class Kg_construct_ehr():
             else:
                 self.dic_race_sec[race] += 1
 
-            if gender not in self.dic_race_sec.keys():
+            if gender not in self.dic_gen_sec.keys():
                 self.dic_gen_sec[gender] = {}
                 self.dic_gen_sec[gender] = 1
             else:
-                self.dic_race_sec[gender] += 1
+                self.dic_gen_sec[gender] += 1
             age = self.dic_demographic[i]['Age']
             self.age_list.append(age)
 

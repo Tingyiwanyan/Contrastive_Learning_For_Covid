@@ -556,6 +556,31 @@ class Kg_construct_ehr():
             self.age_list.append(age)
 
 
+    def gen_demo_spec_csv(self,data,name_to_store):
+        pick_num = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 19,
+                    20, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 36, 37, 38, 41, 43,
+                    45, 46, 47, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 66,
+                    67, 69, 70, 72, 73, 74, 75, 76, 78, 79, 80, 83]
+        pick_num = np.array(pick_num)
+        self.feature_mean = []
+        feature = list(np.array(list(self.dic_vital.keys()) + list(self.dic_lab.keys()))[pick_num])
+        self.feature_copy = []
+        self.feature_iqr = []
+        self.demo_spec = {}
+        for i in feature:
+            self.demo_spec[i] = []
+        for i in data:
+            for j in self.dic_patient[i]['prior_time_vital'].keys():
+                for k in self.dic_patient[i]['prior_time_vital'][j].keys():
+                    if k in self.demo_spec.keys():
+                        self.demo_spec[j] += self.dic_patient[i]['prior_time_vital'][j][k]
+            for j in self.dic_patient[i]['prior_time_lab'].keys():
+                for k in self.dic_patient[i]['prior_time_lab'][j].keys():
+                    if k in self.demo_spec.keys():
+                        self.demo_spec[j] += self.dic_patient[i]['prior_time_lab'][j][k]
+
+
+
 
 
         #df = pd.DataFrame(

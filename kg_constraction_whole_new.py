@@ -574,10 +574,28 @@ class Kg_construct_ehr():
                 for k in self.dic_patient[i]['prior_time_vital'][j].keys():
                     if k in self.demo_spec.keys():
                         self.demo_spec[k] += self.dic_patient[i]['prior_time_vital'][j][k]
+
             for j in self.dic_patient[i]['prior_time_lab'].keys():
                 for k in self.dic_patient[i]['prior_time_lab'][j].keys():
                     if k in self.demo_spec.keys():
                         self.demo_spec[k] += self.dic_patient[i]['prior_time_lab'][j][k]
+
+        for i in self.demo_spec.keys():
+            self.feature_copy.append(i)
+            # std = np.float(self.dic_vital[i]['std'])
+            #values = [np.float(j) for j in self.dic_vital[i]['value'] if np.float(i) < mean + std]
+            #percent_75 = np.percentile(values, 75)
+            #values_correction = [j for j in self.demo_spec[i]]# if i < percent_75]
+            mean_value = np.mean(self.demo_spec[i])
+            self.feature_mean.append(mean_value)
+            irq_value = iqr(self.demo_spec[i])
+            self.feature_iqr.append(irq_value)
+
+
+
+        df = pd.DataFrame(
+            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean, "irq": self.feature_iqr})
+        df.to_csv(name_to_store, index=False)
 
 
 

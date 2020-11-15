@@ -589,7 +589,7 @@ class Kg_construct_ehr():
             mean = np.mean(values)
             std = np.std(values)
             values_filtered = [j for j in values if j < mean+std]
-            percent_90 = np.percentile(values_filtered,75)
+            percent_90 = np.percentile(values_filtered,90)
             values_correction = [j for j in values_filtered if j < percent_90]
             mean_value = np.mean(values_correction)
             self.feature_mean.append(mean_value)

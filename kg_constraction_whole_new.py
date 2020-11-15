@@ -585,10 +585,10 @@ class Kg_construct_ehr():
             # std = np.float(self.dic_vital[i]['std'])
             #values = [np.float(j) for j in self.dic_vital[i]['value'] if np.float(i) < mean + std]
             #percent_75 = np.percentile(values, 75)
-            #values_correction = [j for j in self.demo_spec[i]]# if i < percent_75]
-            mean_value = np.mean(self.demo_spec[i])
+            values_correction = [np.float(j) for j in self.demo_spec[i]]# if i < percent_75]
+            mean_value = np.mean(values_correction)
             self.feature_mean.append(mean_value)
-            irq_value = iqr(self.demo_spec[i])
+            irq_value = iqr(values_correction)
             self.feature_iqr.append(irq_value)
 
 

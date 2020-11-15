@@ -573,11 +573,11 @@ class Kg_construct_ehr():
             for j in self.dic_patient[i]['prior_time_vital'].keys():
                 for k in self.dic_patient[i]['prior_time_vital'][j].keys():
                     if k in self.demo_spec.keys():
-                        self.demo_spec[j] += self.dic_patient[i]['prior_time_vital'][j][k]
+                        self.demo_spec[k] += self.dic_patient[i]['prior_time_vital'][j][k]
             for j in self.dic_patient[i]['prior_time_lab'].keys():
                 for k in self.dic_patient[i]['prior_time_lab'][j].keys():
                     if k in self.demo_spec.keys():
-                        self.demo_spec[j] += self.dic_patient[i]['prior_time_lab'][j][k]
+                        self.demo_spec[k] += self.dic_patient[i]['prior_time_lab'][j][k]
 
 
 

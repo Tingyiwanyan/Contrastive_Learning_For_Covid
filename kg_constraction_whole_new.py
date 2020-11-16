@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_icu_whole import dynamic_hgm
+from Dynamic_hgm_death_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -759,7 +759,7 @@ if __name__ == "__main__":
 
     random_pick_death = random.sample(death_data,1100)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
-    #kg.total_data_mortality = reduced_data
+    kg.total_data_mortality = reduced_data
 
     random_pick_intubate = random.sample(intubate_data, 200)
     reduced_data_intubate = [i for i in kg.total_data_intubation if i not in random_pick_intubate]
@@ -767,7 +767,7 @@ if __name__ == "__main__":
 
     random_pick_icu = random.sample(icu_data, 350)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
-    kg.total_data_icu = reduced_data_icu
+    #kg.total_data_icu = reduced_data_icu
 
     """
     Demographic table stat

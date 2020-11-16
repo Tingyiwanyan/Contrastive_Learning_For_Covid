@@ -82,6 +82,7 @@ class kg_process_data():
             self.train_patient_whole.append(self.train_patient)
             self.test_patient_whole.append(self.test_patient)
             self.test_patient = []
+            self.train_duplicate = []
 
 
 

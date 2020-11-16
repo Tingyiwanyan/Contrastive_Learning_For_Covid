@@ -534,11 +534,11 @@ class Kg_construct_ehr():
             {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
-    def gen_race_csv(self,name_to_store):
+    def gen_race_csv(self,data,name_to_store):
         self.dic_race_sec = {}
         self.dic_gen_sec = {}
         self.age_list = []
-        for i in self.total_data_mortality:
+        for i in data:
             race = self.dic_demographic[i]['race']
             gender = self.dic_demographic[i]['gender']
             if race not in self.dic_race_sec.keys():

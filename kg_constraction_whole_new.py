@@ -505,9 +505,9 @@ class Kg_construct_ehr():
                 self.feature_copy.append(i)
                 #std = np.float(self.dic_vital[i]['std'])
                 values = [np.float(i) for i in self.dic_vital[i]['value'] if np.float(i)<mean+std]
-                percent_75 = np.percentile(values,75)
+                percent_75 = np.percentile(values,85)
                 values_correction = [i for i in values if i < percent_75]
-                mean_value = np.mean(values_correction)
+                mean_value = np.median(values_correction)
                 self.feature_mean.append(mean_value)
                 irq_value = iqr(values_correction)
                 self.feature_iqr.append(irq_value)
@@ -519,7 +519,7 @@ class Kg_construct_ehr():
                 values = [np.float(i) for i in self.dic_lab[i]['lab_value_patient'] if np.float(i)<mean+std]
                 percent_75 = np.percentile(values, 75)
                 values_correction = [i for i in values if i < percent_75]
-                mean_value = np.mean(values_correction)
+                mean_value = np.median(values_correction)
                 self.feature_mean.append(mean_value)
                 irq_value = iqr(values_correction)
                 self.feature_iqr.append(irq_value)
@@ -531,7 +531,7 @@ class Kg_construct_ehr():
         #time_step4 = self.ave_data_scores_total[3, :][pick_num]
         #variable_scores = list(time_step1) + list(time_step2) + list(time_step3) + list(time_step4)
         df = pd.DataFrame(
-            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean,"irq":self.feature_iqr})
+            {"Demographic Features": self.feature_copy, "median_value": self.feature_mean,"irq":self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
     def gen_race_csv(self,data,name_to_store):

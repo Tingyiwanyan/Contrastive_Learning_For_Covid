@@ -591,7 +591,7 @@ class Kg_construct_ehr():
             values_filtered = [j for j in values if j < mean+std]
             percent_90 = np.percentile(values_filtered,80)
             values_correction = [j for j in values_filtered if j < percent_90]
-            mean_value = np.mean(values_correction)
+            mean_value = np.median(values_correction)
             self.feature_mean.append(mean_value)
             irq_value = iqr(values_correction)
             self.feature_iqr.append(irq_value)
@@ -599,7 +599,7 @@ class Kg_construct_ehr():
 
 
         df = pd.DataFrame(
-            {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean, "irq": self.feature_iqr})
+            {"Demographic Features": self.feature_copy, "median_value": self.feature_mean, "irq": self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
 

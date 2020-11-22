@@ -566,32 +566,41 @@ class Kg_construct_ehr():
         feature = list(np.array(list(self.dic_vital.keys()) + list(self.dic_lab.keys()))[pick_num])
         self.feature_copy = []
         self.feature_iqr = []
+        self.demo_spec_each = {}
         self.demo_spec = {}
         for i in feature:
             self.demo_spec[i] = []
         for i in data:
+            for l in feature:
+                self.demo_spec_each[l] = []
             for j in self.dic_patient[i]['prior_time_vital'].keys():
                 for k in self.dic_patient[i]['prior_time_vital'][j].keys():
-                    if k in self.demo_spec.keys():
-                        self.demo_spec[k] += self.dic_patient[i]['prior_time_vital'][j][k]
+                    if k in self.demo_spec_each.keys():
+                        self.demo_spec_each[k] += self.dic_patient[i]['prior_time_vital'][j][k]
 
             for j in self.dic_patient[i]['prior_time_lab'].keys():
                 for k in self.dic_patient[i]['prior_time_lab'][j].keys():
                     if k in self.demo_spec.keys():
-                        self.demo_spec[k] += self.dic_patient[i]['prior_time_lab'][j][k]
+                        self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
+            for j in self.demo_spec_each.keys():
+                median = np.median(self.demo_spec_each[j])
+                if j in self.demo_spec.keys():
+                    self.demo_spec[j].append(median)
+            self.demo_spec_each = {}
 
         for i in self.demo_spec.keys():
             self.feature_copy.append(i)
             # std = np.float(self.dic_vital[i]['std'])
             #values = [np.float(j) for j in self.dic_vital[i]['value'] if np.float(i) < mean + std]
             #percent_75 = np.percentile(values, 75)
+
             values = [np.float(j) for j in self.demo_spec[i]]# if i < percent_75]
-            mean = np.mean(values)
-            std = np.std(values)
-            values_filtered = [j for j in values if j < mean+std]
-            percent_90 = np.percentile(values_filtered,80)
-            values_correction = [j for j in values_filtered if j < percent_90]
-            mean_value = np.median(values_correction)
+            #mean = np.mean(values)
+            #std = np.std(values)
+            #values_filtered = [j for j in values if j < mean+std]
+            #percent_90 = np.percentile(values_filtered,80)
+            #values_correction = [j for j in values_filtered if j < percent_90]
+            mean_value = np.median(values)
             self.feature_mean.append(mean_value)
             irq_value = iqr(values_correction)
             self.feature_iqr.append(irq_value)

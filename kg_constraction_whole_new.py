@@ -585,8 +585,8 @@ class Kg_construct_ehr():
             for j in self.demo_spec_each.keys():
                 median_array = [np.float(m) for m in self.demo_spec_each[j]]
                 median = np.median(median_array)
-                if j in self.demo_spec.keys():
-                    self.demo_spec[j].append(median)
+                if b in self.demo_spec.keys():
+                    self.demo_spec[b].append(median)
             self.demo_spec_each = {}
 
         for i in self.demo_spec.keys():

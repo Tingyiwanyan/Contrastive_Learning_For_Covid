@@ -583,7 +583,8 @@ class Kg_construct_ehr():
                     if k in self.demo_spec.keys():
                         self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
-                median = np.median(self.demo_spec_each[j])
+                median_array = [np.float(m) for m in self.demo_spec_each[j]]
+                median = np.median(median_array)
                 if j in self.demo_spec.keys():
                     self.demo_spec[j].append(median)
             self.demo_spec_each = {}

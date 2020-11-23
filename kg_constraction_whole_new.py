@@ -582,7 +582,7 @@ class Kg_construct_ehr():
                     if k in self.demo_spec.keys():
                         self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
-                median_array = [np.float(m) for m in self.demo_spec_each[j] if not math.isnan(str(m))]
+                median_array = [np.float(m) for m in self.demo_spec_each[j] if not math.isnan(m)]
                 median_non_nan_array = [m for m in median_array if not math.isnan(m)]
                 median = np.median(median_non_nan_array)
                 if j in self.demo_spec.keys():

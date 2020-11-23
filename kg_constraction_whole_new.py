@@ -603,7 +603,7 @@ class Kg_construct_ehr():
             #values_correction = [j for j in values_filtered if j < percent_90]
             mean_value = np.median(values)
             self.feature_mean.append(mean_value)
-            irq_value = iqr(values_correction)
+            irq_value = iqr(values)
             self.feature_iqr.append(irq_value)
 
 

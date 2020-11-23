@@ -585,7 +585,7 @@ class Kg_construct_ehr():
                 self.median_array = [np.float(m) for m in self.demo_spec_each[j]]
                 mean = np.mean(self.median_array)
                 std = np.std(self.median_array)
-                values_filtered = [f for f in self.median_array if f < mean + std]
+                values_filtered = [f for f in self.median_array if f < mean + std or f ==  mean + std]
                 percent_90 = np.percentile(values_filtered, 80)
                 values_correction = [f for f in values_filtered if f < percent_90]
                 #median_non_nan_array = [m for m in median_array if not math.isnan(m)]

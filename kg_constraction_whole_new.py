@@ -583,8 +583,13 @@ class Kg_construct_ehr():
                         self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
                 median_array = [np.float(m) for m in self.demo_spec_each[j]]
+                mean = np.mean(median_array)
+                std = np.std(median_array)
+                values_filtered = [f for f in median_array if f < mean + std]
+                percent_90 = np.percentile(values_filtered, 80)
+                values_correction = [f for f in values_filtered if f < percent_90]
                 #median_non_nan_array = [m for m in median_array if not math.isnan(m)]
-                median = np.median(median_array)
+                median = np.median(values_correction)
                 if j in self.demo_spec.keys():
                     if not math.isnan(median):
                         self.demo_spec[j].append(median)
@@ -597,14 +602,14 @@ class Kg_construct_ehr():
             #percent_75 = np.percentile(values, 75)
 
             values = [np.float(j) for j in self.demo_spec[i]]# if i < percent_75]
-            mean = np.mean(values)
-            std = np.std(values)
-            values_filtered = [j for j in values if j < mean+std]
-            percent_90 = np.percentile(values_filtered,60)
-            values_correction = [j for j in values_filtered if j < percent_90]
-            mean_value = np.median(values_correction)
+            #mean = np.mean(values)
+            #std = np.std(values)
+            #values_filtered = [j for j in values if j < mean+std]
+            #percent_90 = np.percentile(values_filtered,80)
+            #values_correction = [j for j in values_filtered if j < percent_90]
+            mean_value = np.median(values)
             self.feature_mean.append(mean_value)
-            irq_value = iqr(values_correction)
+            irq_value = iqr(values)
             self.feature_iqr.append(irq_value)
 
 

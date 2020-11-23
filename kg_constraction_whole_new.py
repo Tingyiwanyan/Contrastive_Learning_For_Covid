@@ -583,8 +583,6 @@ class Kg_construct_ehr():
                         self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
                 self.median_array = [np.float(m) for m in self.demo_spec_each[j]]
-                if math.isnan(median_array[0]):
-                    continue
                 mean = np.mean(self.median_array)
                 std = np.std(self.median_array)
                 values_filtered = [f for f in self.median_array if f < mean + std]

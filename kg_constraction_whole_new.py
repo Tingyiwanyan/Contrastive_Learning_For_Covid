@@ -582,12 +582,12 @@ class Kg_construct_ehr():
                     if k in self.demo_spec.keys():
                         self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
-                median_array = [np.float(m) for m in self.demo_spec_each[j]]
+                self.median_array = [np.float(m) for m in self.demo_spec_each[j]]
                 if math.isnan(median_array[0]):
                     continue
-                mean = np.mean(median_array)
-                std = np.std(median_array)
-                values_filtered = [f for f in median_array if f < mean + std]
+                mean = np.mean(self.median_array)
+                std = np.std(self.median_array)
+                values_filtered = [f for f in self.median_array if f < mean + std]
                 percent_90 = np.percentile(values_filtered, 80)
                 values_correction = [f for f in values_filtered if f < percent_90]
                 #median_non_nan_array = [m for m in median_array if not math.isnan(m)]

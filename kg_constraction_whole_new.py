@@ -576,15 +576,17 @@ class Kg_construct_ehr():
             for j in self.dic_patient[i]['prior_time_vital'].keys():
                 for k in self.dic_patient[i]['prior_time_vital'][j].keys():
                     if k in self.demo_spec_each.keys():
-                        self.demo_spec_each[k] += self.dic_patient[i]['prior_time_vital'][j][k]
+                        if not math.isnan(self.dic_patient[i]['prior_time_vital'][j][k]):
+                            self.demo_spec_each[k] += self.dic_patient[i]['prior_time_vital'][j][k]
             for j in self.dic_patient[i]['prior_time_lab'].keys():
                 for k in self.dic_patient[i]['prior_time_lab'][j].keys():
                     if k in self.demo_spec.keys():
-                        self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
+                        if not math.isnan(self.dic_patient[i]['prior_time_lab'][j][k]):
+                            self.demo_spec_each[k] += self.dic_patient[i]['prior_time_lab'][j][k]
             for j in self.demo_spec_each.keys():
                 median_array = [np.float(m) for m in self.demo_spec_each[j]]
-                median_non_nan_array = [m for m in median_array if not math.isnan(m)]
-                median = np.median(median_non_nan_array)
+                #median_non_nan_array = [m for m in median_array if not math.isnan(m)]
+                median = np.median(median_array)
                 if j in self.demo_spec.keys():
                     self.demo_spec[j].append(median)
             self.demo_spec_each = {}

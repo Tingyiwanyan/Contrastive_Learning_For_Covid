@@ -31,7 +31,7 @@ class Kg_construct_ehr():
         self.covid_labtest = pd.read_csv(self.covid_lab)
         self.labtest = pd.read_csv(self.lab)
         self.vital_sign = pd.read_csv(self.vital)
-        # self.comorbidity = pd.read_csv(self.file_path_comorbidity)
+        self.comorbidity = pd.read_csv(self.file_path_comorbidity)
         self.lab_comb = pd.read_csv(self.lab_comb)
         self.reg_ar = np.array(self.registry)
         self.covid_ar = np.array(self.covid_labtest)
@@ -786,6 +786,23 @@ if __name__ == "__main__":
     random_pick_icu = random.sample(icu_data, 350)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
     #kg.total_data_icu = reduced_data_icu
+
+    com_file = '/home/tingyi.wanyan/EHR_knowledge_graph/comorbidity_matrix_20200710.csv'
+    com = pd.read_csv(com_file)
+    com_ar_rough = np.concatenate(np.array(com))
+    com_ = []
+    [com_.append(i.split(' ')) for i in com_ar_rough]
+    com_ar = np.array(com_)
+    kg.com_ar = com_ar
+    kg.com = com
+    remove_symbol = np.array([i.replace('"', '') for i in kg.com_ar[:, 1]])
+    kg.com_ar[:, 1] = remove_symbol
+
+    com_mapping_file = '/datadrive/tingyi_wanyan/user_tingyi.wanyan/RemappedMRNs.csv'
+    com_mapping = pd.read_csv(com_mapping_file)
+    com_mapping_ar = np.array(com_mapping)
+
+    kg.com_mapping_ar = com_mapping_ar
 
     """
     Demographic table stat

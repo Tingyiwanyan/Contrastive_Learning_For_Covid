@@ -620,13 +620,20 @@ class Kg_construct_ehr():
             {"Demographic Features": self.feature_copy, "median_value": self.feature_mean, "irq": self.feature_iqr})
         df.to_csv(name_to_store, index=False)
 
+    def get_comorbidity(self,data):
+        self.feature_name_comor = ["afib","asthma","cad","cancer","ckd","copd","diabetes","heartfailure","hypertension","stroke",
+                        "alcohol","liver"]
+
+        self.feature_num_comor = np.zeros(12)
+        for i in data:
+            index = np.where(self.com_mapping_ar[:,0]==str(i))[0][0]
+            mapping = self.com_mapping_ar[index,1]
+            index_mapping = np.where(self.com_ar[:,1]==mapping)[0][0]
+            comor_list = [np.float(i) for i in self.com_ar[index_mapping][4:]]
+            for j in range(12):
+                self.feature_num_comor[j]+=comor_list[j]
 
 
-
-
-        #df = pd.DataFrame(
-           # {"Demographic Features": self.feature_copy, "mean_value": self.feature_mean, "irq": self.feature_iqr})
-        #df.to_csv(name_to_store, index=False)
 
 if __name__ == "__main__":
     kg = Kg_construct_ehr()

@@ -1208,9 +1208,9 @@ class dynamic_hgm():
 
 
         for i in range(5):
-            if name_of_model == "ce_rnn"
+            if name_of_model == "ce_rnn":
                 self.config_model_ce_rnn()
-            if name_of_model == "cl_rnn"
+            if name_of_model == "cl_rnn":
                 self.config_model_cl_rnn()
             if name_of_model == "ce_retain":
                 self.config_moldel_ce_retain()

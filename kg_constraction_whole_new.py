@@ -820,7 +820,14 @@ if __name__ == "__main__":
     #pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()
     # LSTM_.train()
-    dhgm = dynamic_hgm(kg, process_data)
+
+    """
+    24h RNN with CE
+    """
+    dhgm = dynamic_hgm(kg, process_data,4)
+    dhgm.cross_validation("ce_rnn")
+
+
 
 
 

@@ -1195,6 +1195,7 @@ class dynamic_hgm():
         self.f1_score_total = []
         self.acc_total = []
         self.area_total = []
+        self.auprc_total = []
         self.test_logit_total = []
         self.tp_score_total = []
         self.fp_score_total = []
@@ -1227,6 +1228,7 @@ class dynamic_hgm():
             self.cal_auc()
             self.cal_auprc()
             self.area_total.append(self.area)
+            self.auprc_total.append(self.area_auprc)
             self.precision_score_total.append(self.precision_test)
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
@@ -1258,16 +1260,14 @@ class dynamic_hgm():
         print(np.mean(self.acc_total))
         print("acc_std")
         print(self.std_acc)
-        print("area_ave_score")
+        print("auroc_ave_score")
         print(np.mean(self.area_total))
-        print("area_std_score")
+        print("auroc_std_score")
         print(self.std_auc)
-        print("precision_ave_score")
-        print(np.mean(self.precision_total))
-        print("precision_std_score")
-        print(self.std_precision)
-        print("recall_ave_score")
-        print(np.mean(self.recall_total))
+        print("auprc_ave_score")
+        print(np.mean(self.auprc_total))
+        print("auprc_std_score")
+        print(np.std(self.auprc_total))
 
 
 

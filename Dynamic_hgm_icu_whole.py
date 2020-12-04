@@ -602,9 +602,9 @@ class dynamic_hgm():
         self.get_latent_rep_hetero()
         self.SGNN_loss()
         self.SGNN_loss_contrast()
-        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
-        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
-            0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
+        self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(self.negative_sum)
+        #self.train_step_neg = tf.compat.v1.train.AdamOptimizer(1e-3).minimize(
+            #0.8 * self.negative_sum + 0.2 * self.negative_sum_contrast)
         # self.train_step_cross_entropy = tf.train.AdamOptimizer(1e-3).minimize(self.cross_entropy)
         self.sess = tf.InteractiveSession()
         tf.global_variables_initializer().run()
@@ -991,6 +991,7 @@ class dynamic_hgm():
         self.f1_score_total = []
         self.acc_total = []
         self.area_total = []
+        self.area_auprc_total = []
         self.tp_score_total = []
         self.fp_score_total = []
         self.precision_score_total = []
@@ -1012,7 +1013,9 @@ class dynamic_hgm():
             self.tp_score_total.append(self.tp_total)
             self.fp_score_total.append(self.fp_total)
             self.cal_auc()
+            self.cal_auprc()
             self.area_total.append(self.area)
+            self.area_auprc_total.append(self.area_auprc)
             self.precision_score_total.append(self.precision_test)
             self.recall_score_total.append(self.recall_test)
             self.precision_curve_total.append(self.precision_total)
@@ -1065,3 +1068,12 @@ class dynamic_hgm():
             x = self.fp_total[i + 1] - self.fp_total[i]
             y = (self.tp_total[i + 1] + self.tp_total[i]) / 2
             self.area += x * y
+
+    def cal_auprc(self):
+        self.area_auprc = 0
+        self.precision_total.sort()
+        self.recall_total.sort()
+        for i in range(len(self.precision_total)-1):
+            x = self.recall_total[i + 1] - self.recall_total[i]
+            y = (self.precision_total[i + 1] + self.precision_total[i]) / 2
+            self.area_auprc += x * y

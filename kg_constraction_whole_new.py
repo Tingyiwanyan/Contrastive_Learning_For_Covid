@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -792,7 +792,7 @@ if __name__ == "__main__":
 
     random_pick_icu = random.sample(icu_data, 350)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
-    #kg.total_data_icu = reduced_data_icu
+    kg.total_data_icu = reduced_data_icu
 
     com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)
@@ -824,8 +824,8 @@ if __name__ == "__main__":
     """
     24h RNN with CE
     """
-    dhgm = dynamic_hgm(kg, process_data,4)
-    dhgm.cross_validation("cl_retain")
+    dhgm = dynamic_hgm(kg, process_data)
+    #dhgm.cross_validation()
 
 
 

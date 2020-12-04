@@ -34,7 +34,7 @@ class kg_process_data():
     """
     Prepare death data, 10 cross validation
     """
-
+    """
     def separate_train_test(self):
         self.data_patient_num = len(self.kg.total_data_mortality)
         #self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
@@ -53,7 +53,7 @@ class kg_process_data():
             self.train_mortality_whole.append(self.train_patient)
             self.train_validate_mortality_whole.append(self.test_patient)
             self.test_patient = []
-
+    """
 
 
 
@@ -77,7 +77,7 @@ class kg_process_data():
     """
     prepare icu data, 10 cross validation
     """
-    """
+
     def separate_train_test(self):
         self.data_patient_num = len(self.kg.total_data_icu)
         self.test_num = np.int(np.floor(self.data_patient_num * self.test_percent))
@@ -95,7 +95,7 @@ class kg_process_data():
             self.test_patient_whole.append(self.test_patient)
             self.test_patient = []
             self.train_duplicate = []
-    """
+
 
 
 

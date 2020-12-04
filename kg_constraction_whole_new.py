@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_icu_whole import dynamic_hgm
+from Dynamic_hgm_death_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -824,8 +824,8 @@ if __name__ == "__main__":
     """
     24h RNN with CE
     """
-    dhgm = dynamic_hgm(kg, process_data)
-    #dhgm.cross_validation()
+    dhgm = dynamic_hgm(kg, process_data,4)
+    dhgm.cross_validation("ce_rnn")
 
 
 

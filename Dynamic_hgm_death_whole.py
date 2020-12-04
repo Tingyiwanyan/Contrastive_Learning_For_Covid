@@ -1303,8 +1303,8 @@ class dynamic_hgm():
 
     def cal_auprc(self):
         self.area_auprc = 0
-        self.precision_total.sort()
-        self.recall_total.sort()
+        #self.precision_total.sort()
+        #self.recall_total.sort()
         for i in range(len(self.precision_total)-1):
             x = self.recall_total[i + 1] - self.recall_total[i]
             y = (self.precision_total[i + 1] + self.precision_total[i]) / 2

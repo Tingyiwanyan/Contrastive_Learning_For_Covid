@@ -1253,7 +1253,7 @@ class dynamic_hgm():
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]
             self.train()
-            if name_of_model == "ce_rnn" or name_of_model = "cl_rnn":
+            if name_of_model == "ce_rnn" or name_of_model == "cl_rnn":
                 self.test(self.test_data)
             else:
                 self.test_retain(self.test_data)

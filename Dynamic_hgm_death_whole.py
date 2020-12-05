@@ -1273,10 +1273,10 @@ class dynamic_hgm():
             self.test_logit_total.append(self.test_logit)
             #self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
-
-        #self.ave_data_scores_total = self.ave_data_scores_total/5
-        #self.norm = np.linalg.norm(self.ave_data_scores_total)
-        #self.ave_data_scores_total = self.ave_data_scores_total/self.norm
+        if name_of_model == "ce_retain" or name_of_model == "cl_retain":
+            self.ave_data_scores_total = self.ave_data_scores_total/5
+            self.norm = np.linalg.norm(self.ave_data_scores_total)
+            self.ave_data_scores_total = self.ave_data_scores_total/self.norm
         self.tp_ave_score = np.sum(self.tp_score_total,0)/5
         self.fp_ave_score = np.sum(self.fp_score_total,0)/5
         self.precision_ave_score = np.sum(self.precision_curve_total,0)/5

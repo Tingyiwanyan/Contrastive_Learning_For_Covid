@@ -838,6 +838,7 @@ if __name__ == "__main__":
     df_roc.to_csv("roc_curve_24_RNN_CE_mortality", index=False)
 
     dhgm.train_data = process_data.train_mortality
+    dhgm.config_model_ce_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
     np.save("embedding_24h_rnn_ce_mortality.npy",dhgm.test_patient)
@@ -863,6 +864,7 @@ if __name__ == "__main__":
     df_roc.to_csv("roc_curve_24_RNN_CL_mortality", index=False)
 
     dhgm.train_data = process_data.train_mortality
+    dhgm.config_model_cl_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
     np.save("embedding_24h_rnn_cl_mortality.npy", dhgm.test_patient)
@@ -890,6 +892,7 @@ if __name__ == "__main__":
     dhgm.gen_heap_map_csv("heat_map_24h_retain_CE")
 
     dhgm.train_data = process_data.train_mortality
+    dhgm.config_moldel_ce_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
     np.save("embedding_24h_retain_ce_mortality.npy", dhgm.test_patient)
@@ -917,6 +920,7 @@ if __name__ == "__main__":
     dhgm.gen_heap_map_csv("heat_map_24h_retain_CL")
 
     dhgm.train_data = process_data.train_mortality
+    dhgm.config_model_cl_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
     np.save("embedding_24h_retain_cl_mortality.npy", dhgm.test_patient)

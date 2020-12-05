@@ -822,7 +822,7 @@ if __name__ == "__main__":
     # LSTM_.train()
 
     #print("now training 24h RNN with CE mortality")
-
+    """
     dhgm = dynamic_hgm(kg, process_data,4)
     print("now training 24h RNN with CE intubation")
     dhgm.cross_validation("ce_rnn")
@@ -869,7 +869,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
+    """
     print("now training 24h RETAIN with CE intubation")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("ce_retain")

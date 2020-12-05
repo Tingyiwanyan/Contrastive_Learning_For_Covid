@@ -4,6 +4,7 @@ import random
 import math
 import copy
 from itertools import groupby
+import pandas as pd
 
 
 class dynamic_hgm():

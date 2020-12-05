@@ -72,8 +72,8 @@ class kg_process_data():
             self.test_patient_whole.append(self.test_patient)
             self.test_patient = []
 
-        self.train_mortality =train_patient_whole[0]
-        self.test_mortality = test_patient_whole[0]
+        self.train_mortality =self.train_patient_whole[0]
+        self.test_mortality = self.test_patient_whole[0]
 
 
 

@@ -922,7 +922,7 @@ if __name__ == "__main__":
     """
     # print("now training 24h RNN with CE mortality")
 
-
+    """
     dhgm = dynamic_hgm(kg, process_data, 8)
     print("now training 48h RNN with CE mortality")
     dhgm.cross_validation("ce_rnn")
@@ -945,7 +945,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
+    """
     print("now training 48h RNN with CL mortality")
     dhgm = dynamic_hgm(kg, process_data, 8)
     dhgm.cross_validation("cl_rnn")

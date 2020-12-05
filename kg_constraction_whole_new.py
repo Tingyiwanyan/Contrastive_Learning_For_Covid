@@ -824,8 +824,9 @@ if __name__ == "__main__":
     """
     24h RNN with CE
     """
-    print("now training 24h RNN with CE mortality")
+    #print("now training 24h RNN with CE mortality")
     dhgm = dynamic_hgm(kg, process_data,4)
+    print("now training 24h RNN with CE mortality")
     dhgm.cross_validation("ce_rnn")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
@@ -836,6 +837,8 @@ if __name__ == "__main__":
                        "std_tp": dhgm.std_tp})
     df_roc.to_csv("roc_curve_24_RNN_CE_mortality", index=False)
 
+    dhgm.train_data = process_data.train_mortality
+    dhgm.train()
     dhgm.test(dhgm.test_data_final)
     np.save("embedding_24h_rnn_ce_mortality.npy",dhgm.test_patient)
     np.save("logit_24h_rnn_ce_mortality.npy",dhgm.test_logit)
@@ -859,7 +862,8 @@ if __name__ == "__main__":
                            "std_tp": dhgm.std_tp})
     df_roc.to_csv("roc_curve_24_RNN_CL_mortality", index=False)
 
-
+    dhgm.train_data = process_data.train_mortality
+    dhgm.train()
     dhgm.test(dhgm.test_data_final)
     np.save("embedding_24h_rnn_cl_mortality.npy", dhgm.test_patient)
     np.save("logit_24h_rnn_cl_mortality.npy", dhgm.test_logit)
@@ -885,8 +889,9 @@ if __name__ == "__main__":
 
     dhgm.gen_heap_map_csv("heat_map_24h_retain_CE")
 
-
-    dhgm.test(dhgm.test_data_final)
+    dhgm.train_data = process_data.train_mortality
+    dhgm.train()
+    dhgm.test_retain(dhgm.test_data_final)
     np.save("embedding_24h_retain_ce_mortality.npy", dhgm.test_patient)
     np.save("logit_24h_retain_ce_mortality.npy", dhgm.test_logit)
 
@@ -911,7 +916,9 @@ if __name__ == "__main__":
 
     dhgm.gen_heap_map_csv("heat_map_24h_retain_CL")
 
-    dhgm.test(dhgm.test_data_final)
+    dhgm.train_data = process_data.train_mortality
+    dhgm.train()
+    dhgm.test_retain(dhgm.test_data_final)
     np.save("embedding_24h_retain_cl_mortality.npy", dhgm.test_patient)
     np.save("logit_24h_retain_cl_mortality.npy", dhgm.test_logit)
 

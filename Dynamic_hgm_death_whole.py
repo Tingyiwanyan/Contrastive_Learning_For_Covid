@@ -1238,7 +1238,7 @@ class dynamic_hgm():
         self.recall_curve_total = []
         self.test_patient_whole = []
         feature_len = self.item_size + self.lab_size
-        #self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
+        self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
 
         for i in range(5):
@@ -1271,7 +1271,8 @@ class dynamic_hgm():
             self.recall_curve_total.append(self.recall_total)
             self.test_patient_whole.append(self.test_patient)
             self.test_logit_total.append(self.test_logit)
-            #self.ave_data_scores_total += self.ave_data_scores
+            if name_of_model == "ce_retain" or name_of_model == "cl_retain":
+                self.ave_data_scores_total += self.ave_data_scores
             self.sess.close()
         if name_of_model == "ce_retain" or name_of_model == "cl_retain":
             self.ave_data_scores_total = self.ave_data_scores_total/5

@@ -182,6 +182,39 @@ class dynamic_hgm():
         self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
         #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
         for i in range(self.time_sequence):
+            x_input_cur = tf.gather(self.input_x, i, axis=1)
+            if i == 0:
+                concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
+            else:
+                concat_cur = tf.concat([hidden_rep[i - 1], x_input_cur], 2)
+            forget_cur = \
+                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_forget_gate), self.bias_forget_gate))
+            info_cur = \
+                tf.math.sigmoid(tf.math.add(tf.matmul(concat_cur, self.weight_info_gate), self.bias_info_gate))
+            cellstate_cur = \
+                tf.math.tanh(tf.math.add(tf.matmul(concat_cur, self.weight_cell_state), self.bias_cell_state))
+            info_cell_state = tf.multiply(info_cur, cellstate_cur)
+            if not i == 0:
+                forget_cell_state = tf.multiply(forget_cur, cell_state[i - 1])
+                cellstate_cur = tf.math.add(forget_cell_state, info_cell_state)
+            output_gate = \
+                tf.nn.relu(tf.math.add(tf.matmul(concat_cur, self.weight_output_gate), self.bias_output_gate))
+            hidden_current = tf.multiply(output_gate, cellstate_cur)
+            cell_state.append(cellstate_cur)
+            hidden_rep.append(hidden_current)
+
+        self.hidden_last = hidden_rep[self.time_sequence - 1]
+        for i in range(self.time_sequence):
+            hidden_rep[i] = tf.expand_dims(hidden_rep[i], 1)
+        self.hidden_rep = tf.concat(hidden_rep, 1)
+        self.check = concat_cur
+
+    def lstm_cell_retain(self):
+        cell_state = []
+        hidden_rep = []
+        self.project_input = tf.math.add(tf.matmul(self.input_x, self.weight_projection_w), self.bias_projection_b)
+        #self.project_input = tf.matmul(self.input_x, self.weight_projection_w)
+        for i in range(self.time_sequence):
             x_input_cur = tf.gather(self.project_input, i, axis=1)
             if i == 0:
                 concat_cur = tf.concat([self.init_hiddenstate, x_input_cur], 2)
@@ -677,7 +710,7 @@ class dynamic_hgm():
         tf.local_variables_initializer().run()
 
     def config_moldel_ce_retain(self):
-        self.lstm_cell()
+        self.lstm_cell_retain()
         self.demo_layer()
         # self.softmax_loss()
         self.build_dhgm_model_retain()
@@ -705,7 +738,7 @@ class dynamic_hgm():
         tf.local_variables_initializer().run()
 
     def config_model_cl_retain(self):
-        self.lstm_cell()
+        self.lstm_cell_retain()
         self.demo_layer()
         # self.softmax_loss()
         self.build_dhgm_model_retain()
@@ -930,7 +963,7 @@ class dynamic_hgm():
                                                      self.mortality: self.one_batch_mortality,
                                                      self.init_hiddenstate: init_hidden_state,
                                                      self.input_icu_intubation:self.one_batch_icu_intubation})
-                print(self.err_[0])
+                #print(self.err_[0])
 
                 """
                 self.err_lstm = self.sess.run([self.cross_entropy, self.train_step_cross_entropy,self.init_hiddenstate,self.output_layer,self.logit_sig],
@@ -1220,7 +1253,10 @@ class dynamic_hgm():
             self.train_data = self.train_data_whole[i]
             self.test_data = self.test_data_whole[i]
             self.train()
-            self.test(self.test_data)
+            if name_of_model == "ce_rnn" or name_of_model = "cl_rnn":
+                self.test(self.test_data)
+            else:
+                self.test_retain(self.test_data)
             self.f1_score_total.append(self.f1_test)
             self.acc_total.append(self.acc)
             self.tp_score_total.append(self.tp_total)

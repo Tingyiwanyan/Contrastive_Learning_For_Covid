@@ -80,25 +80,21 @@ class kg_process_data():
     """
     prepare icu data, 10 cross validation
     """
-    """
-    def separate_train_test(self):
+
+    def separate_train_test_icu(self):
         self.data_patient_num = len(self.kg.total_data_icu)
         self.test_num = np.int(np.floor(self.data_patient_num * self.test_percent))
-        self.train_duplicate = []
         for j in range(5):
-            for i in self.kg.total_data_mortality[j * self.test_num:(j + 1) * self.test_num]:
+            for i in self.kg.total_data_intubation[j * self.test_num:(j + 1) * self.test_num]:
                 self.test_patient.append(i)
-            self.train_patient = [i for i in self.kg.total_data_mortality if i not in self.test_patient]
-            for k in self.train_patient:
-                if self.kg.dic_patient[k]['death_flag'] == 1:
-                    self.train_duplicate.append(k)
-            self.train_patient += self.train_duplicate
-            random.shuffle(self.train_patient)
+            self.train_patient = [i for i in self.kg.total_data_intubation if i not in self.test_patient]
             self.train_patient_whole.append(self.train_patient)
             self.test_patient_whole.append(self.test_patient)
             self.test_patient = []
-            self.train_duplicate = []
-    """
+
+        self.train_mortality = self.train_patient_whole[0]
+        self.test_mortality = self.test_patient_whole[0]
+
 
 
 

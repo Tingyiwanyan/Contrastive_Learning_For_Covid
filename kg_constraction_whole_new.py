@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -815,12 +815,12 @@ if __name__ == "__main__":
     Demographic table stat
     """
     process_data = kg_process_data(kg)
-    process_data.separate_train_test_mortality()
+    process_data.separate_train_test_icu()
     LSTM_ = LSTM_model(kg, process_data)
     #pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()
     # LSTM_.train()
-
+    """
     #print("now training 24h RNN with CE mortality")
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE mortality full sample")
@@ -1016,7 +1016,7 @@ if __name__ == "__main__":
 
     del dhgm
 
-    """
+    
     dhgm = dynamic_hgm(kg, process_data,4)
     print("now training 24h RNN with CE intubation full sample")
     dhgm.cross_validation("ce_rnn")
@@ -1216,7 +1216,7 @@ if __name__ == "__main__":
 
     del dhgm
     
-
+    """
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE icu full")
     dhgm.cross_validation("ce_rnn")
@@ -1408,7 +1408,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-    """
+
 
 
 

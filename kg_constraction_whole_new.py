@@ -1021,11 +1021,8 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-    """
 
-    """
-    icu set
-    """
+
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE icu")
     dhgm.cross_validation("ce_rnn")
@@ -1071,7 +1068,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
+    """
     print("now training 24h RETAIN with CE icu")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("ce_retain")

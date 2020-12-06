@@ -1215,7 +1215,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-    """
+    
 
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE icu full")

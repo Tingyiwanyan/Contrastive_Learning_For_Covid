@@ -35,24 +35,19 @@ class kg_process_data():
     Prepare death data, 10 cross validation
     """
 
-    def separate_train_test(self):
+    def separate_train_test_mortality(self):
         self.data_patient_num = len(self.kg.total_data_mortality)
-        #self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
-        self.test_num = np.int(np.floor(self.data_patient_num*self.test_percent))
-        for i in self.kg.total_data_mortality[0 * self.test_num:(0 + 1) * self.test_num]:
-            self.test_mortality.append(i)
-        self.train_mortality = [i for i in self.kg.total_data_mortality if i not in self.test_mortality]
-
-        self.data_patient_num = len(self.train_mortality)
-        # self.train_num = np.int(np.floor(self.data_patient_num*self.train_percent))
-        self.test_num = np.int(np.floor(self.data_patient_num * 0.2))
+        self.test_num = np.int(np.floor(self.data_patient_num * self.test_percent))
         for j in range(5):
-            for i in self.train_mortality[j*self.test_num:(j+1)*self.test_num]:
+            for i in self.kg.total_data_intubation[j * self.test_num:(j + 1) * self.test_num]:
                 self.test_patient.append(i)
-            self.train_patient = [i for i in self.train_mortality if i not in self.test_patient]
-            self.train_mortality_whole.append(self.train_patient)
-            self.train_validate_mortality_whole.append(self.test_patient)
+            self.train_patient = [i for i in self.kg.total_data_intubation if i not in self.test_patient]
+            self.train_patient_whole.append(self.train_patient)
+            self.test_patient_whole.append(self.test_patient)
             self.test_patient = []
+
+        self.train_mortality = self.train_patient_whole[0]
+        self.test_mortality = self.test_patient_whole[0]
 
 
 

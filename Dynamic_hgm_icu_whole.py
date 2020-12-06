@@ -1003,7 +1003,7 @@ class dynamic_hgm():
                                                      # self.lab_test: self.one_batch_item,
                                                      self.mortality: self.one_batch_mortality,
                                                      self.init_hiddenstate_att: init_hidden_state})
-                print(self.err_[0])
+                #print(self.err_[0])
 
     def test(self, data):
         Death = np.zeros([1,2])

@@ -969,7 +969,7 @@ class dynamic_hgm():
                                                      self.mortality: self.one_batch_mortality,
                                                      self.init_hiddenstate: init_hidden_state,
                                                      self.input_icu_intubation:self.one_batch_icu_intubation})
-                print(self.err_[0])
+                #print(self.err_[0])
 
                 """
                 self.err_lstm = self.sess.run([self.cross_entropy, self.train_step_cross_entropy,self.init_hiddenstate,self.output_layer,self.logit_sig],

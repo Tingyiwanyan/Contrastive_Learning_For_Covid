@@ -815,7 +815,7 @@ if __name__ == "__main__":
     Demographic table stat
     """
     process_data = kg_process_data(kg)
-    process_data.separate_train_test_intubation()
+    process_data.separate_train_test_mortality()
     LSTM_ = LSTM_model(kg, process_data)
     #pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()

@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_icu_whole import dynamic_hgm
+from Dynamic_hgm_death_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -782,7 +782,7 @@ if __name__ == "__main__":
             if i in kg.total_data_icu:
                 icu_data.append(i)
 
-    random_pick_death = random.sample(death_data,1100)
+    random_pick_death = random.sample(death_data,1200)
     reduced_data = [i for i in kg.total_data_mortality if i not in random_pick_death]
     kg.total_data_mortality = reduced_data
 
@@ -815,14 +815,14 @@ if __name__ == "__main__":
     Demographic table stat
     """
     process_data = kg_process_data(kg)
-    process_data.separate_train_test_icu()
+    process_data.separate_train_test_mortality()
     LSTM_ = LSTM_model(kg, process_data)
     #pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()
     # LSTM_.train()
 
     #print("now training 24h RNN with CE mortality")
-    """
+
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE mortality restricted sample")
     dhgm.cross_validation("ce_rnn")
@@ -920,7 +920,7 @@ if __name__ == "__main__":
     del dhgm
 
     # print("now training 24h RNN with CE intubation")
-
+    """
     dhgm = dynamic_hgm(kg, process_data, 8)
     print("now training 48h RNN with CE mortality")
     dhgm.cross_validation("ce_rnn")
@@ -1217,7 +1217,7 @@ if __name__ == "__main__":
 
     del dhgm
     
-    """
+    
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE icu")
     dhgm.cross_validation("ce_rnn")
@@ -1409,7 +1409,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
+    """
 
 
 

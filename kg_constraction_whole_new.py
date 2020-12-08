@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -790,9 +790,9 @@ if __name__ == "__main__":
     reduced_data_intubate = [i for i in kg.total_data_intubation if i not in random_pick_intubate]
     #kg.total_data_intubation = reduced_data_intubate
 
-    random_pick_icu = random.sample(icu_data, 350)
+    random_pick_icu = random.sample(icu_data, 400)
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
-    #kg.total_data_icu = reduced_data_icu
+    kg.total_data_icu = reduced_data_icu
 
     com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)
@@ -815,13 +815,14 @@ if __name__ == "__main__":
     Demographic table stat
     """
     process_data = kg_process_data(kg)
-    process_data.separate_train_test_mortality()
+    process_data.separate_train_test_icu()
     LSTM_ = LSTM_model(kg, process_data)
     #pretrain = pretrain_dhgm(kg,process_data)
     # LSTM_.config_model()
     # LSTM_.train()
 
     #print("now training 24h RNN with CE mortality")
+    """
     dhgm = dynamic_hgm(kg, process_data, 4)
     print("now training 24h RNN with CE mortality restricted sample")
     dhgm.cross_validation("ce_rnn")
@@ -1016,7 +1017,7 @@ if __name__ == "__main__":
 
     del dhgm
     
-    """
+    
     dhgm = dynamic_hgm(kg, process_data,4)
     print("now training 24h RNN with CE intubation full sample")
     dhgm.cross_validation("ce_rnn")
@@ -1139,7 +1140,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-    """
+    
     print("now training 48h RNN with CL intubation full")
     dhgm = dynamic_hgm(kg, process_data, 8)
     dhgm.cross_validation("cl_rnn")
@@ -1218,158 +1219,158 @@ if __name__ == "__main__":
     
     """
     dhgm = dynamic_hgm(kg, process_data, 4)
-    print("now training 24h RNN with CE icu full")
+    print("now training 24h RNN with CE icu")
     dhgm.cross_validation("ce_rnn")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_24_RNN_CE_icu_full", index=False)
+    df_prc.to_csv("pr_curve_24_RNN_CE_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_24_RNN_CE_icu_full", index=False)
+    df_roc.to_csv("roc_curve_24_RNN_CE_icu", index=False)
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_model_ce_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
-    np.save("embedding_24h_rnn_ce_icu_full.npy", dhgm.test_patient)
-    np.save("logit_24h_rnn_ce_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_24h_rnn_ce_icu.npy", dhgm.test_patient)
+    np.save("logit_24h_rnn_ce_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 24h RNN with CL icu full")
+    print("now training 24h RNN with CL icu")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("cl_rnn")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_24_RNN_CL_icu_full", index=False)
+    df_prc.to_csv("pr_curve_24_RNN_CL_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_24_RNN_CL_icu_full", index=False)
+    df_roc.to_csv("roc_curve_24_RNN_CL_icu", index=False)
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_model_cl_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
-    np.save("embedding_24h_rnn_cl_icu_full.npy", dhgm.test_patient)
-    np.save("logit_24h_rnn_cl_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_24h_rnn_cl_icu.npy", dhgm.test_patient)
+    np.save("logit_24h_rnn_cl_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 24h RETAIN with CE icu full")
+    print("now training 24h RETAIN with CE icu")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("ce_retain")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_24_RETAIN_CE_icu_full", index=False)
+    df_prc.to_csv("pr_curve_24_RETAIN_CE_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_24_RETAIN_CE_icu_full", index=False)
+    df_roc.to_csv("roc_curve_24_RETAIN_CE_icu", index=False)
 
-    dhgm.gen_heap_map_csv("heat_map_24h_retain_CE_icu_full")
+    dhgm.gen_heap_map_csv("heat_map_24h_retain_CE_icu")
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_moldel_ce_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
-    np.save("embedding_24h_retain_ce_icu_full.npy", dhgm.test_patient)
-    np.save("logit_24h_retain_ce_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_24h_retain_ce_icu.npy", dhgm.test_patient)
+    np.save("logit_24h_retain_ce_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 24h RETAIN with CL icu full")
+    print("now training 24h RETAIN with CL icu")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("cl_retain")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_24_RETAIN_CL_icu_full", index=False)
+    df_prc.to_csv("pr_curve_24_RETAIN_CL_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_24_RETAIN_CL_icu_full", index=False)
+    df_roc.to_csv("roc_curve_24_RETAIN_CL_icu", index=False)
 
-    dhgm.gen_heap_map_csv("heat_map_24h_retain_CL_icu_full")
+    dhgm.gen_heap_map_csv("heat_map_24h_retain_CL_icu")
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_model_cl_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
-    np.save("embedding_24h_retain_cl_icu_full.npy", dhgm.test_patient)
-    np.save("logit_24h_retain_cl_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_24h_retain_cl_icu.npy", dhgm.test_patient)
+    np.save("logit_24h_retain_cl_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
     dhgm = dynamic_hgm(kg, process_data, 8)
-    print("now training 48h RNN with CE icu full")
+    print("now training 48h RNN with CE icu")
     dhgm.cross_validation("ce_rnn")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_48_RNN_CE_icu_full", index=False)
+    df_prc.to_csv("pr_curve_48_RNN_CE_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_48_RNN_CE_icu_full", index=False)
+    df_roc.to_csv("roc_curve_48_RNN_CE_icu", index=False)
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_model_ce_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
-    np.save("embedding_48h_rnn_ce_icu_full.npy", dhgm.test_patient)
-    np.save("logit_48h_rnn_ce_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_48h_rnn_ce_icu.npy", dhgm.test_patient)
+    np.save("logit_48h_rnn_ce_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 48h RNN with CL icu full")
+    print("now training 48h RNN with CL icu")
     dhgm = dynamic_hgm(kg, process_data, 8)
     dhgm.cross_validation("cl_rnn")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_48_RNN_CL_icu_full", index=False)
+    df_prc.to_csv("pr_curve_48_RNN_CL_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_48_RNN_CL_icu_full", index=False)
+    df_roc.to_csv("roc_curve_48_RNN_CL_icu", index=False)
 
     dhgm.train_data = process_data.train_mortality
     dhgm.config_model_cl_rnn()
     dhgm.train()
     dhgm.test(dhgm.test_data_final)
-    np.save("embedding_48h_rnn_cl_icu_full.npy", dhgm.test_patient)
-    np.save("logit_48h_rnn_cl_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_48h_rnn_cl_icu.npy", dhgm.test_patient)
+    np.save("logit_48h_rnn_cl_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 48h RETAIN with CE icu full")
+    print("now training 48h RETAIN with CE icu")
     dhgm = dynamic_hgm(kg, process_data, 8)
     dhgm.cross_validation("ce_retain")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_48_RETAIN_CE_icu_full", index=False)
+    df_prc.to_csv("pr_curve_48_RETAIN_CE_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_48_RETAIN_CE_icu_full", index=False)
+    df_roc.to_csv("roc_curve_48_RETAIN_CE_icu", index=False)
 
     # dhgm.gen_heap_map_csv("heat_map_48h_retain_CE")
 
@@ -1377,24 +1378,24 @@ if __name__ == "__main__":
     dhgm.config_moldel_ce_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
-    np.save("embedding_48h_retain_ce_icu_full.npy", dhgm.test_patient)
-    np.save("logit_48h_retain_ce_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_48h_retain_ce_icu.npy", dhgm.test_patient)
+    np.save("logit_48h_retain_ce_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
 
-    print("now training 48h RETAIN with CL icu full")
+    print("now training 48h RETAIN with CL icu")
     dhgm = dynamic_hgm(kg, process_data, 8)
     dhgm.cross_validation("cl_retain")
 
     df_prc = pd.DataFrame({"recall_ave_seq": dhgm.recall_ave_score, "precision_ave_seq": dhgm.precision_ave_score,
                            "std_precision": dhgm.std_precision})
-    df_prc.to_csv("pr_curve_48_RETAIN_CL_icu_full", index=False)
+    df_prc.to_csv("pr_curve_48_RETAIN_CL_icu", index=False)
 
     df_roc = pd.DataFrame({"tp_ave_seq": dhgm.tp_ave_score, "fp_ave_seq": dhgm.fp_ave_score,
                            "std_tp": dhgm.std_tp})
-    df_roc.to_csv("roc_curve_48_RETAIN_CL_icu_full", index=False)
+    df_roc.to_csv("roc_curve_48_RETAIN_CL_icu", index=False)
 
     # dhgm.gen_heap_map_csv("heat_map_48h_retain_CL")
 
@@ -1402,13 +1403,13 @@ if __name__ == "__main__":
     dhgm.config_model_cl_retain()
     dhgm.train()
     dhgm.test_retain(dhgm.test_data_final)
-    np.save("embedding_48h_retain_cl_icu_full.npy", dhgm.test_patient)
-    np.save("logit_48h_retain_cl_icu_full.npy", dhgm.test_logit)
+    np.save("embedding_48h_retain_cl_icu.npy", dhgm.test_patient)
+    np.save("logit_48h_retain_cl_icu.npy", dhgm.test_logit)
 
     dhgm.sess.close()
 
     del dhgm
-    """
+
 
 
 

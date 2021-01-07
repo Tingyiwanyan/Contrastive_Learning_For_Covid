@@ -868,7 +868,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-    """
+    
 
     print("now training 24h RETAIN with CE mortality")
     dhgm = dynamic_hgm(kg, process_data, 4)
@@ -894,7 +894,6 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
     """
     print("now training 24h RETAIN with CL mortality")
     dhgm = dynamic_hgm(kg, process_data, 4)
@@ -922,7 +921,7 @@ if __name__ == "__main__":
     del dhgm
 
     # print("now training 24h RNN with CE intubation")
-    """
+
     """
     dhgm = dynamic_hgm(kg, process_data, 8)
     print("now training 48h RNN with CE mortality")

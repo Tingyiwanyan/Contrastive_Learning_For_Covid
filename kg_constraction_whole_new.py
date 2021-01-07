@@ -918,7 +918,7 @@ if __name__ == "__main__":
 
     dhgm.sess.close()
 
-    del dhgm
+    #del dhgm
 
     # print("now training 24h RNN with CE intubation")
 

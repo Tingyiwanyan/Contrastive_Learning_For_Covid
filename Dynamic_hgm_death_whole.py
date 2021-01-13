@@ -1244,7 +1244,7 @@ class dynamic_hgm():
         self.ave_data_scores_total = np.zeros((self.time_sequence, feature_len))
 
 
-        for i in range(2):
+        for i in range(5):
             if name_of_model == "ce_rnn":
                 self.config_model_ce_rnn()
             if name_of_model == "cl_rnn":

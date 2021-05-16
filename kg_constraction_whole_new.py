@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_intubation_whole import dynamic_hgm
 from MLP import MLP_model
 
 
@@ -844,7 +844,7 @@ if __name__ == "__main__":
     dhgm.sess.close()
 
     del dhgm
-
+    """
     print("now training 24h RNN with CL mortality")
     dhgm = dynamic_hgm(kg, process_data, 4)
     dhgm.cross_validation("cl_rnn")
@@ -857,16 +857,17 @@ if __name__ == "__main__":
                            "std_tp": dhgm.std_tp})
     df_roc.to_csv("roc_curve_24_RNN_CL_mortality", index=False)
 
-    dhgm.train_data = process_data.train_mortality
-    dhgm.config_model_cl_rnn()
-    dhgm.train()
-    dhgm.test(dhgm.test_data_final)
-    np.save("embedding_24h_rnn_cl_mortality.npy", dhgm.test_patient)
-    np.save("logit_24h_rnn_cl_mortality.npy", dhgm.test_logit)
+    #dhgm.train_data = process_data.train_mortality
+    #dhgm.config_model_cl_rnn()
+    #dhgm.train()
+    #dhgm.test(dhgm.test_data_final)
+    #np.save("embedding_24h_rnn_cl_mortality.npy", dhgm.test_patient)
+    #np.save("logit_24h_rnn_cl_mortality.npy", dhgm.test_logit)
 
-    dhgm.sess.close()
+    #dhgm.sess.close()
 
     del dhgm
+    """
     
 
     print("now training 24h RETAIN with CE mortality")
@@ -908,16 +909,16 @@ if __name__ == "__main__":
 
     dhgm.gen_heap_map_csv("heat_map_24h_retain_CL_mortality")
 
-    dhgm.train_data = process_data.train_mortality
-    dhgm.config_model_cl_retain()
-    dhgm.train()
-    dhgm.test_retain(dhgm.test_data_final)
-    np.save("embedding_24h_retain_cl_mortality.npy", dhgm.test_patient)
-    np.save("logit_24h_retain_cl_mortality.npy", dhgm.test_logit)
+    #dhgm.train_data = process_data.train_mortality
+    #dhgm.config_model_cl_retain()
+    #dhgm.train()
+    #dhgm.test_retain(dhgm.test_data_final)
+    #np.save("embedding_24h_retain_cl_mortality.npy", dhgm.test_patient)
+    #np.save("logit_24h_retain_cl_mortality.npy", dhgm.test_logit)
 
-    dhgm.sess.close()
+    #dhgm.sess.close()
 
-    #del dhgm
+    del dhgm
 
     # print("now training 24h RNN with CE intubation")
 

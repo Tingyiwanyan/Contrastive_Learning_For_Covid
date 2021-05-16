@@ -7,7 +7,7 @@ from scipy.stats import iqr
 import json
 from LSTM import LSTM_model
 from Data_process import kg_process_data
-from Dynamic_hgm_death_whole import dynamic_hgm
+from Dynamic_hgm_icu_whole import dynamic_hgm
 from MLP import MLP_model
 
 

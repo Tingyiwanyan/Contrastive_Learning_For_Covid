@@ -794,7 +794,7 @@ if __name__ == "__main__":
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
     #kg.total_data_icu = reduced_data_icu
 
-    com_file = '/home/tingyi.wanyan/comorbidity_matrix_20200710.csv'
+    com_file = '/datadrive/tingyi.wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)
     com_ar_rough = np.concatenate(np.array(com))
     com_ = []

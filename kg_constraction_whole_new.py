@@ -22,9 +22,8 @@ class Kg_construct_ehr():
         self.covid_lab = file_path + '/covid19LabTest.csv'
         self.lab = file_path + '/Lab.csv'
         self.vital = file_path + '/vitals.csv'
-        file_path_ = '/home/tingyi.wanyan'
         self.lab_comb = 'lab_mapping_comb.csv'
-        self.file_path_comorbidity = '/datadrive/tingyi.wanyan/comorbidity_matrix_20200710.csv'
+        self.file_path_comorbidity = '/datadrive/tingyi_wanyan/comorbidity_matrix_20200710.csv'
 
     def read_csv(self):
         self.registry = pd.read_csv(self.reg)
@@ -794,7 +793,7 @@ if __name__ == "__main__":
     reduced_data_icu = [i for i in kg.total_data_icu if i not in random_pick_icu]
     #kg.total_data_icu = reduced_data_icu
 
-    com_file = '/datadrive/tingyi.wanyan/comorbidity_matrix_20200710.csv'
+    com_file = '/datadrive/tingyi_wanyan/comorbidity_matrix_20200710.csv'
     com = pd.read_csv(com_file)
     com_ar_rough = np.concatenate(np.array(com))
     com_ = []
